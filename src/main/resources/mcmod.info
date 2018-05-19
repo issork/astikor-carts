@@ -1,0 +1,16 @@
+[
+{
+  "modid": "astikoor",
+  "name": "Astikoor",
+  "description": "Astikoor",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["MennoMax"],
+  "credits": "Lanathan",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
