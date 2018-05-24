@@ -84,7 +84,7 @@ public class EntityCart extends Entity
             this.motionX = moveVec.x;
             this.motionZ = moveVec.z;
             this.tickLerp();
-            if(moveVec.subtract(this.getLookVec()).lengthVector() > 1 && this.posY == targetVec.y)
+            if(moveVec.subtract(this.getLookVec()).lengthVector() > 1)
             {
                 this.factor = -this.factor;
             }
