@@ -53,6 +53,10 @@ public class EntityCart extends Entity
     public void onUpdate()
     {
         super.onUpdate();
+        if(!this.hasNoGravity())
+        {
+            this.motionY += -0.04D;
+        }
         if(this.pulling != null)
         {
             if(!this.world.isRemote)
@@ -61,7 +65,6 @@ public class EntityCart extends Entity
                 {
                     ((WorldServer) this.world).getEntityTracker().sendToTracking(this, PacketHandler.INSTANCE.getPacketFrom(new CPacketEntityCartUpdate(this.pulling.getEntityId(), this.getEntityId())));
                     this.setPulling(null);
-                    ;
                     return;
                 }
             }
@@ -89,7 +92,7 @@ public class EntityCart extends Entity
         else
         {
             this.factor = 0.0D;
-            this.motionX = this.hasNoGravity() ? this.motionX - 0.4D : 0.0D;
+            this.motionX = 0.0D;
             this.motionZ = 0.0D;
         }
         this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
