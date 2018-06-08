@@ -35,16 +35,13 @@ public class SPacketRiddenSprint implements IMessage
         {
             final EntityPlayerMP sender = ctx.getServerHandler().player;
             sender.getServerWorld().addScheduledTask(() -> {
-                    if(sender.isRiding())
+                if(sender.isRiding())
+                {
+                    if(sender.getRidingEntity() instanceof EntityRiddenCart)
                     {
-                        if(sender.getRidingEntity() != null)
-                        {
-                            if(sender.getRidingEntity() instanceof EntityRiddenCart)
-                            {
-                                ((EntityRiddenCart) sender.getRidingEntity()).getPulling().setSprinting(true);
-                            }
-                        }
+                        ((EntityRiddenCart) sender.getRidingEntity()).getPulling().setSprinting(true);
                     }
+                }
             });
             return null;
         }
