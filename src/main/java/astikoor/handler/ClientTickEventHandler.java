@@ -33,17 +33,21 @@ public class ClientTickEventHandler
         {
             if(player.getRidingEntity() instanceof EntityRiddenCart)
             {
-                if(Minecraft.getMinecraft().gameSettings.keyBindSprint.isPressed())
+                EntityRiddenCart cart = (EntityRiddenCart) player.getRidingEntity();
+                if(cart.getPulling() != null)
                 {
-                    PacketHandler.INSTANCE.sendToServer(new SPacketRiddenSprint());
-                    ((EntityRiddenCart) player.getRidingEntity()).getPulling().setSprinting(true);
-                }
-                boolean newstate = Minecraft.getMinecraft().gameSettings.keyBindForward.isKeyDown();
-                if(oldstate != newstate)
-                {
-                    oldstate = newstate;
-                    PacketHandler.INSTANCE.sendToServer(new SPacketMoveCart(newstate));
-                    ((EntityRiddenCart) player.getRidingEntity()).updateForward(newstate);
+                    if(Minecraft.getMinecraft().gameSettings.keyBindSprint.isPressed())
+                    {
+                        PacketHandler.INSTANCE.sendToServer(new SPacketRiddenSprint());
+                        cart.getPulling().setSprinting(true);
+                    }
+                    boolean newstate = Minecraft.getMinecraft().gameSettings.keyBindForward.isKeyDown();
+                    if(oldstate != newstate)
+                    {
+                        oldstate = newstate;
+                        PacketHandler.INSTANCE.sendToServer(new SPacketMoveCart(newstate));
+                        cart.updateForward(newstate);
+                    }
                 }
             }
         }
