@@ -48,7 +48,7 @@ public class CPacketEntityCartUpdate implements IMessage
                 Entity pulling = Minecraft.getMinecraft().world.getEntityByID(message.pullingId);
                 if(cart.getPulling() == pulling)
                 {
-                    ((EntityCart) cart).setPulling(null);;
+                    ((EntityCart) cart).setPulling(null);
                 }
                 else
                 {

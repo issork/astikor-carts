@@ -41,16 +41,13 @@ public class SPacketMoveCart implements IMessage
         {
             final EntityPlayerMP sender = ctx.getServerHandler().player;
             sender.getServerWorld().addScheduledTask(() -> {
-                    if(sender.isRiding())
+                if(sender.isRiding())
+                {
+                    if(sender.getRidingEntity() instanceof EntityRiddenCart)
                     {
-                        if(sender.getRidingEntity() != null)
-                        {
-                            if(sender.getRidingEntity() instanceof EntityRiddenCart)
-                            {
-                                ((EntityRiddenCart) sender.getRidingEntity()).updateForward(message.forward);
-                            }
-                        }
+                        ((EntityRiddenCart) sender.getRidingEntity()).updateForward(message.forward);
                     }
+                }
             });
             return null;
         }

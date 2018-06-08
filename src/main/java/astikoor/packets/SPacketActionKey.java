@@ -60,8 +60,8 @@ public class SPacketActionKey implements IMessage
                         }
                         if(closest.canPull(sender.getRidingEntity()))
                         {
-                            closest.setPulling(sender.getRidingEntity());
                             sender.getServerWorld().getEntityTracker().sendToTracking(closest, PacketHandler.INSTANCE.getPacketFrom(new CPacketEntityCartUpdate(sender.getRidingEntity().getEntityId(), closest.getEntityId())));
+                            closest.setPulling(sender.getRidingEntity());
                         }
                     }
                 }
