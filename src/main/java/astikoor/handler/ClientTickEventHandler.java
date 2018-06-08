@@ -33,14 +33,10 @@ public class ClientTickEventHandler
         {
             if(player.getRidingEntity() instanceof EntityRiddenCart)
             {
-                EntityRiddenCart cart = (EntityRiddenCart) player.getRidingEntity();
                 if(Minecraft.getMinecraft().gameSettings.keyBindSprint.isPressed())
                 {
-                    if(cart.isPulled())
-                    {
-                        PacketHandler.INSTANCE.sendToServer(new SPacketRiddenSprint());
-                        cart.getPulling().setSprinting(true);
-                    }
+                    PacketHandler.INSTANCE.sendToServer(new SPacketRiddenSprint());
+                    ((EntityRiddenCart) player.getRidingEntity()).getPulling().setSprinting(true);
                 }
                 boolean newstate = Minecraft.getMinecraft().gameSettings.keyBindForward.isKeyDown();
                 if(oldstate != newstate)
