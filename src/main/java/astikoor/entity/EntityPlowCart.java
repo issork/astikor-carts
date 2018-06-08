@@ -27,7 +27,7 @@ public class EntityPlowCart extends EntityCart
     {
         super(worldIn);
         this.setSize(1.5F, 1.4F);
-        this.stepHeight = 1.0F;
+        this.stepHeight = 1.2F;
         this.offsetFactor = 2.4D;
     }
     
@@ -37,7 +37,7 @@ public class EntityPlowCart extends EntityCart
         String[] canPullArray = ModConfig.plowcart.canPull;
         for(int i = 0; i < canPullArray.length; i++)
         {
-            if(canPullArray[i].equals(EntityList.getKey(pullingIn).toString()))
+            if(canPullArray[i].equals(pullingIn instanceof EntityPlayer ? "minecraft:player" : EntityList.getKey(pullingIn).toString()))
             {
                 return true;
             }

@@ -19,9 +19,13 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.fml.common.registry.EntityEntry;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
@@ -36,7 +40,7 @@ public class EntityCargoCart extends EntityCart implements IInventoryChangedList
     {
         super(worldIn);
         this.setSize(1.5F, 1.4F);
-        this.stepHeight = 1.0F;
+        this.stepHeight = 1.2F;
         this.offsetFactor = 2.4D;
     }
     
@@ -46,7 +50,7 @@ public class EntityCargoCart extends EntityCart implements IInventoryChangedList
         String[] canPullArray = ModConfig.cargocart.canPull;
         for(int i = 0; i < canPullArray.length; i++)
         {
-            if(canPullArray[i].equals(EntityList.getKey(pullingIn).toString()))
+            if(canPullArray[i].equals(pullingIn instanceof EntityPlayer ? "minecraft:player" : EntityList.getKey(pullingIn).toString()))
             {
                 return true;
             }

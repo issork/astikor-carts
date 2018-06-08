@@ -20,7 +20,7 @@ public class EntityChariot extends EntityRiddenCart
     {
         super(worldIn);
         this.setSize(1.5F, 1.4F);
-        this.stepHeight = 1.0F;
+        this.stepHeight = 1.2F;
         this.offsetFactor = 2.4D;
     }
     
@@ -34,7 +34,7 @@ public class EntityChariot extends EntityRiddenCart
         String[] canPullArray = ModConfig.chariot.canPull;
         for(int i = 0; i < canPullArray.length; i++)
         {
-            if(canPullArray[i].equals(EntityList.getKey(pullingIn).toString()))
+            if(canPullArray[i].equals(pullingIn instanceof EntityPlayer ? "minecraft:player" : EntityList.getKey(pullingIn).toString()))
             {
                 return true;
             }
