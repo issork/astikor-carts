@@ -1,22 +1,14 @@
 package astikoor.entity;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import com.google.common.collect.Sets;
-
-import astikoor.config.ModConfig;
 import astikoor.handler.PacketHandler;
 import astikoor.packets.CPacketEntityCartUpdate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.MoverType;
-import net.minecraft.entity.ai.EntityAITasks;
 import net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;

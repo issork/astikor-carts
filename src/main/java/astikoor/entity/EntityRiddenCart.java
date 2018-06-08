@@ -1,14 +1,9 @@
 package astikoor.entity;
 
-import javax.vecmath.Vector3d;
-
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.MoverType;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.passive.AbstractHorse;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class EntityRiddenCart extends EntityCart

@@ -2,10 +2,11 @@ package astikoor.packets;
 
 import java.util.List;
 
-import astikoor.config.ModConfig;
 import astikoor.entity.EntityCart;
 import astikoor.handler.PacketHandler;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -39,31 +40,27 @@ public class SPacketActionKey implements IMessage
         {
             final EntityPlayerMP sender = ctx.getServerHandler().player;
             sender.getServerWorld().addScheduledTask(() -> {
-                if(sender.isRiding())
+                List<EntityCart> result = sender.getServerWorld().getEntitiesWithinAABB(EntityCart.class, sender.getEntityBoundingBox().grow(3), entity -> entity != sender.getRidingEntity() && entity.isEntityAlive());
+                EntityCart closest = result.get(0);
+                Entity target = sender.isRiding() ? sender.getRidingEntity() : (EntityPlayer) sender;
+                System.out.println(target);
+                for(EntityCart cart : result)
                 {
-                    List<EntityCart> result = sender.getServerWorld().getEntitiesWithinAABB(EntityCart.class, sender.getEntityBoundingBox().grow(3), entity -> entity != sender.getRidingEntity() && entity.isEntityAlive());
-                    if(!result.isEmpty())
+                    if(cart.getPulling() == target)
                     {
-                        EntityCart closest = result.get(0);
-                        for(EntityCart cart : result)
-                        {
-                            if(cart.getPulling() == sender.getRidingEntity())
-                            {
-                                sender.getServerWorld().getEntityTracker().sendToTracking(cart, PacketHandler.INSTANCE.getPacketFrom(new CPacketEntityCartUpdate(sender.getRidingEntity().getEntityId(), cart.getEntityId())));
-                                cart.setPulling(null);
-                                return;
-                            }
-                            if(new Vec3d(cart.posX-sender.posX, cart.posY-sender.posY, cart.posZ-sender.posZ).lengthVector() < new Vec3d(closest.posX-sender.posX, closest.posY-sender.posY, closest.posZ-sender.posZ).lengthVector())
-                            {
-                                closest = cart;
-                            }
-                        }
-                        if(closest.canPull(sender.getRidingEntity()))
-                        {
-                            sender.getServerWorld().getEntityTracker().sendToTracking(closest, PacketHandler.INSTANCE.getPacketFrom(new CPacketEntityCartUpdate(sender.getRidingEntity().getEntityId(), closest.getEntityId())));
-                            closest.setPulling(sender.getRidingEntity());
-                        }
+                        sender.getServerWorld().getEntityTracker().sendToTracking(cart, PacketHandler.INSTANCE.getPacketFrom(new CPacketEntityCartUpdate(target.getEntityId(), cart.getEntityId())));
+                        cart.setPulling(null);
+                        return;
                     }
+                    if(new Vec3d(cart.posX-sender.posX, cart.posY-sender.posY, cart.posZ-sender.posZ).lengthVector() < new Vec3d(closest.posX-sender.posX, closest.posY-sender.posY, closest.posZ-sender.posZ).lengthVector())
+                    {
+                        closest = cart;
+                    }
+                }
+                if(closest.canPull(target))
+                {
+                    sender.getServerWorld().getEntityTracker().sendToTracking(closest, PacketHandler.INSTANCE.getPacketFrom(new CPacketEntityCartUpdate(target.getEntityId(), closest.getEntityId())));
+                    closest.setPulling(target);
                 }
             });
             return null;

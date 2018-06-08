@@ -3,10 +3,10 @@ package astikoor.entity;
 import javax.annotation.Nullable;
 
 import astikoor.Astikoor;
+import astikoor.config.ModConfig;
 import astikoor.handler.PacketHandler;
 import astikoor.init.ModItems;
 import astikoor.packets.CPacketCargoLoad;
-import astikoor.config.ModConfig;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.item.EntityItem;
@@ -22,7 +22,6 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
@@ -36,7 +35,7 @@ public class EntityCargoCart extends EntityCart implements IInventoryChangedList
     {
         super(worldIn);
         this.setSize(1.5F, 1.4F);
-        this.stepHeight = 1.0F;
+        this.stepHeight = 1.2F;
         this.offsetFactor = 2.4D;
     }
     
@@ -46,7 +45,7 @@ public class EntityCargoCart extends EntityCart implements IInventoryChangedList
         String[] canPullArray = ModConfig.cargocart.canPull;
         for(int i = 0; i < canPullArray.length; i++)
         {
-            if(canPullArray[i].equals(EntityList.getKey(pullingIn).toString()))
+            if(canPullArray[i].equals(pullingIn instanceof EntityPlayer ? "minecraft:player" : EntityList.getKey(pullingIn).toString()))
             {
                 return true;
             }

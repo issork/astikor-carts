@@ -3,14 +3,9 @@ package astikoor.entity;
 import astikoor.config.ModConfig;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -20,7 +15,7 @@ public class EntityChariot extends EntityRiddenCart
     {
         super(worldIn);
         this.setSize(1.5F, 1.4F);
-        this.stepHeight = 1.0F;
+        this.stepHeight = 1.2F;
         this.offsetFactor = 2.4D;
     }
     
@@ -34,7 +29,7 @@ public class EntityChariot extends EntityRiddenCart
         String[] canPullArray = ModConfig.chariot.canPull;
         for(int i = 0; i < canPullArray.length; i++)
         {
-            if(canPullArray[i].equals(EntityList.getKey(pullingIn).toString()))
+            if(canPullArray[i].equals(pullingIn instanceof EntityPlayer ? "minecraft:player" : EntityList.getKey(pullingIn).toString()))
             {
                 return true;
             }

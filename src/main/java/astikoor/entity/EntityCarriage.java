@@ -1,7 +1,5 @@
 package astikoor.entity;
 
-import javax.vecmath.Vector2d;
-
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
