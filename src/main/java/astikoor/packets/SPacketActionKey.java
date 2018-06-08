@@ -2,7 +2,6 @@ package astikoor.packets;
 
 import java.util.List;
 
-import astikoor.config.ModConfig;
 import astikoor.entity.EntityCart;
 import astikoor.handler.PacketHandler;
 import io.netty.buffer.ByteBuf;

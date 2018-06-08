@@ -2,7 +2,6 @@ package astikoor.item;
 
 import astikoor.entity.EntityCarriage;
 import astikoor.entity.EntityCart;
-import astikoor.entity.EntityChariot;
 import net.minecraft.world.World;
 
 public class ItemCarriage extends CartItem
