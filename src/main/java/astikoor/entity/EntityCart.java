@@ -154,6 +154,11 @@ public class EntityCart extends Entity
     {
         return this.pulling;
     }
+    
+    public boolean isPulled()
+    {
+        return this.pulling != null;
+    }
 
     /**
      * @param entityIn
