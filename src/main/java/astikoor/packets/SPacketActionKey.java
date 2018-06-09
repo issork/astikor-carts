@@ -43,7 +43,6 @@ public class SPacketActionKey implements IMessage
                 List<EntityCart> result = sender.getServerWorld().getEntitiesWithinAABB(EntityCart.class, sender.getEntityBoundingBox().grow(3), entity -> entity != sender.getRidingEntity() && entity.isEntityAlive());
                 EntityCart closest = result.get(0);
                 Entity target = sender.isRiding() ? sender.getRidingEntity() : (EntityPlayer) sender;
-                System.out.println(target);
                 for(EntityCart cart : result)
                 {
                     if(cart.getPulling() == target)
