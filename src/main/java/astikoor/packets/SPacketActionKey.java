@@ -41,25 +41,28 @@ public class SPacketActionKey implements IMessage
             final EntityPlayerMP sender = ctx.getServerHandler().player;
             sender.getServerWorld().addScheduledTask(() -> {
                 List<EntityCart> result = sender.getServerWorld().getEntitiesWithinAABB(EntityCart.class, sender.getEntityBoundingBox().grow(3), entity -> entity != sender.getRidingEntity() && entity.isEntityAlive());
-                EntityCart closest = result.get(0);
-                Entity target = sender.isRiding() ? sender.getRidingEntity() : (EntityPlayer) sender;
-                for(EntityCart cart : result)
+                if(!result.isEmpty())
                 {
-                    if(cart.getPulling() == target)
+                    EntityCart closest = result.get(0);
+                    Entity target = sender.isRiding() ? sender.getRidingEntity() : (EntityPlayer) sender;
+                    for(EntityCart cart : result)
                     {
-                        sender.getServerWorld().getEntityTracker().sendToTracking(cart, PacketHandler.INSTANCE.getPacketFrom(new CPacketEntityCartUpdate(target.getEntityId(), cart.getEntityId())));
-                        cart.setPulling(null);
-                        return;
+                        if(cart.getPulling() == target)
+                        {
+                            sender.getServerWorld().getEntityTracker().sendToTracking(cart, PacketHandler.INSTANCE.getPacketFrom(new CPacketEntityCartUpdate(target.getEntityId(), cart.getEntityId())));
+                            cart.setPulling(null);
+                            return;
+                        }
+                        if(new Vec3d(cart.posX-sender.posX, cart.posY-sender.posY, cart.posZ-sender.posZ).lengthVector() < new Vec3d(closest.posX-sender.posX, closest.posY-sender.posY, closest.posZ-sender.posZ).lengthVector())
+                        {
+                            closest = cart;
+                        }
                     }
-                    if(new Vec3d(cart.posX-sender.posX, cart.posY-sender.posY, cart.posZ-sender.posZ).lengthVector() < new Vec3d(closest.posX-sender.posX, closest.posY-sender.posY, closest.posZ-sender.posZ).lengthVector())
+                    if(closest.canPull(target))
                     {
-                        closest = cart;
+                        sender.getServerWorld().getEntityTracker().sendToTracking(closest, PacketHandler.INSTANCE.getPacketFrom(new CPacketEntityCartUpdate(target.getEntityId(), closest.getEntityId())));
+                        closest.setPulling(target);
                     }
-                }
-                if(closest.canPull(target))
-                {
-                    sender.getServerWorld().getEntityTracker().sendToTracking(closest, PacketHandler.INSTANCE.getPacketFrom(new CPacketEntityCartUpdate(target.getEntityId(), closest.getEntityId())));
-                    closest.setPulling(target);
                 }
             });
             return null;

@@ -47,7 +47,7 @@ public class EntityCart extends Entity
         super.onUpdate();
         if(!this.hasNoGravity())
         {
-            this.motionY += -0.04D;
+            this.motionY -= 0.04D;
         }
         if(this.pulling != null)
         {
