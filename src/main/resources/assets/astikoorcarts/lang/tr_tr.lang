@@ -1,0 +1,10 @@
+item.astikoorcarts:cargocart.name=At ArabasÄ±
+item.astikoorcarts:plowcart.name=Pulluk
+item.astikoorcarts:chariot.name=Ã‡ift Tekerli At ArabasÄ±
+item.astikoorcarts:wheel.name=Tekerlek
+itemGroup.astikoorcarts=Astikoor At ArabalarÄ±
+entity.cargocart.name=At ArabasÄ±
+entity.plowcart.name=Pulluk
+entity.chariot.name=Ã‡ift Tekerli At ArabasÄ±
+key.categories.astikoorcarts=Astikoor At ArabalarÄ±
+key.astikoorcarts.desc=Etkinlik TuÅŸu

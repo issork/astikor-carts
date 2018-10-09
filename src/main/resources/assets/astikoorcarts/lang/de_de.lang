@@ -1,0 +1,10 @@
+item.astikoorcarts:cargocart.name=Karren
+item.astikoorcarts:plowcart.name=Pflug
+item.astikoorcarts:chariot.name=Streitwagen
+item.astikoorcarts:wheel.name=Rad
+itemGroup.astikoorcarts=Astikoor Karren
+entity.cargocart.name=Karren
+entity.plowcart.name=Pflug
+entity.chariot.name=Streitwagen
+key.categories.astikoorcarts=Astikoor Karren
+key.astikoorcarts.desc=Aktionstaste

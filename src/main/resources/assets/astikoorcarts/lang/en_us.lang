@@ -1,0 +1,10 @@
+item.astikoorcarts:cargocart.name=Cart
+item.astikoorcarts:plowcart.name=Plow
+item.astikoorcarts:chariot.name=Chariot
+item.astikoorcarts:wheel.name=Wheel
+itemGroup.astikoorcarts=Astikoor Carts
+entity.cargocart.name=Cart
+entity.plowcart.name=Plow
+entity.chariot.name=Chariot
+key.categories.astikoorcarts=Astikoor Carts
+key.astikoorcarts.desc=Action Key
