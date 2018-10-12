@@ -17,29 +17,29 @@ public class ClientTickEventHandler
     @SubscribeEvent
     public void onClientTickEvent(ClientTickEvent event)
     {
-        if(Minecraft.getMinecraft().world == null)
+        if (Minecraft.getMinecraft().world == null)
         {
             return;
         }
-        if(ModKeybindings.keybindings.get(0).isPressed())
+        if (ModKeybindings.keybindings.get(0).isPressed())
         {
             PacketHandler.INSTANCE.sendToServer(new CPacketActionKey());
         }
         EntityPlayerSP player = Minecraft.getMinecraft().player;
-        if(player.isRiding())
+        if (player.isRiding())
         {
-            if(player.getRidingEntity() instanceof EntityRiddenCart)
+            if (player.getRidingEntity() instanceof EntityRiddenCart)
             {
                 EntityRiddenCart cart = (EntityRiddenCart) player.getRidingEntity();
-                if(cart.getPulling() != null)
+                if (cart.getPulling() != null)
                 {
-                    if(Minecraft.getMinecraft().gameSettings.keyBindSprint.isPressed())
+                    if (Minecraft.getMinecraft().gameSettings.keyBindSprint.isPressed())
                     {
                         PacketHandler.INSTANCE.sendToServer(new CPacketRiddenSprint());
                         cart.getPulling().setSprinting(true);
                     }
                     boolean newstate = Minecraft.getMinecraft().gameSettings.keyBindForward.isKeyDown();
-                    if(oldstate != newstate)
+                    if (oldstate != newstate)
                     {
                         oldstate = newstate;
                         PacketHandler.INSTANCE.sendToServer(new CPacketMoveCart(newstate));
@@ -48,9 +48,9 @@ public class ClientTickEventHandler
                 }
             }
         }
-        if(Minecraft.getMinecraft().gameSettings.keyBindSneak.isKeyDown())
+        if (Minecraft.getMinecraft().gameSettings.keyBindSneak.isKeyDown())
         {
-            if(oldstate)
+            if (oldstate)
             {
                 oldstate = false;
             }

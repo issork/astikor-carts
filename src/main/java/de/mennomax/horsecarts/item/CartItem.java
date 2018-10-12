@@ -28,24 +28,24 @@ public abstract class CartItem extends Item
     public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn)
     {
         ItemStack itemstack = playerIn.getHeldItem(handIn);
-        if(handIn == EnumHand.MAIN_HAND)
+        if (handIn == EnumHand.MAIN_HAND)
         {
             Vec3d vec3d = new Vec3d(playerIn.posX, playerIn.posY + playerIn.getEyeHeight(), playerIn.posZ);
             Vec3d vec3d1 = new Vec3d(playerIn.getLookVec().x * 5.0 + vec3d.x, playerIn.getLookVec().y * 5.0 + vec3d.y, playerIn.getLookVec().z * 5.0 + vec3d.z);
 
             RayTraceResult result = worldIn.rayTraceBlocks(vec3d, vec3d1, false);
-            if(result != null)
+            if (result != null)
             {
-                if(result.typeOfHit == Type.BLOCK)
+                if (result.typeOfHit == Type.BLOCK)
                 {
-                    if(!worldIn.isRemote)
+                    if (!worldIn.isRemote)
                     {
                         EntityCart cart = newCart(worldIn);
                         cart.setPosition(result.hitVec.x, result.hitVec.y, result.hitVec.z);
                         cart.rotationYaw = (playerIn.rotationYaw + 180) % 360;
                         worldIn.spawnEntity(cart);
 
-                        if(!playerIn.capabilities.isCreativeMode)
+                        if (!playerIn.capabilities.isCreativeMode)
                         {
                             itemstack.shrink(1);
                         }

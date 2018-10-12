@@ -85,7 +85,7 @@ public class ModelPlowCart extends ModelBase
         this.leftWheel = (new ModelRenderer(this, 34, 4));
         this.leftWheel.setRotationPoint(14.5F, 5.0F, 1.0F);
         this.leftWheel.addBox(-2.0F, -1.0F, -1.0F, 1, 2, 2);
-        for(int i = 0; i < 8; i++)
+        for (int i = 0; i < 8; i++)
         {
             ModelRenderer rim = (new ModelRenderer(this, 0, 11));
             rim.addBox(-1.5F, -4.5F, 9.86F, 1, 9, 1);
@@ -103,7 +103,7 @@ public class ModelPlowCart extends ModelBase
         this.rightWheel.mirror = true;
         this.rightWheel.setRotationPoint(-14.5F, 5.0F, 1.0F);
         this.rightWheel.addBox(1.0F, -1.0F, -1.0F, 1, 2, 2);
-        for(int i = 0; i < 8; i++)
+        for (int i = 0; i < 8; i++)
         {
             ModelRenderer rim = (new ModelRenderer(this, 0, 11));
             rim.addBox(0.5F, -4.5F, 9.86F, 1, 9, 1);
@@ -124,7 +124,7 @@ public class ModelPlowCart extends ModelBase
         this.axis.render(scale);
         this.shaft.renderWithRotation(scale);
         this.shaftConnector.renderWithRotation(scale);
-        for(int i = 0; i < 3; ++i)
+        for (int i = 0; i < 3; ++i)
         {
             this.triangle[i].render(scale);
         }
@@ -140,7 +140,7 @@ public class ModelPlowCart extends ModelBase
         this.leftWheel.render(scale);
         this.rightWheel.render(scale);
 
-        if(((EntityPlowCart) entity).getPlowing())
+        if (((EntityPlowCart) entity).getPlowing())
         {
             this.plowShaftUpper.rotateAngleX = ((float) Math.PI / 4.0F);
         }

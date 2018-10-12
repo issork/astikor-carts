@@ -18,13 +18,13 @@ public class CPacketRiddenSprint implements IMessage
     @Override
     public void fromBytes(ByteBuf buf)
     {
-        
+
     }
 
     @Override
     public void toBytes(ByteBuf buf)
     {
-        
+
     }
 
     public static class RiddenSprintPacketHandler implements IMessageHandler<CPacketRiddenSprint, IMessage>
@@ -35,9 +35,9 @@ public class CPacketRiddenSprint implements IMessage
         {
             final EntityPlayerMP sender = ctx.getServerHandler().player;
             sender.getServerWorld().addScheduledTask(() -> {
-                if(sender.isRiding())
+                if (sender.isRiding())
                 {
-                    if(sender.getRidingEntity() instanceof EntityRiddenCart)
+                    if (sender.getRidingEntity() instanceof EntityRiddenCart)
                     {
                         ((EntityRiddenCart) sender.getRidingEntity()).getPulling().setSprinting(true);
                     }

@@ -30,14 +30,14 @@ public class EntityPlowCart extends EntityCart
         this.stepHeight = 1.2F;
         this.offsetFactor = 2.4D;
     }
-    
+
     @Override
     public boolean canPull(Entity pullingIn)
     {
         String[] canPullArray = ModConfig.plowcart.canPull;
-        for(int i = 0; i < canPullArray.length; i++)
+        for (int i = 0; i < canPullArray.length; i++)
         {
-            if(canPullArray[i].equals(pullingIn instanceof EntityPlayer ? "minecraft:player" : EntityList.getKey(pullingIn).toString()))
+            if (canPullArray[i].equals(pullingIn instanceof EntityPlayer ? "minecraft:player" : EntityList.getKey(pullingIn).toString()))
             {
                 return true;
             }
@@ -58,32 +58,32 @@ public class EntityPlowCart extends EntityCart
     @Override
     public void onDestroyed(DamageSource source)
     {
-        if(!source.isCreativePlayer())
+        if (!source.isCreativePlayer())
         {
             this.world.spawnEntity(new EntityItem(this.world, this.posX, this.posY + 1.0F, this.posZ, new ItemStack(ModItems.plowcart)));
         }
-        
+
     }
 
     @Override
     public void onUpdate()
     {
         super.onUpdate();
-        if(this.prevPosX != this.posX && this.prevPosZ != this.posZ)
+        if (this.prevPosX != this.posX && this.prevPosZ != this.posZ)
         {
             BlockPos pos = new BlockPos(this.getPositionVector().x - this.getLookVec().x * BLADEOFFSET, this.getPositionVector().y - 1.0, this.getPositionVector().z - this.getLookVec().z * BLADEOFFSET);
             IBlockState iblockstate = this.world.getBlockState(pos);
             Material topMaterial = this.world.getBlockState(pos.up()).getMaterial();
             Block block = iblockstate.getBlock();
-            if(this.getPlowing() && (topMaterial == Material.AIR || topMaterial == Material.PLANTS || topMaterial == Material.VINE))
+            if (this.getPlowing() && (topMaterial == Material.AIR || topMaterial == Material.PLANTS || topMaterial == Material.VINE))
             {
-                if(block == Blocks.GRASS || block == Blocks.GRASS_PATH)
+                if (block == Blocks.GRASS || block == Blocks.GRASS_PATH)
                 {
                     this.setBlock(this.world, pos, Blocks.FARMLAND.getDefaultState().withProperty(BlockFarmland.MOISTURE, 7));
                 }
-                if(block == Blocks.DIRT)
+                if (block == Blocks.DIRT)
                 {
-                    switch((BlockDirt.DirtType) iblockstate.getValue(BlockDirt.VARIANT))
+                    switch ((BlockDirt.DirtType) iblockstate.getValue(BlockDirt.VARIANT))
                     {
                     case DIRT:
                         this.setBlock(this.world, pos, Blocks.FARMLAND.getDefaultState().withProperty(BlockFarmland.MOISTURE, 7));
@@ -108,7 +108,7 @@ public class EntityPlowCart extends EntityCart
 
     protected void setBlock(World worldIn, BlockPos pos, IBlockState state)
     {
-        if(!worldIn.isRemote)
+        if (!worldIn.isRemote)
         {
             worldIn.setBlockState(pos, state, 11);
         }

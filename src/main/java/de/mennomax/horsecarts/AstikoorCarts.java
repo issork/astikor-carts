@@ -20,7 +20,7 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 public class AstikoorCarts
 {
     public static final String MODID = "astikoorcarts";
-    public static final String VERSION = "1.12-0.1.1.1";
+    public static final String VERSION = "1.12.2-0.1.1.1";
 
     @SidedProxy(clientSide = "de.mennomax.horsecarts.proxy.ClientProxy", serverSide = "de.mennomax.horsecarts.proxy.ServerProxy")
     public static IProxy proxy;
@@ -39,8 +39,8 @@ public class AstikoorCarts
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
-    	MinecraftForge.EVENT_BUS.register(new MissingMappingHandler());
-    	MinecraftForge.EVENT_BUS.register(new TrackingEventHandler());
+        MinecraftForge.EVENT_BUS.register(new MissingMappingHandler());
+        MinecraftForge.EVENT_BUS.register(new TrackingEventHandler());
         NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
         proxy.init();
     }

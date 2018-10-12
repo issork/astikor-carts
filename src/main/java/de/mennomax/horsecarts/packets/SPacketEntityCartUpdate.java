@@ -46,7 +46,7 @@ public class SPacketEntityCartUpdate implements IMessage
             Minecraft.getMinecraft().addScheduledTask(() -> {
                 EntityCart cart = (EntityCart) Minecraft.getMinecraft().world.getEntityByID(message.cartId);
                 Entity pulling = Minecraft.getMinecraft().world.getEntityByID(message.pullingId);
-                if(cart.getPulling() == pulling)
+                if (cart.getPulling() == pulling)
                 {
                     ((EntityCart) cart).setPulling(null);
                 }

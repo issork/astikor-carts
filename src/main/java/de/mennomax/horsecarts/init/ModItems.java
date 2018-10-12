@@ -40,16 +40,16 @@ public class ModItems
             itemset.add(chariot);
             itemset.add(carriage);
 
-            for(Item item : itemset)
+            for (Item item : itemset)
             {
                 event.getRegistry().register(item);
-            }	
+            }
         }
 
         @SubscribeEvent
         public static void registerItemModels(ModelRegistryEvent event)
         {
-            for(Item item : itemset)
+            for (Item item : itemset)
             {
                 ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));
             }

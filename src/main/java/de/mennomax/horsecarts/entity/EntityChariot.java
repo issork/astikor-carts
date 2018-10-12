@@ -18,18 +18,18 @@ public class EntityChariot extends EntityRiddenCart
         this.stepHeight = 1.2F;
         this.offsetFactor = 2.4D;
     }
-    
+
     @Override
     public boolean canPull(Entity pullingIn)
     {
-        if(!(pullingIn instanceof EntityLivingBase))
+        if (!(pullingIn instanceof EntityLivingBase))
         {
             return false;
         }
         String[] canPullArray = ModConfig.chariot.canPull;
-        for(int i = 0; i < canPullArray.length; i++)
+        for (int i = 0; i < canPullArray.length; i++)
         {
-            if(canPullArray[i].equals(pullingIn instanceof EntityPlayer ? "minecraft:player" : EntityList.getKey(pullingIn).toString()))
+            if (canPullArray[i].equals(pullingIn instanceof EntityPlayer ? "minecraft:player" : EntityList.getKey(pullingIn).toString()))
             {
                 return true;
             }
@@ -40,7 +40,7 @@ public class EntityChariot extends EntityRiddenCart
     @Override
     public boolean processInitialInteract(EntityPlayer player, EnumHand hand)
     {
-        if(!this.world.isRemote)
+        if (!this.world.isRemote)
         {
             player.startRiding(this);
         }
@@ -62,7 +62,7 @@ public class EntityChariot extends EntityRiddenCart
     @Override
     public void updatePassenger(Entity passenger)
     {
-        if(this.isPassenger(passenger))
+        if (this.isPassenger(passenger))
         {
             Vec3d vec3d = (new Vec3d((double) -0.3D, 0.0D, 0.0D)).rotateYaw(-this.rotationYaw * 0.017453292F - ((float) Math.PI / 2F));
             passenger.setPosition(this.posX + vec3d.x, this.posY + this.getMountedYOffset() + passenger.getYOffset(), this.posZ + vec3d.z);
