@@ -15,8 +15,8 @@ public class ClientProxy implements IProxy
 
     public void init()
     {
-    	MinecraftForge.EVENT_BUS.register(new GuiEventHandler());
-    	MinecraftForge.EVENT_BUS.register(new ClientTickEventHandler());
+        MinecraftForge.EVENT_BUS.register(new GuiEventHandler());
+        MinecraftForge.EVENT_BUS.register(new ClientTickEventHandler());
         ModKeybindings.registerKeyBindings();
     }
 

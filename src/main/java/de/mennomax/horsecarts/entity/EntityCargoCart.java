@@ -38,14 +38,14 @@ public class EntityCargoCart extends EntityCart implements IInventoryChangedList
         this.stepHeight = 1.2F;
         this.offsetFactor = 2.4D;
     }
-    
+
     @Override
     public boolean canPull(Entity pullingIn)
     {
         String[] canPullArray = ModConfig.cargocart.canPull;
-        for(int i = 0; i < canPullArray.length; i++)
+        for (int i = 0; i < canPullArray.length; i++)
         {
-            if(canPullArray[i].equals(pullingIn instanceof EntityPlayer ? "minecraft:player" : EntityList.getKey(pullingIn).toString()))
+            if (canPullArray[i].equals(pullingIn instanceof EntityPlayer ? "minecraft:player" : EntityList.getKey(pullingIn).toString()))
             {
                 return true;
             }
@@ -66,9 +66,9 @@ public class EntityCargoCart extends EntityCart implements IInventoryChangedList
     @Override
     public void onDestroyed(DamageSource source)
     {
-        if(!source.isCreativePlayer())
+        if (!source.isCreativePlayer())
             this.world.spawnEntity(new EntityItem(this.world, this.posX, this.posY + 1.0F, this.posZ, new ItemStack(ModItems.cargocart)));
-        for(int i = 0; i < this.cargo.getSizeInventory(); i++)
+        for (int i = 0; i < this.cargo.getSizeInventory(); i++)
         {
             ItemStack stack = this.cargo.getStackInSlot(i);
             world.spawnEntity(new EntityItem(this.world, this.posX, this.posY + 1.0F, this.posZ, stack));
@@ -79,17 +79,17 @@ public class EntityCargoCart extends EntityCart implements IInventoryChangedList
     public boolean processInitialInteract(EntityPlayer player, EnumHand hand)
     {
         {
-            if(!this.world.isRemote)
+            if (!this.world.isRemote)
             {
-            	if(player.isSneaking())
+                if (player.isSneaking())
                 {
                     player.openGui(AstikoorCarts.instance, 0, world, this.getEntityId(), 0, 0);
                 }
-            	else
-            	{
-            		player.startRiding(this);
-            	}
-                
+                else
+                {
+                    player.startRiding(this);
+                }
+
             }
         }
         return true;
@@ -104,7 +104,7 @@ public class EntityCargoCart extends EntityCart implements IInventoryChangedList
     @Override
     public void updatePassenger(Entity passenger)
     {
-        if(this.isPassenger(passenger))
+        if (this.isPassenger(passenger))
         {
             Vec3d vec3d = (new Vec3d((double) -0.68D, 0.0D, 0.0D)).rotateYaw(-this.rotationYaw * 0.017453292F - ((float) Math.PI / 2F));
             passenger.setPosition(this.posX + vec3d.x, this.posY + this.getMountedYOffset() + passenger.getYOffset(), this.posZ + vec3d.z);
@@ -115,16 +115,16 @@ public class EntityCargoCart extends EntityCart implements IInventoryChangedList
     protected void entityInit()
     {
         InventoryBasic inventory = this.cargo;
-        if(inventory != null)
+        if (inventory != null)
         {
             inventory.removeInventoryChangeListener(this);
             int i = Math.min(inventory.getSizeInventory(), this.cargo.getSizeInventory());
 
-            for(int j = 0; j < i; ++j)
+            for (int j = 0; j < i; ++j)
             {
                 ItemStack itemstack = inventory.getStackInSlot(j);
 
-                if(!itemstack.isEmpty())
+                if (!itemstack.isEmpty())
                 {
                     this.cargo.setInventorySlotContents(j, itemstack.copy());
                 }
@@ -140,7 +140,7 @@ public class EntityCargoCart extends EntityCart implements IInventoryChangedList
     {
         NBTTagList nbttaglist = compound.getTagList("Items", 10);
 
-        for(int i = 0; i < nbttaglist.tagCount(); ++i)
+        for (int i = 0; i < nbttaglist.tagCount(); ++i)
         {
             this.cargo.setInventorySlotContents(i, new ItemStack(nbttaglist.getCompoundTagAt(i)));
         }
@@ -150,10 +150,10 @@ public class EntityCargoCart extends EntityCart implements IInventoryChangedList
     protected void writeEntityToNBT(NBTTagCompound compound)
     {
         NBTTagList nbttaglist = new NBTTagList();
-        for(int i = 0; i < this.cargo.getSizeInventory(); ++i)
+        for (int i = 0; i < this.cargo.getSizeInventory(); ++i)
         {
             ItemStack itemstack = this.cargo.getStackInSlot(i);
-            if(!itemstack.isEmpty())
+            if (!itemstack.isEmpty())
             {
                 NBTTagCompound nbttagcompound = new NBTTagCompound();
                 nbttagcompound.setByte("Slot", (byte) i);
@@ -167,28 +167,28 @@ public class EntityCargoCart extends EntityCart implements IInventoryChangedList
     @Override
     public void onInventoryChanged(IInventory invBasic)
     {
-        if(!this.world.isRemote)
+        if (!this.world.isRemote)
         {
             int lastload = this.load;
             int tempload = 0;
-            for(int i = 0; i < this.cargo.getSizeInventory(); i++)
+            for (int i = 0; i < this.cargo.getSizeInventory(); i++)
             {
-                if(!this.cargo.getStackInSlot(i).isEmpty())
+                if (!this.cargo.getStackInSlot(i).isEmpty())
                 {
                     tempload++;
                 }
             }
-            if(tempload > 31)
+            if (tempload > 31)
                 this.load = 4;
-            else if(tempload > 16)
+            else if (tempload > 16)
                 this.load = 3;
-            else if(tempload > 8)
+            else if (tempload > 8)
                 this.load = 2;
-            else if(tempload > 3)
+            else if (tempload > 3)
                 this.load = 1;
             else
                 this.load = 0;
-            if(this.load != lastload)
+            if (this.load != lastload)
             {
                 ((WorldServer) this.world).getEntityTracker().sendToTracking(this, PacketHandler.INSTANCE.getPacketFrom(new SPacketCargoLoad(this.load, this.getEntityId())));
             }
@@ -196,11 +196,11 @@ public class EntityCargoCart extends EntityCart implements IInventoryChangedList
     }
 
     @SuppressWarnings("unchecked")
-	@Override
+    @Override
     @Nullable
     public <T> T getCapability(net.minecraftforge.common.capabilities.Capability<T> capability, @Nullable net.minecraft.util.EnumFacing facing)
     {
-        if(capability == net.minecraftforge.items.CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+        if (capability == net.minecraftforge.items.CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
             return (T) itemHandler;
         return super.getCapability(capability, facing);
     }

@@ -16,7 +16,7 @@ public class ModKeybindings
     {
         keybindings.add(new KeyBinding("key.astikoorcarts.desc", Keyboard.KEY_R, "key.categories.astikoorcarts"));
 
-        for(KeyBinding bind : keybindings)
+        for (KeyBinding bind : keybindings)
         {
             ClientRegistry.registerKeyBinding(bind);
         }

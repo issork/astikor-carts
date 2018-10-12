@@ -34,7 +34,7 @@ public class RenderCarriage extends Render<EntityCarriage>
         this.setupRotation(entityYaw);
         this.bindEntityTexture(entity);
 
-        if(this.renderOutlines)
+        if (this.renderOutlines)
         {
             GlStateManager.enableColorMaterial();
             GlStateManager.enableOutlineMode(this.getTeamColor(entity));
@@ -42,7 +42,7 @@ public class RenderCarriage extends Render<EntityCarriage>
 
         this.model.render(entity, partialTicks, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
 
-        if(this.renderOutlines)
+        if (this.renderOutlines)
         {
             GlStateManager.disableOutlineMode();
             GlStateManager.disableColorMaterial();

@@ -39,8 +39,8 @@ public class AstikoorCarts
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
-    	MinecraftForge.EVENT_BUS.register(new MissingMappingHandler());
-    	MinecraftForge.EVENT_BUS.register(new TrackingEventHandler());
+        MinecraftForge.EVENT_BUS.register(new MissingMappingHandler());
+        MinecraftForge.EVENT_BUS.register(new TrackingEventHandler());
         NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
         proxy.init();
     }

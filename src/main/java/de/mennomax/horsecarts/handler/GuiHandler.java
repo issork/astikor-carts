@@ -12,7 +12,7 @@ public class GuiHandler implements IGuiHandler
     @Override
     public Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z)
     {
-        switch(id)
+        switch (id)
         {
         case 0:
             return new ContainerChest(player.inventory, ((EntityCargoCart) world.getEntityByID(x)).cargo, player);
@@ -24,7 +24,7 @@ public class GuiHandler implements IGuiHandler
     @Override
     public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z)
     {
-        switch(id)
+        switch (id)
         {
         case 0:
             return new GuiChest(player.inventory, ((EntityCargoCart) world.getEntityByID(x)).cargo);

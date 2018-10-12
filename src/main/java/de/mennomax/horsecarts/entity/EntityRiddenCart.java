@@ -18,19 +18,19 @@ public class EntityRiddenCart extends EntityCart
     @Override
     public void onUpdate()
     {
-        if(this.getControllingPassenger() != null && this.getPulling() != null)
+        if (this.getControllingPassenger() != null && this.getPulling() != null)
         {
-            if(this.getPulling() instanceof AbstractHorse)
+            if (this.getPulling() instanceof AbstractHorse)
             {
-                if(((AbstractHorse) this.getPulling()).isEatingHaystack())
+                if (((AbstractHorse) this.getPulling()).isEatingHaystack())
                 {
                     ((AbstractHorse) this.getPulling()).setEatingHaystack(false);
                 }
             }
-            if(this.forward)
+            if (this.forward)
             {
                 this.getPulling().rotationYaw = this.getControllingPassenger().getRotationYawHead();
-                if(((EntityLivingBase) this.getPulling()).isSprinting())
+                if (((EntityLivingBase) this.getPulling()).isSprinting())
                 {
                     ((EntityLivingBase) this.getPulling()).travel(0.0F, 0.0F, (float) (this.getPullingSpeed() + SharedMonsterAttributes.MOVEMENT_SPEED.getDefaultValue()));
                 }
@@ -41,7 +41,7 @@ public class EntityRiddenCart extends EntityCart
             }
             else
             {
-                if(this.getPulling().isSprinting())
+                if (this.getPulling().isSprinting())
                 {
                     this.getPulling().setSprinting(false);
                 }
@@ -49,13 +49,13 @@ public class EntityRiddenCart extends EntityCart
         }
         else
         {
-            if(this.forward)
+            if (this.forward)
             {
                 this.forward = false;
             }
-            if(this.getPulling() instanceof EntityLivingBase)
+            if (this.getPulling() instanceof EntityLivingBase)
             {
-                if(this.getPulling().isSprinting())
+                if (this.getPulling().isSprinting())
                 {
                     this.getPulling().setSprinting(false);
                 }

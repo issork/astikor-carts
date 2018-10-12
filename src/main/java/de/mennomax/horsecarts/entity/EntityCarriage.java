@@ -7,7 +7,7 @@ import net.minecraft.world.World;
 public class EntityCarriage extends EntityRiddenCart
 {
     public float axisYawRadian;
-    
+
     public EntityCarriage(World worldIn)
     {
         super(worldIn);
@@ -16,7 +16,7 @@ public class EntityCarriage extends EntityRiddenCart
         this.offsetFactor = 3.0D;
         this.axisYawRadian = 0.0F;
     }
-    
+
     @Override
     public void handleRotation(Vec3d targetVecIn)
     {
@@ -24,12 +24,12 @@ public class EntityCarriage extends EntityRiddenCart
         Vec3d axisVec = this.getAxisVec();
         this.axisYawRadian = (float) (-Math.atan2(axisVec.x - this.pulling.posX, axisVec.z - this.pulling.posZ) + Math.PI);
     }
-    
+
     public Vec3d getAxisVec()
     {
         return this.getPositionVector().add(new Vec3d(-1.0, 0.0, 0.0).rotateYaw((float) Math.toRadians(this.rotationYaw)));
     }
-    
+
     @Override
     public Vec3d getTargetVec()
     {

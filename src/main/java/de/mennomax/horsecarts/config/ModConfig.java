@@ -12,26 +12,26 @@ public class ModConfig
 {
     @Config.LangKey("entity.cargocart.name")
     public static final CargoCart cargocart = new CargoCart();
-    
+
     @Config.LangKey("entity.plowcart.name")
     public static final PlowCart plowcart = new PlowCart();
-    
+
     @Config.LangKey("entity.chariot.name")
     public static final Chariot chariot = new Chariot();
 
     public static class CargoCart
     {
-        public String[] canPull = {"minecraft:horse", "minecraft:donkey", "minecraft:mule", "minecraft:pig"};
+        public String[] canPull = { "minecraft:horse", "minecraft:donkey", "minecraft:mule", "minecraft:pig" };
     }
-    
+
     public static class PlowCart
     {
-        public String[] canPull = {"minecraft:horse", "minecraft:donkey", "minecraft:mule", "minecraft:pig"};
+        public String[] canPull = { "minecraft:horse", "minecraft:donkey", "minecraft:mule", "minecraft:pig" };
     }
-    
+
     public static class Chariot
     {
-        public String[] canPull = {"minecraft:horse"};
+        public String[] canPull = { "minecraft:horse" };
     }
 
     @Mod.EventBusSubscriber
@@ -40,7 +40,7 @@ public class ModConfig
         @SubscribeEvent
         public static void onConfigChanged(final ConfigChangedEvent.OnConfigChangedEvent event)
         {
-            if(event.getModID().equals(AstikoorCarts.MODID))
+            if (event.getModID().equals(AstikoorCarts.MODID))
             {
                 ConfigManager.sync(AstikoorCarts.MODID, Config.Type.INSTANCE);
             }
