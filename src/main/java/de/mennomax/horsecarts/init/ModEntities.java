@@ -36,7 +36,7 @@ public class ModEntities
 
     public static void registerRenders()
     {
-        RenderingRegistry.registerEntityRenderingHandler(EntityCargoCart.class, RenderCargoCart::new);
+    	RenderingRegistry.registerEntityRenderingHandler(EntityCargoCart.class, RenderCargoCart::new);
         RenderingRegistry.registerEntityRenderingHandler(EntityPlowCart.class, RenderPlowCart::new);
         RenderingRegistry.registerEntityRenderingHandler(EntityChariot.class, RenderChariot::new);
         RenderingRegistry.registerEntityRenderingHandler(EntityCarriage.class, RenderCarriage::new);

@@ -78,15 +78,18 @@ public class EntityCargoCart extends EntityCart implements IInventoryChangedList
     @Override
     public boolean processInitialInteract(EntityPlayer player, EnumHand hand)
     {
-        if(player.isSneaking())
-        {
-            player.openGui(AstikoorCarts.instance, 0, world, this.getEntityId(), 0, 0);
-        }
-        else
         {
             if(!this.world.isRemote)
             {
-                player.startRiding(this);
+            	if(player.isSneaking())
+                {
+                    player.openGui(AstikoorCarts.instance, 0, world, this.getEntityId(), 0, 0);
+                }
+            	else
+            	{
+            		player.startRiding(this);
+            	}
+                
             }
         }
         return true;
