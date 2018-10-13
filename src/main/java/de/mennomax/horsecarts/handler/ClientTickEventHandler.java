@@ -8,6 +8,7 @@ import de.mennomax.horsecarts.packets.CPacketRiddenSprint;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 
 public class ClientTickEventHandler
@@ -17,43 +18,46 @@ public class ClientTickEventHandler
     @SubscribeEvent
     public void onClientTickEvent(ClientTickEvent event)
     {
-        if (Minecraft.getMinecraft().world == null)
+        if (event.phase == TickEvent.Phase.END)
         {
-            return;
-        }
-        if (ModKeybindings.keybindings.get(0).isPressed())
-        {
-            PacketHandler.INSTANCE.sendToServer(new CPacketActionKey());
-        }
-        EntityPlayerSP player = Minecraft.getMinecraft().player;
-        if (player.isRiding())
-        {
-            if (player.getRidingEntity() instanceof EntityRiddenCart)
+            if (Minecraft.getMinecraft().world == null)
             {
-                EntityRiddenCart cart = (EntityRiddenCart) player.getRidingEntity();
-                if (cart.getPulling() != null)
+                return;
+            }
+            if (ModKeybindings.keybindings.get(0).isPressed())
+            {
+                PacketHandler.INSTANCE.sendToServer(new CPacketActionKey());
+            }
+            EntityPlayerSP player = Minecraft.getMinecraft().player;
+            if (player.isRiding())
+            {
+                if (player.getRidingEntity() instanceof EntityRiddenCart)
                 {
-                    if (Minecraft.getMinecraft().gameSettings.keyBindSprint.isPressed())
+                    EntityRiddenCart cart = (EntityRiddenCart) player.getRidingEntity();
+                    if (cart.getPulling() != null)
                     {
-                        PacketHandler.INSTANCE.sendToServer(new CPacketRiddenSprint());
-                        cart.getPulling().setSprinting(true);
-                    }
-                    boolean newstate = Minecraft.getMinecraft().gameSettings.keyBindForward.isKeyDown();
-                    if (oldstate != newstate)
-                    {
-                        oldstate = newstate;
-                        PacketHandler.INSTANCE.sendToServer(new CPacketMoveCart(newstate));
-                        cart.updateForward(newstate);
+                        if (Minecraft.getMinecraft().gameSettings.keyBindSprint.isPressed())
+                        {
+                            PacketHandler.INSTANCE.sendToServer(new CPacketRiddenSprint());
+                            cart.getPulling().setSprinting(true);
+                        }
+                        boolean newstate = Minecraft.getMinecraft().gameSettings.keyBindForward.isKeyDown();
+                        if (oldstate != newstate)
+                        {
+                            oldstate = newstate;
+                            PacketHandler.INSTANCE.sendToServer(new CPacketMoveCart(newstate));
+                            cart.updateForward(newstate);
+                        }
                     }
                 }
             }
-        }
-        if (Minecraft.getMinecraft().gameSettings.keyBindSneak.isKeyDown())
-        {
-            if (oldstate)
+            if (Minecraft.getMinecraft().gameSettings.keyBindSneak.isKeyDown())
             {
-                oldstate = false;
-            }
+                if (oldstate)
+                {
+                    oldstate = false;
+                }
+            } 
         }
     }
 }

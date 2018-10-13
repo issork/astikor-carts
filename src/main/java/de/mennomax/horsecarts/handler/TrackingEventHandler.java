@@ -20,11 +20,11 @@ public class TrackingEventHandler
             {
                 PacketHandler.INSTANCE.sendTo(new SPacketEntityCartUpdate(target.getPulling().getEntityId(), target.getEntityId()), (EntityPlayerMP) event.getEntityPlayer());
             }
-        }
-        if (event.getTarget() instanceof EntityCargoCart)
-        {
-            EntityCargoCart target = (EntityCargoCart) event.getTarget();
-            PacketHandler.INSTANCE.sendTo(new SPacketCargoLoad(target.getLoad(), target.getEntityId()), (EntityPlayerMP) event.getEntityPlayer());
+            if (target instanceof EntityCargoCart)
+            {
+                System.out.println("UPDATE CARGO");
+                PacketHandler.INSTANCE.sendTo(new SPacketCargoLoad(((EntityCargoCart) target).getLoad(), ((EntityCargoCart) target).getEntityId()), (EntityPlayerMP) event.getEntityPlayer());
+            }
         }
     }
 }
