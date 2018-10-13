@@ -28,8 +28,8 @@ import net.minecraftforge.items.wrapper.InvWrapper;
 public class EntityCargoCart extends EntityCart implements IInventoryChangedListener
 {
     public int load;
-    public InventoryBasic cargo;
-    protected IItemHandler itemHandler = null;
+    public InventoryBasic cargo = new InventoryBasic(this.getName(), true, 54);
+    protected IItemHandler itemHandler = new InvWrapper(this.cargo);
 
     public EntityCargoCart(World worldIn)
     {
@@ -37,6 +37,7 @@ public class EntityCargoCart extends EntityCart implements IInventoryChangedList
         this.setSize(1.5F, 1.4F);
         this.stepHeight = 1.2F;
         this.offsetFactor = 2.4D;
+        this.cargo.addInventoryChangeListener(this);
     }
 
     @Override
@@ -112,37 +113,14 @@ public class EntityCargoCart extends EntityCart implements IInventoryChangedList
     }
 
     @Override
-    protected void entityInit()
-    {
-        InventoryBasic inventory = this.cargo;
-        if (inventory != null)
-        {
-            inventory.removeInventoryChangeListener(this);
-            int i = Math.min(inventory.getSizeInventory(), this.cargo.getSizeInventory());
-
-            for (int j = 0; j < i; ++j)
-            {
-                ItemStack itemstack = inventory.getStackInSlot(j);
-
-                if (!itemstack.isEmpty())
-                {
-                    this.cargo.setInventorySlotContents(j, itemstack.copy());
-                }
-            }
-        }
-        this.cargo = new InventoryBasic(this.getName(), true, 54);
-        this.cargo.addInventoryChangeListener(this);
-        this.itemHandler = new InvWrapper(this.cargo);
-    }
-
-    @Override
     protected void readEntityFromNBT(NBTTagCompound compound)
     {
         NBTTagList nbttaglist = compound.getTagList("Items", 10);
 
         for (int i = 0; i < nbttaglist.tagCount(); ++i)
         {
-            this.cargo.setInventorySlotContents(i, new ItemStack(nbttaglist.getCompoundTagAt(i)));
+            NBTTagCompound nbttagcompound = nbttaglist.getCompoundTagAt(i);
+            this.cargo.setInventorySlotContents(nbttagcompound.getByte("Slot") & 255, new ItemStack(nbttagcompound));
         }
     }
 
@@ -200,6 +178,7 @@ public class EntityCargoCart extends EntityCart implements IInventoryChangedList
     @Nullable
     public <T> T getCapability(net.minecraftforge.common.capabilities.Capability<T> capability, @Nullable net.minecraft.util.EnumFacing facing)
     {
+        System.out.println(capability);
         if (capability == net.minecraftforge.items.CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
             return (T) itemHandler;
         return super.getCapability(capability, facing);
