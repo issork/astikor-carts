@@ -35,7 +35,13 @@ public class ModItems
         @SubscribeEvent
         public static void registerItems(final RegistryEvent.Register<Item> event)
         {
-            final Item[] items = { new ItemCargoCart(), new ItemWheel(), new ItemPlowCart(), new ItemChariot(), new ItemCarriage() };
+            final Item[] items = {
+                    new ItemCargoCart(),
+                    new ItemWheel(),
+                    new ItemPlowCart(),
+                    new ItemChariot(),
+                    new ItemCarriage()
+            };
 
             for (Item item : items)
             {

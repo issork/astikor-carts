@@ -22,7 +22,6 @@ public class TrackingEventHandler
             }
             if (target instanceof EntityCargoCart)
             {
-                System.out.println("UPDATE CARGO");
                 PacketHandler.INSTANCE.sendTo(new SPacketCargoLoad(((EntityCargoCart) target).getLoad(), ((EntityCargoCart) target).getEntityId()), (EntityPlayerMP) event.getEntityPlayer());
             }
         }

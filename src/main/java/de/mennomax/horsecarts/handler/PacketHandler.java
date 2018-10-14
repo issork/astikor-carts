@@ -13,7 +13,7 @@ import net.minecraftforge.fml.relauncher.Side;
 public class PacketHandler
 {
     private static int id = 0;
-    public static final SimpleNetworkWrapper INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel("astikoor");
+    public static final SimpleNetworkWrapper INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel("astikoorcarts");
 
     public static void registerPackets()
     {

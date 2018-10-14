@@ -1,7 +1,6 @@
 package de.mennomax.horsecarts.init;
 
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
 public class ModCreativeTabs
@@ -11,7 +10,7 @@ public class ModCreativeTabs
         @Override
         public ItemStack getTabIconItem()
         {
-            return new ItemStack(Items.MAP);
+            return new ItemStack(ModItems.WHEEL);
         }
     };
 }

@@ -21,17 +21,29 @@ public class ModConfig
 
     public static class CargoCart
     {
-        public String[] canPull = { "minecraft:horse", "minecraft:donkey", "minecraft:mule", "minecraft:pig" };
+        public String[] canPull = {
+                "minecraft:horse",
+                "minecraft:donkey",
+                "minecraft:mule",
+                "minecraft:pig"
+        };
     }
 
     public static class PlowCart
     {
-        public String[] canPull = { "minecraft:horse", "minecraft:donkey", "minecraft:mule", "minecraft:pig" };
+        public String[] canPull = {
+                "minecraft:horse",
+                "minecraft:donkey",
+                "minecraft:mule",
+                "minecraft:pig"
+        };
     }
 
     public static class Chariot
     {
-        public String[] canPull = { "minecraft:horse" };
+        public String[] canPull = {
+                "minecraft:horse"
+        };
     }
 
     @Mod.EventBusSubscriber
