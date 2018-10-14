@@ -23,19 +23,19 @@ public class MissingMappingHandler
             switch (mapping.key.toString())
             {
             case "astikoor:chariot":
-                mapping.remap(ModItems.chariot);
+                mapping.remap(ModItems.CHARIOT);
                 break;
             case "astikoor:plowcart":
-                mapping.remap(ModItems.plowcart);
+                mapping.remap(ModItems.PLOWCART);
                 break;
             case "astikoor:cargocart":
-                mapping.remap(ModItems.cargocart);
+                mapping.remap(ModItems.CARGOCART);
                 break;
             case "astikoor:wheel":
-                mapping.remap(ModItems.wheel);
+                mapping.remap(ModItems.WHEEL);
                 break;
             case "astikoor:carriage":
-                mapping.remap(ModItems.carriage);
+                mapping.remap(ModItems.CARRIAGE);
                 break;
             }
         }

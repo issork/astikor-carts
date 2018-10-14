@@ -60,7 +60,7 @@ public class EntityPlowCart extends EntityCart
     {
         if (!source.isCreativePlayer())
         {
-            this.world.spawnEntity(new EntityItem(this.world, this.posX, this.posY + 1.0F, this.posZ, new ItemStack(ModItems.plowcart)));
+            this.world.spawnEntity(new EntityItem(this.world, this.posX, this.posY + 1.0F, this.posZ, new ItemStack(ModItems.PLOWCART)));
         }
 
     }

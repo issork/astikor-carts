@@ -11,27 +11,35 @@ import de.mennomax.horsecarts.entity.EntityChariot;
 import de.mennomax.horsecarts.entity.EntityPlowCart;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.registry.EntityRegistry;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.EntityEntry;
+import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
+import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
 
-@EventBusSubscriber
+@ObjectHolder(AstikoorCarts.MODID)
 public class ModEntities
 {
-    private static int id = 0;
-
-    public static void registerEntities()
+    @EventBusSubscriber
+    public static class EntityRegistrationHandler
     {
-        registerEntity(EntityCargoCart.class, "cargocart", 80, 3, false);
-        registerEntity(EntityPlowCart.class, "plowcart", 80, 3, false);
-        registerEntity(EntityChariot.class, "chariot", 80, 3, false);
-        registerEntity(EntityCarriage.class, "carriage", 80, 3, false);
-    }
+        private static int id = 0;
 
-    private static void registerEntity(Class<? extends Entity> entityClass, String entityName, int trackingRange, int updateFrequency, boolean sendsVelocityUpdates)
-    {
-        ResourceLocation registryName = new ResourceLocation(AstikoorCarts.MODID, entityName);
-        EntityRegistry.registerModEntity(registryName, entityClass, entityName, id++, AstikoorCarts.instance, trackingRange, updateFrequency, sendsVelocityUpdates);
+        @SubscribeEvent
+        public static void registerEntities(final RegistryEvent.Register<EntityEntry> event)
+        {
+            final EntityEntry[] entries = { createEntry(EntityCargoCart.class, "cargocart", 80, 3, false), createEntry(EntityPlowCart.class, "plowcart", 80, 3, false), createEntry(EntityChariot.class, "chariot", 80, 3, false), createEntry(EntityCarriage.class, "carriage", 80, 3, false) };
+
+            event.getRegistry().registerAll(entries);
+        }
+
+        private static EntityEntry createEntry(final Class<? extends Entity> entityClass, final String name, int trackingRange, int updateFrequency, boolean sendVelocityUpdates)
+        {
+            final ResourceLocation resourceLocation = new ResourceLocation(AstikoorCarts.MODID, name);
+            return EntityEntryBuilder.create().entity(entityClass).id(resourceLocation, id++).name(resourceLocation.toString()).tracker(trackingRange, updateFrequency, sendVelocityUpdates).build();
+        }
     }
 
     public static void registerRenders()

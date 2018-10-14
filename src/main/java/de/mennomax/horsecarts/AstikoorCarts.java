@@ -31,7 +31,6 @@ public class AstikoorCarts
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
-        ModEntities.registerEntities();
         PacketHandler.registerPackets();
         proxy.preInit();
     }

@@ -68,7 +68,7 @@ public class EntityCargoCart extends EntityCart implements IInventoryChangedList
     public void onDestroyed(DamageSource source)
     {
         if (!source.isCreativePlayer())
-            this.world.spawnEntity(new EntityItem(this.world, this.posX, this.posY + 1.0F, this.posZ, new ItemStack(ModItems.cargocart)));
+            this.world.spawnEntity(new EntityItem(this.world, this.posX, this.posY + 1.0F, this.posZ, new ItemStack(ModItems.CARGOCART)));
         for (int i = 0; i < this.cargo.getSizeInventory(); i++)
         {
             ItemStack stack = this.cargo.getStackInSlot(i);
