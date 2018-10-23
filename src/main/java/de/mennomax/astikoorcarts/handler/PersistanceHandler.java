@@ -12,6 +12,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
 import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -25,16 +26,16 @@ public class PersistanceHandler
             event.addCapability(new ResourceLocation(AstikoorCarts.MODID), new PullProvider());
         }
     }
-    
+
     @SubscribeEvent
     public void onChunkWatch(ChunkWatchEvent.Watch event)
     {
-        for(ClassInheritanceMultiMap<Entity> entitylist : event.getChunkInstance().getEntityLists())
+        for (ClassInheritanceMultiMap<Entity> entitylist : event.getChunkInstance().getEntityLists())
         {
-            for(Entity entity : entitylist)
+            for (Entity entity : entitylist)
             {
                 IPull pullCapability = entity.getCapability(PullProvider.PULL, null);
-                if(pullCapability.getFirstDrawnUUID() != null)
+                if (pullCapability.getFirstDrawnUUID() != null)
                 {
                     ((AbstractDrawn) ((WorldServer) entity.world).getEntityFromUuid(pullCapability.getFirstDrawnUUID())).setPulling(entity);
                 }
@@ -50,4 +51,16 @@ public class PersistanceHandler
             ((EntityLiving) event.getEntity()).tasks.addTask(2, new EntityAIPullCart((EntityLiving) event.getEntity()));
         }
     }
+
+    @SubscribeEvent
+    public void onEntityTravelToDimension(EntityTravelToDimensionEvent event)
+    {
+        AbstractDrawn drawn = event.getEntity().getCapability(PullProvider.PULL, null).getDrawn();
+        if (drawn != null)
+        {
+            drawn.setPortal(event.getEntity().getPosition());
+            drawn.changeDimension(event.getDimension());
+        }
+    }
+
 }

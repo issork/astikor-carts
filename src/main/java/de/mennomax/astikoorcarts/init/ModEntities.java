@@ -31,10 +31,10 @@ public class ModEntities
         public static void registerEntities(final RegistryEvent.Register<EntityEntry> event)
         {
             event.getRegistry().registerAll(
-                createEntry(EntityCargoCart.class, "cargocart", 80, 3, false),
-                createEntry(EntityPlowCart.class, "plowcart", 80, 3, false),
-                createEntry(EntityChariot.class, "chariot", 80, 3, false),
-                createEntry(EntityCarriage.class, "carriage", 80, 3, false)
+                    createEntry(EntityCargoCart.class, "cargocart", 80, 3, false),
+                    createEntry(EntityPlowCart.class, "plowcart", 80, 3, false),
+                    createEntry(EntityChariot.class, "chariot", 80, 3, false),
+                    createEntry(EntityCarriage.class, "carriage", 80, 3, false)
             );
         }
 

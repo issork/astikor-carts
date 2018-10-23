@@ -1,7 +1,5 @@
 package de.mennomax.astikoorcarts.entity;
 
-import com.google.common.base.Predicate;
-
 import de.mennomax.astikoorcarts.capabilities.PullProvider;
 import de.mennomax.astikoorcarts.handler.PacketHandler;
 import de.mennomax.astikoorcarts.packets.SPacketDrawnUpdate;
@@ -73,9 +71,13 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
             }
             Vec3d moveVec = new Vec3d(targetVec.x - this.posX - this.getLookVec().x * this.offsetFactor, 0.0, targetVec.z - this.posZ - this.getLookVec().z * this.offsetFactor);
             this.motionX = moveVec.x;
+            if (!this.pulling.onGround && this.pulling.fallDistance == 0.0D)
+            {
+                this.motionY = targetVec.y - this.posY;
+            }
             this.motionZ = moveVec.z;
             this.tickLerp();
-            if(this.world.isRemote)
+            if (this.world.isRemote)
             {
                 this.factor = -Math.sqrt(moveVec.x * moveVec.x + moveVec.z * moveVec.z);
                 if (moveVec.subtract(this.getLookVec()).lengthVector() > 1)
@@ -86,7 +88,7 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
         }
         else
         {
-            if(this.world.isRemote)
+            if (this.world.isRemote)
             {
                 this.factor = 0.0D;
             }
