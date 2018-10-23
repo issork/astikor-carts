@@ -1,5 +1,7 @@
 package de.mennomax.astikoorcarts.entity;
 
+import com.google.common.base.Predicate;
+
 import de.mennomax.astikoorcarts.capabilities.PullProvider;
 import de.mennomax.astikoorcarts.handler.PacketHandler;
 import de.mennomax.astikoorcarts.packets.SPacketDrawnUpdate;
@@ -11,7 +13,6 @@ import net.minecraft.entity.MoverType;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntitySelectors;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraft.util.math.Vec3d;
@@ -24,7 +25,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public abstract class AbstractDrawn extends Entity implements IEntityAdditionalSpawnData
 {
     protected Entity pulling;
+    @SideOnly(Side.CLIENT)
     private float wheelrot;
+    @SideOnly(Side.CLIENT)
     private double factor;
     private int lerpSteps;
     private double lerpX;
@@ -69,23 +72,32 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
                 this.prevRotationYaw -= 360.0F;
             }
             Vec3d moveVec = new Vec3d(targetVec.x - this.posX - this.getLookVec().x * this.offsetFactor, 0.0, targetVec.z - this.posZ - this.getLookVec().z * this.offsetFactor);
-            this.factor = -Math.sqrt(moveVec.x * moveVec.x + moveVec.z * moveVec.z);
             this.motionX = moveVec.x;
             this.motionZ = moveVec.z;
             this.tickLerp();
-            if (moveVec.subtract(this.getLookVec()).lengthVector() > 1)
+            if(this.world.isRemote)
             {
-                this.factor = -this.factor;
+                this.factor = -Math.sqrt(moveVec.x * moveVec.x + moveVec.z * moveVec.z);
+                if (moveVec.subtract(this.getLookVec()).lengthVector() > 1)
+                {
+                    this.factor = -this.factor;
+                }
             }
         }
         else
         {
-            this.factor = 0.0D;
+            if(this.world.isRemote)
+            {
+                this.factor = 0.0D;
+            }
             this.motionX = 0.0D;
             this.motionZ = 0.0D;
         }
         this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
-        this.collideWithNearbyEntities();
+        for (Entity entity : this.world.getEntitiesInAABBexcluding(this, this.getEntityBoundingBox(), EntitySelectors.getTeamCollisionPredicate(this)))
+        {
+            this.applyEntityCollision(entity);
+        }
     }
 
     /**
@@ -198,37 +210,6 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
     public boolean canBePushed()
     {
         return true;
-    }
-
-    protected void collideWithNearbyEntities()
-    {
-        for (Entity entity : this.world.getEntitiesInAABBexcluding(this, this.getEntityBoundingBox(), EntitySelectors.getTeamCollisionPredicate(this)))
-        {
-            double dx = entity.posX - this.posX;
-            double dz = entity.posZ - this.posZ;
-            double delta = MathHelper.absMax(dx, dz);
-            if (delta >= 0.01D)
-            {
-                delta = (double) MathHelper.sqrt(delta);
-                dx = dx / delta;
-                dz = dz / delta;
-                double d3 = 1.0D / delta;
-                if (d3 > 1.0D)
-                {
-                    d3 = 1.0D;
-                }
-                dx = dx * d3;
-                dz = dz * d3;
-                dx = dx * 0.05D;
-                dz = dz * 0.05D;
-                dx = dx * (double) (1.0F - this.entityCollisionReduction);
-                dz = dz * (double) (1.0F - this.entityCollisionReduction);
-                if (!entity.isBeingRidden())
-                {
-                    entity.addVelocity(dx, 0.0D, dz);
-                }
-            }
-        }
     }
 
     @Override

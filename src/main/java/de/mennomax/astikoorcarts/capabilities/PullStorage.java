@@ -22,6 +22,9 @@ public class PullStorage implements IStorage<IPull>
     @Override
     public void readNBT(Capability<IPull> capability, IPull instance, EnumFacing side, NBTBase nbt)
     {
-        instance.setFirstDrawnUUID(NBTUtil.getUUIDFromTag((NBTTagCompound) nbt));
+        if(!((NBTTagCompound) nbt).hasNoTags())
+        {
+            instance.setFirstDrawnUUID(NBTUtil.getUUIDFromTag((NBTTagCompound) nbt));
+        }
     }
 }

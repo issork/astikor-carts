@@ -3,7 +3,7 @@ package de.mennomax.astikoorcarts;
 import de.mennomax.astikoorcarts.capabilities.IPull;
 import de.mennomax.astikoorcarts.capabilities.PullFactory;
 import de.mennomax.astikoorcarts.capabilities.PullStorage;
-import de.mennomax.astikoorcarts.handler.CapabilityEventHandler;
+import de.mennomax.astikoorcarts.handler.PersistanceHandler;
 import de.mennomax.astikoorcarts.handler.GuiHandler;
 import de.mennomax.astikoorcarts.handler.MissingMappingHandler;
 import de.mennomax.astikoorcarts.handler.PacketHandler;
@@ -43,7 +43,7 @@ public class AstikoorCarts
     public void init(FMLInitializationEvent event)
     {
         MinecraftForge.EVENT_BUS.register(new MissingMappingHandler());
-        MinecraftForge.EVENT_BUS.register(new CapabilityEventHandler());
+        MinecraftForge.EVENT_BUS.register(new PersistanceHandler());
         NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
         proxy.init();
     }
