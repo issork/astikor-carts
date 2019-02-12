@@ -16,9 +16,6 @@ public class ModConfig
     @Config.LangKey("entity.astikoorcarts:plowcart.name")
     public static final PlowCart plowcart = new PlowCart();
 
-    @Config.LangKey("entity.astikoorcarts:chariot.name")
-    public static final Chariot chariot = new Chariot();
-
     public static class CargoCart
     {
         public String[] canPull = {
@@ -36,13 +33,6 @@ public class ModConfig
                 "minecraft:donkey",
                 "minecraft:mule",
                 "minecraft:pig"
-        };
-    }
-
-    public static class Chariot
-    {
-        public String[] canPull = {
-                "minecraft:horse"
         };
     }
 

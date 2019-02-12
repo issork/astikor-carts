@@ -4,7 +4,7 @@ import de.mennomax.astikoorcarts.entity.AbstractDrawn;
 import de.mennomax.astikoorcarts.entity.EntityCargoCart;
 import net.minecraft.world.World;
 
-public class ItemCargoCart extends CartItem
+public class ItemCargoCart extends AbstractCartItem
 {
     public ItemCargoCart()
     {

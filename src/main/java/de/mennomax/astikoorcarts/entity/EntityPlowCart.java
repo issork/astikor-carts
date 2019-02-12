@@ -1,27 +1,34 @@
 package de.mennomax.astikoorcarts.entity;
 
+import de.mennomax.astikoorcarts.AstikoorCarts;
 import de.mennomax.astikoorcarts.config.ModConfig;
 import de.mennomax.astikoorcarts.init.ModItems;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
-import net.minecraft.block.BlockFarmland;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.inventory.InventoryBasic;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemHoe;
+import net.minecraft.item.ItemSpade;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.DamageSource;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
-public class EntityPlowCart extends AbstractDrawn
+public class EntityPlowCart extends AbstractDrawnInventory
 {
-    private boolean plowing = false;
-    private static final double BLADEOFFSET = 1.2D;
+    private static final DataParameter<Boolean> PLOWING = EntityDataManager.<Boolean>createKey(EntityPlowCart.class, DataSerializers.BOOLEAN);
+    private static final double BLADEOFFSET = 1.7D;
 
     public EntityPlowCart(World worldIn)
     {
@@ -29,6 +36,7 @@ public class EntityPlowCart extends AbstractDrawn
         this.setSize(1.5F, 1.4F);
         this.stepHeight = 1.2F;
         this.offsetFactor = 2.4D;
+        this.inventory = new InventoryBasic(this.getName(), true, 3);
     }
 
     @Override
@@ -47,70 +55,121 @@ public class EntityPlowCart extends AbstractDrawn
 
     public boolean getPlowing()
     {
-        return plowing;
-    }
-
-    public void setPlowing(boolean plowingIn)
-    {
-        this.plowing = plowingIn;
-    }
-
-    @Override
-    public void onDestroyed(DamageSource source)
-    {
-        if (!source.isCreativePlayer())
-        {
-            this.world.spawnEntity(new EntityItem(this.world, this.posX, this.posY + 1.0F, this.posZ, new ItemStack(ModItems.PLOWCART)));
-        }
-
+        return this.dataManager.get(PLOWING);
     }
 
     @Override
     public void onUpdate()
     {
         super.onUpdate();
-        if (this.prevPosX != this.posX && this.prevPosZ != this.posZ)
+        EntityPlayer player = this.pulling != null && this.pulling.getControllingPassenger() instanceof EntityPlayer ? (EntityPlayer) this.pulling.getControllingPassenger() : (this.pulling instanceof EntityPlayer ? (EntityPlayer) this.pulling : null);
+        if (!this.world.isRemote && this.dataManager.get(PLOWING) && player != null)
         {
-            BlockPos pos = new BlockPos(this.getPositionVector().x - this.getLookVec().x * BLADEOFFSET, this.getPositionVector().y - 1.0, this.getPositionVector().z - this.getLookVec().z * BLADEOFFSET);
-            IBlockState iblockstate = this.world.getBlockState(pos);
-            Material topMaterial = this.world.getBlockState(pos.up()).getMaterial();
-            Block block = iblockstate.getBlock();
-            if (this.getPlowing() && (topMaterial == Material.AIR || topMaterial == Material.PLANTS || topMaterial == Material.VINE))
+            if (this.prevPosX != this.posX || this.prevPosZ != this.posZ)
             {
-                if (block == Blocks.GRASS || block == Blocks.GRASS_PATH)
+                for (int i = 0; i < this.inventory.getSizeInventory(); i++)
                 {
-                    this.setBlock(this.world, pos, Blocks.FARMLAND.getDefaultState().withProperty(BlockFarmland.MOISTURE, 7));
-                }
-                if (block == Blocks.DIRT)
-                {
-                    switch ((BlockDirt.DirtType) iblockstate.getValue(BlockDirt.VARIANT))
+                    if(inventory.getStackInSlot(i) != ItemStack.EMPTY)
                     {
-                    case DIRT:
-                        this.setBlock(this.world, pos, Blocks.FARMLAND.getDefaultState().withProperty(BlockFarmland.MOISTURE, 7));
-                        break;
-                    case COARSE_DIRT:
-                        this.setBlock(this.world, pos, Blocks.DIRT.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.DIRT));
-                        break;
-                    default:
-                        break;
+                        float offset = -38.0F+i*38.0F;
+                        double blockPosX = this.posX + MathHelper.sin((this.rotationYaw-offset) * 0.017453292F) * BLADEOFFSET;
+                        double blockPosZ = this.posZ - MathHelper.cos((this.rotationYaw-offset) * 0.017453292F) * BLADEOFFSET;
+                        BlockPos blockPos = new BlockPos(blockPosX, this.posY - 0.5D, blockPosZ);
+                        BlockPos upPos = blockPos.up();
+                        Material upMaterial = this.world.getBlockState(upPos).getMaterial();
+                        if (upMaterial == Material.AIR)
+                        {
+                            handleTool(blockPos, i, player);
+                        }
+                        else if (upMaterial == Material.PLANTS || upMaterial == Material.VINE)
+                        {
+                            this.world.destroyBlock(upPos, false);
+                            handleTool(blockPos, i, player);
+                        }
                     }
                 }
             }
         }
     }
+    
+    @Override
+    public Item getCartItem()
+    {
+        return ModItems.PLOWCART;
+    }
 
     @Override
     public boolean processInitialInteract(EntityPlayer player, EnumHand hand)
     {
-        this.plowing = !this.plowing;
+        if (!this.world.isRemote)
+        {
+            if (player.isSneaking())
+            {
+                player.openGui(AstikoorCarts.instance, 1, this.world, this.getEntityId(), 0, 0);
+            }
+            else
+            {
+                this.dataManager.set(PLOWING, !this.dataManager.get(PLOWING));
+            }
+        }
         return true;
     }
 
-    protected void setBlock(World worldIn, BlockPos pos, IBlockState state)
+    @Override
+    protected void readEntityFromNBT(NBTTagCompound compound)
     {
-        if (!worldIn.isRemote)
+        super.readEntityFromNBT(compound);
+        dataManager.set(PLOWING, compound.getBoolean("Plowing"));
+    }
+
+    @Override
+    protected void writeEntityToNBT(NBTTagCompound compound)
+    {
+        super.writeEntityToNBT(compound);
+        compound.setBoolean("Plowing", dataManager.get(PLOWING));
+    }
+
+    @Override
+    protected void entityInit()
+    {
+        super.entityInit();
+        this.dataManager.register(PLOWING, false);
+    }
+    
+    @SuppressWarnings("incomplete-switch")
+    private void handleTool(BlockPos pos, int slot, EntityPlayer player)
+    {
+        IBlockState state = this.world.getBlockState(pos);
+        Block block = state.getBlock();
+        ItemStack itemstack = this.inventory.getStackInSlot(slot);
+        if (itemstack.getItem() instanceof ItemHoe)
         {
-            worldIn.setBlockState(pos, state, 11);
+            if (block == Blocks.GRASS || block == Blocks.GRASS_PATH)
+            {
+                this.world.setBlockState(pos, Blocks.FARMLAND.getDefaultState(), 11);
+                itemstack.damageItem(1, player);
+            }
+            
+            else if (block == Blocks.DIRT)
+            {
+                switch (state.getValue(BlockDirt.VARIANT))
+                {
+                    case DIRT:
+                        this.world.setBlockState(pos, Blocks.FARMLAND.getDefaultState(), 11);
+                        itemstack.damageItem(1, player);
+                    case COARSE_DIRT:
+                        this.world.setBlockState(pos, Blocks.DIRT.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.DIRT), 11);
+                        itemstack.damageItem(1, player);
+                }
+            }
+        }
+        else if (itemstack.getItem() instanceof ItemSpade)
+        {
+            if (block == Blocks.GRASS)
+            {
+                this.world.setBlockState(pos, Blocks.GRASS_PATH.getDefaultState());
+                itemstack.damageItem(1, player);
+            }
         }
     }
 }

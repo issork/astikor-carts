@@ -9,9 +9,8 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class CPacketOpenCartGui implements IMessage
 {
-
-    int invId;
-    int cartId;
+    private int invId;
+    private int cartId;
 
     public CPacketOpenCartGui()
     {

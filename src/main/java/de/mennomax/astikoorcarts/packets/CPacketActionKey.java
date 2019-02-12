@@ -2,10 +2,10 @@ package de.mennomax.astikoorcarts.packets;
 
 import java.util.List;
 
+import de.mennomax.astikoorcarts.capabilities.PullProvider;
 import de.mennomax.astikoorcarts.entity.AbstractDrawn;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -42,8 +42,8 @@ public class CPacketActionKey implements IMessage
                 List<AbstractDrawn> result = sender.getServerWorld().getEntitiesWithinAABB(AbstractDrawn.class, sender.getEntityBoundingBox().grow(3), entity -> entity != sender.getRidingEntity() && entity.isEntityAlive());
                 if (!result.isEmpty())
                 {
+                    Entity target = sender.isRiding() ? sender.getRidingEntity() : sender;
                     AbstractDrawn closest = result.get(0);
-                    Entity target = sender.isRiding() ? sender.getRidingEntity() : (EntityPlayer) sender;
                     for (AbstractDrawn cart : result)
                     {
                         if (cart.getPulling() == target)
@@ -58,6 +58,14 @@ public class CPacketActionKey implements IMessage
                     }
                     if (closest.canPull(target))
                     {
+                        if(target.hasCapability(PullProvider.PULL, null))
+                        {
+                            AbstractDrawn drawn = target.getCapability(PullProvider.PULL, null).getDrawn();
+                            if(drawn != null && drawn.getPulling() == target)
+                            {
+                                return;
+                            }
+                        }
                         closest.setPulling(target);
                     }
                 }

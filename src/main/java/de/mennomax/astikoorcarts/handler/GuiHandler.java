@@ -1,6 +1,9 @@
 package de.mennomax.astikoorcarts.handler;
 
+import de.mennomax.astikoorcarts.client.gui.inventory.GuiPlow;
 import de.mennomax.astikoorcarts.entity.EntityCargoCart;
+import de.mennomax.astikoorcarts.entity.EntityPlowCart;
+import de.mennomax.astikoorcarts.inventory.ContainerPlow;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ContainerChest;
@@ -14,10 +17,12 @@ public class GuiHandler implements IGuiHandler
     {
         switch (id)
         {
-        case 0:
-            return new ContainerChest(player.inventory, ((EntityCargoCart) world.getEntityByID(x)).cargo, player);
-        default:
-            return null;
+            case 0:
+                return new ContainerChest(player.inventory, ((EntityCargoCart) world.getEntityByID(x)).inventory, player);
+            case 1:
+                return new ContainerPlow(player.inventory, ((EntityPlowCart) world.getEntityByID(x)).inventory);
+            default:
+                return null;
         }
     }
 
@@ -26,10 +31,12 @@ public class GuiHandler implements IGuiHandler
     {
         switch (id)
         {
-        case 0:
-            return new GuiChest(player.inventory, ((EntityCargoCart) world.getEntityByID(x)).cargo);
-        default:
-            return null;
+            case 0:
+                return new GuiChest(player.inventory, ((EntityCargoCart) world.getEntityByID(x)).inventory);
+            case 1:
+                return new GuiPlow(player.inventory, ((EntityPlowCart) world.getEntityByID(x)).inventory);
+            default:
+                return null;
         }
     }
 

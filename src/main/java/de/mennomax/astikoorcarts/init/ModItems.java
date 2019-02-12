@@ -5,8 +5,6 @@ import java.util.Set;
 
 import de.mennomax.astikoorcarts.AstikoorCarts;
 import de.mennomax.astikoorcarts.item.ItemCargoCart;
-import de.mennomax.astikoorcarts.item.ItemCarriage;
-import de.mennomax.astikoorcarts.item.ItemChariot;
 import de.mennomax.astikoorcarts.item.ItemPlowCart;
 import de.mennomax.astikoorcarts.item.ItemWheel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -21,11 +19,9 @@ import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
 @ObjectHolder(AstikoorCarts.MODID)
 public class ModItems
 {
-    public static final Item CARGOCART = null;
     public static final Item WHEEL = null;
+    public static final Item CARGOCART = null;
     public static final Item PLOWCART = null;
-    public static final Item CHARIOT = null;
-    public static final Item CARRIAGE = null;
 
     @EventBusSubscriber
     public static class ItemRegistrationHandler
@@ -33,17 +29,15 @@ public class ModItems
         public static final Set<Item> ITEMSET = new HashSet<Item>();
 
         @SubscribeEvent
-        public static void registerItems(final RegistryEvent.Register<Item> event)
+        public static void registerItems(RegistryEvent.Register<Item> event)
         {
-            final Item[] items = {
-                    new ItemCargoCart(),
+            final Item[] ITEMS = {
                     new ItemWheel(),
-                    new ItemPlowCart(),
-                    new ItemChariot(),
-                    new ItemCarriage()
+                    new ItemCargoCart(),
+                    new ItemPlowCart()
             };
 
-            for (Item item : items)
+            for (Item item : ITEMS)
             {
                 event.getRegistry().register(item);
                 ITEMSET.add(item);
@@ -51,7 +45,7 @@ public class ModItems
         }
 
         @SubscribeEvent
-        public static void registerItemModels(final ModelRegistryEvent event)
+        public static void registerItemModels(ModelRegistryEvent event)
         {
             for (Item item : ITEMSET)
             {

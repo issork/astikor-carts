@@ -2,12 +2,8 @@ package de.mennomax.astikoorcarts.init;
 
 import de.mennomax.astikoorcarts.AstikoorCarts;
 import de.mennomax.astikoorcarts.client.render.RenderCargoCart;
-import de.mennomax.astikoorcarts.client.render.RenderCarriage;
-import de.mennomax.astikoorcarts.client.render.RenderChariot;
 import de.mennomax.astikoorcarts.client.render.RenderPlowCart;
 import de.mennomax.astikoorcarts.entity.EntityCargoCart;
-import de.mennomax.astikoorcarts.entity.EntityCarriage;
-import de.mennomax.astikoorcarts.entity.EntityChariot;
 import de.mennomax.astikoorcarts.entity.EntityPlowCart;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
@@ -28,19 +24,17 @@ public class ModEntities
         private static int id = 0;
 
         @SubscribeEvent
-        public static void registerEntities(final RegistryEvent.Register<EntityEntry> event)
+        public static void registerEntities(RegistryEvent.Register<EntityEntry> event)
         {
             event.getRegistry().registerAll(
                     createEntry(EntityCargoCart.class, "cargocart", 80, 3, false),
-                    createEntry(EntityPlowCart.class, "plowcart", 80, 3, false),
-                    createEntry(EntityChariot.class, "chariot", 80, 3, false),
-                    createEntry(EntityCarriage.class, "carriage", 80, 3, false)
+                    createEntry(EntityPlowCart.class, "plowcart", 80, 3, false)
             );
         }
 
         private static EntityEntry createEntry(final Class<? extends Entity> entityClass, final String name, int trackingRange, int updateFrequency, boolean sendVelocityUpdates)
         {
-            final ResourceLocation resourceLocation = new ResourceLocation(AstikoorCarts.MODID, name);
+            ResourceLocation resourceLocation = new ResourceLocation(AstikoorCarts.MODID, name);
             return EntityEntryBuilder.create().entity(entityClass).id(resourceLocation, id++).name(resourceLocation.toString()).tracker(trackingRange, updateFrequency, sendVelocityUpdates).build();
         }
     }
@@ -49,7 +43,5 @@ public class ModEntities
     {
         RenderingRegistry.registerEntityRenderingHandler(EntityCargoCart.class, RenderCargoCart::new);
         RenderingRegistry.registerEntityRenderingHandler(EntityPlowCart.class, RenderPlowCart::new);
-        RenderingRegistry.registerEntityRenderingHandler(EntityChariot.class, RenderChariot::new);
-        RenderingRegistry.registerEntityRenderingHandler(EntityCarriage.class, RenderCarriage::new);
     }
 }

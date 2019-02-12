@@ -8,14 +8,24 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.MoverType;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.util.EntitySelectors;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.util.ITeleporter;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -31,8 +41,9 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
     private double lerpX;
     private double lerpY;
     private double lerpZ;
-    private int lasthit;
-    private int hitcount;
+    private double lerpYaw;
+    private static final DataParameter<Integer> TIME_SINCE_HIT = EntityDataManager.<Integer>createKey(AbstractDrawn.class, DataSerializers.VARINT);
+    private static final DataParameter<Float> DAMAGE_TAKEN = EntityDataManager.<Float>createKey(AbstractDrawn.class, DataSerializers.FLOAT);
     protected double offsetFactor;
 
     public AbstractDrawn(World worldIn)
@@ -43,6 +54,15 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
     @Override
     public void onUpdate()
     {
+        if (this.getTimeSinceHit() > 0)
+        {
+            this.setTimeSinceHit(this.getTimeSinceHit() - 1);
+        }
+
+        if (this.getDamageTaken() > 0.0F)
+        {
+            this.setDamageTaken(this.getDamageTaken() - 1.0F);
+        }
         super.onUpdate();
         if (!this.hasNoGravity())
         {
@@ -69,22 +89,27 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
             {
                 this.prevRotationYaw -= 360.0F;
             }
-            Vec3d moveVec = new Vec3d(targetVec.x - this.posX - this.getLookVec().x * this.offsetFactor, 0.0, targetVec.z - this.posZ - this.getLookVec().z * this.offsetFactor);
-            this.motionX = moveVec.x;
-            if (!this.pulling.onGround && this.pulling.fallDistance == 0.0D)
+            double lookX = MathHelper.sin(-this.rotationYaw * 0.017453292F - (float) Math.PI);
+            double lookZ = MathHelper.cos(-this.rotationYaw * 0.017453292F - (float) Math.PI);
+            double moveX = targetVec.x - this.posX + lookX * this.offsetFactor;
+            double moveZ = targetVec.z - this.posZ + lookZ * this.offsetFactor;
+            this.motionX = moveX;
+            if (!this.onGround && this.fallDistance == 0.0D)
             {
                 this.motionY = targetVec.y - this.posY;
             }
-            this.motionZ = moveVec.z;
-            this.tickLerp();
+            this.motionZ = moveZ;
+            
             if (this.world.isRemote)
             {
-                this.factor = -Math.sqrt(moveVec.x * moveVec.x + moveVec.z * moveVec.z);
-                if (moveVec.subtract(this.getLookVec()).lengthVector() > 1)
+                this.factor = -Math.sqrt(moveX * moveX + moveZ * moveZ);
+                if (Math.sqrt((moveX+lookX) * (moveX+lookX) + (moveZ+lookZ) * (moveZ+lookZ)) > 1)
                 {
                     this.factor = -this.factor;
                 }
             }
+            this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
+            this.tickLerp();
         }
         else
         {
@@ -92,16 +117,13 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
             {
                 this.factor = 0.0D;
             }
-            this.motionX = 0.0D;
-            this.motionZ = 0.0D;
         }
-        this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
         for (Entity entity : this.world.getEntitiesInAABBexcluding(this, this.getEntityBoundingBox(), EntitySelectors.getTeamCollisionPredicate(this)))
         {
             this.applyEntityCollision(entity);
         }
     }
-
+    
     /**
      * Handles the rotation of this cart and its components.
      * 
@@ -129,12 +151,15 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
     {
         if (this.pulling != null)
         {
-            RayTraceResult result = this.world.rayTraceBlocks(new Vec3d(this.posX, this.posY + this.height, this.posZ), new Vec3d(this.pulling.posX, this.pulling.posY + this.height / 2, this.pulling.posZ), false, true, false);
-            if (result != null)
+            if (this.collidedHorizontally)
             {
-                if (result.typeOfHit == Type.BLOCK)
+                RayTraceResult result = this.world.rayTraceBlocks(new Vec3d(this.posX, this.posY + this.height, this.posZ), new Vec3d(this.pulling.posX, this.pulling.posY + this.height / 2, this.pulling.posZ), false, true, false);
+                if (result != null)
                 {
-                    return true;
+                    if (result.typeOfHit == Type.BLOCK)
+                    {
+                        return true;
+                    }
                 }
             }
         }
@@ -175,13 +200,19 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
                     if (this.pulling != null)
                     {
                         this.pulling.getCapability(PullProvider.PULL, null).setDrawn(null);
+                        this.playSound(SoundEvents.ENTITY_ITEM_BREAK, 0.5F, 0.1F);
                     }
                     ((WorldServer) this.world).getEntityTracker().sendToTracking(this, PacketHandler.INSTANCE.getPacketFrom(new SPacketDrawnUpdate(-1, this.getEntityId())));
                 }
                 else
                 {
+                    if (this.pulling != null)
+                    {
+                        this.setPulling(null);
+                    }
                     entityIn.getCapability(PullProvider.PULL, null).setDrawn(this);
                     ((WorldServer) this.world).getEntityTracker().sendToTracking(this, PacketHandler.INSTANCE.getPacketFrom(new SPacketDrawnUpdate(entityIn.getEntityId(), this.getEntityId())));
+                    this.playSound(SoundEvents.ENTITY_HORSE_ARMOR, 0.5F, 1.0F);
                 }
             }
             this.pulling = entityIn;
@@ -201,6 +232,16 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
         this.wheelrot -= 0.12F * this.factor;
         return this.wheelrot;
     }
+    
+    @Override
+    public Entity changeDimension(int dimension, ITeleporter teleporter)
+    {
+        if(this.pulling == null || this.pulling.timeUntilPortal == this.pulling.getPortalCooldown())
+        {
+            return super.changeDimension(dimension, teleporter);
+        }
+        return null;
+    }
 
     @Override
     public boolean canBeCollidedWith()
@@ -217,67 +258,95 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
     @Override
     public boolean attackEntityFrom(DamageSource source, float amount)
     {
-        if (!this.isDead)
+        if (this.isEntityInvulnerable(source))
         {
-            if (source.isCreativePlayer())
+            return false;
+        }
+        else if (!this.world.isRemote && !this.isDead)
+        {
+            if (source instanceof EntityDamageSourceIndirect && source.getTrueSource() != null && this.isPassenger(source.getTrueSource()))
             {
-                this.setDead();
+                return false;
             }
             else
             {
-                this.lasthit = this.ticksExisted;
+                this.setTimeSinceHit(10);
+                this.setDamageTaken(this.getDamageTaken() + amount * 10.0F);
+                boolean flag = source.getTrueSource() instanceof EntityPlayer && ((EntityPlayer)source.getTrueSource()).capabilities.isCreativeMode;
 
-                if (this.lasthit >= ticksExisted - 20)
+                if (flag || this.getDamageTaken() > 40.0F)
                 {
-                    this.hitcount++;
-                }
-                else
-                {
-                    this.hitcount = 0;
-                }
-                if (this.hitcount == 10)
-                {
+                    this.onDestroyed(source, flag);
+                    this.setPulling(null);
+
                     this.setDead();
                 }
-            }
-            if (this.isDead)
-            {
-                this.setPulling(null);
-                if (!this.world.isRemote)
-                {
-                    this.onDestroyed(source);
-                }
+
+                return true;
             }
         }
         return true;
     }
+    
+    public void setDamageTaken(float damageTaken)
+    {
+        this.dataManager.set(DAMAGE_TAKEN, damageTaken);
+    }
+
+    public float getDamageTaken()
+    {
+        return this.dataManager.get(DAMAGE_TAKEN).floatValue();
+    }
+
+    public void setTimeSinceHit(int timeSinceHit)
+    {
+        this.dataManager.set(TIME_SINCE_HIT, timeSinceHit);
+    }
+
+    public int getTimeSinceHit()
+    {
+        return this.dataManager.get(TIME_SINCE_HIT).intValue();
+    }
+    
+    public abstract Item getCartItem();
 
     /**
-     * Executes upon carts destruction.
+     * Executes upon carts destruction. Currently only used to drop items on death.
      * 
      * @param source The damage source.
+     * @param byCreativePlayer Whether or not this entity was destroyed by a player in creative mode.
      */
-    public void onDestroyed(DamageSource source)
+    public void onDestroyed(DamageSource source, boolean byCreativePlayer)
     {
-
+        if (!byCreativePlayer && this.world.getGameRules().getBoolean("doEntityDrops"))
+        {
+            this.dropItemWithOffset(this.getCartItem(), 1, 0.0F);
+        }
+    }
+    
+    @Override
+    public ItemStack getPickedResult(RayTraceResult target)
+    {
+        return new ItemStack(this.getCartItem());
     }
 
     @Override
     protected void entityInit()
     {
-
+        this.dataManager.register(TIME_SINCE_HIT, 0);
+        this.dataManager.register(DAMAGE_TAKEN, 0.0F);
     }
 
     @Override
     protected void readEntityFromNBT(NBTTagCompound compound)
     {
-
+        
     }
 
     @Override
     protected void writeEntityToNBT(NBTTagCompound compound)
     {
-
+        
     }
 
     public void writeSpawnData(ByteBuf buffer)
@@ -292,7 +361,7 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
     {
         if (additionalData.readableBytes() >= 4)
         {
-            setPulling(world.getEntityByID(additionalData.readInt()));
+            this.setPulling(world.getEntityByID(additionalData.readInt()));
         }
     }
 
@@ -300,11 +369,14 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
     {
         if (this.lerpSteps > 0 && !this.pulling.canPassengerSteer())
         {
-            double dx = this.posX + (this.lerpX - this.posX) / (double) this.lerpSteps;
-            double dy = this.posY + (this.lerpY - this.posY) / (double) this.lerpSteps;
-            double dz = this.posZ + (this.lerpZ - this.posZ) / (double) this.lerpSteps;
+            double dx = this.posX + (this.lerpX - this.posX) / this.lerpSteps;
+            double dy = this.posY + (this.lerpY - this.posY) / this.lerpSteps;
+            double dz = this.posZ + (this.lerpZ - this.posZ) / this.lerpSteps;
+            double drot = MathHelper.wrapDegrees(this.lerpYaw - this.rotationYaw);
+            this.rotationYaw = (float)(this.rotationYaw + drot / this.lerpSteps);
             --this.lerpSteps;
             this.setPosition(dx, dy, dz);
+            this.setRotation(this.rotationYaw, this.rotationPitch);
         }
     }
 
@@ -315,6 +387,7 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
         this.lerpX = x;
         this.lerpY = y;
         this.lerpZ = z;
+        this.lerpYaw = (double)yaw;
         this.lerpSteps = 10;
     }
 
@@ -328,6 +401,7 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
             this.posX = this.lerpX;
             this.posY = this.lerpY;
             this.posZ = this.lerpZ;
+            this.rotationYaw = (float)this.lerpYaw;
         }
     }
 }

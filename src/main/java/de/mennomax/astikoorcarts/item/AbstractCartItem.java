@@ -14,14 +14,14 @@ import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-public abstract class CartItem extends Item
+public abstract class AbstractCartItem extends Item
 {
-    public CartItem(String name)
+    public AbstractCartItem(String name)
     {
         this.setRegistryName(AstikoorCarts.MODID, name);
         this.setUnlocalizedName(this.getRegistryName().toString());
-        setCreativeTab(ModCreativeTabs.astikoor);
-        setMaxStackSize(1);
+        this.setCreativeTab(ModCreativeTabs.astikoor);
+        this.setMaxStackSize(1);
     }
 
     @Override
@@ -40,7 +40,7 @@ public abstract class CartItem extends Item
                 {
                     if (!worldIn.isRemote)
                     {
-                        AbstractDrawn cart = newCart(worldIn);
+                        AbstractDrawn cart = this.newCart(worldIn);
                         cart.setPosition(result.hitVec.x, result.hitVec.y, result.hitVec.z);
                         cart.rotationYaw = (playerIn.rotationYaw + 180) % 360;
                         worldIn.spawnEntity(cart);

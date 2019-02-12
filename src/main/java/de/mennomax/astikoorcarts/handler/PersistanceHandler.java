@@ -46,14 +46,14 @@ public class PersistanceHandler
     @SubscribeEvent
     public void onEntityJoinWorld(EntityJoinWorldEvent event)
     {
-        if (event.getEntity() instanceof EntityLiving)
+        if (!event.getWorld().isRemote && event.getEntity() instanceof EntityLiving)
         {
             ((EntityLiving) event.getEntity()).tasks.addTask(2, new EntityAIPullCart((EntityLiving) event.getEntity()));
         }
     }
 
     @SubscribeEvent
-    public void onEntityTravelToDimension(EntityTravelToDimensionEvent event)
+    public void onEnwdtityTravelToDimension(EntityTravelToDimensionEvent event)
     {
         AbstractDrawn drawn = event.getEntity().getCapability(PullProvider.PULL, null).getDrawn();
         if (drawn != null)
