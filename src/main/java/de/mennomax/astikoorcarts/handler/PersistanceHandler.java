@@ -54,7 +54,7 @@ public class PersistanceHandler
     }
 
     @SubscribeEvent
-    public void onEnwdtityTravelToDimension(EntityTravelToDimensionEvent event)
+    public void onEntityTravelToDimension(EntityTravelToDimensionEvent event)
     {
         AbstractDrawn drawn = event.getEntity().getCapability(PullProvider.PULL, null).getDrawn();
         if (drawn != null)
