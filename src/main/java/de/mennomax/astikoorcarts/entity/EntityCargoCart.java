@@ -26,7 +26,6 @@ public class EntityCargoCart extends AbstractDrawnInventory implements IInventor
     {
         super(worldIn);
         this.setSize(1.5F, 1.4F);
-        this.stepHeight = 1.2F;
         this.offsetFactor = 2.4D;
         this.inventory = new InventoryBasic(this.getName(), true, 54);
         this.inventory.addInventoryChangeListener(this);
@@ -35,7 +34,7 @@ public class EntityCargoCart extends AbstractDrawnInventory implements IInventor
     @Override
     public boolean canPull(Entity pullingIn)
     {
-        for (String entry : ModConfig.cargocart.canPull)
+        for (String entry : ModConfig.cargoCart.canPull)
         {
             if (entry.equals(pullingIn instanceof EntityPlayer ? "minecraft:player" : EntityList.getKey(pullingIn).toString()))
             {

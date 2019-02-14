@@ -11,6 +11,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.IInventoryChangedListener;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemHoe;
@@ -25,24 +27,30 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
-public class EntityPlowCart extends AbstractDrawnInventory
+public class EntityPlowCart extends AbstractDrawnInventory implements IInventoryChangedListener
 {
     private static final DataParameter<Boolean> PLOWING = EntityDataManager.<Boolean>createKey(EntityPlowCart.class, DataSerializers.BOOLEAN);
     private static final double BLADEOFFSET = 1.7D;
-
+    @SuppressWarnings("rawtypes")
+    private static final DataParameter[] TOOLS = {
+            EntityDataManager.<ItemStack>createKey(EntityPlowCart.class, DataSerializers.ITEM_STACK),
+            EntityDataManager.<ItemStack>createKey(EntityPlowCart.class, DataSerializers.ITEM_STACK),
+            EntityDataManager.<ItemStack>createKey(EntityPlowCart.class, DataSerializers.ITEM_STACK)
+    };
+    
     public EntityPlowCart(World worldIn)
     {
         super(worldIn);
         this.setSize(1.5F, 1.4F);
-        this.stepHeight = 1.2F;
         this.offsetFactor = 2.4D;
         this.inventory = new InventoryBasic(this.getName(), true, 3);
+        this.inventory.addInventoryChangeListener(this);
     }
 
     @Override
     public boolean canPull(Entity pullingIn)
     {
-        String[] canPullArray = ModConfig.plowcart.canPull;
+        String[] canPullArray = ModConfig.plowCart.canPull;
         for (int i = 0; i < canPullArray.length; i++)
         {
             if (canPullArray[i].equals(pullingIn instanceof EntityPlayer ? "minecraft:player" : EntityList.getKey(pullingIn).toString()))
@@ -115,11 +123,16 @@ public class EntityPlowCart extends AbstractDrawnInventory
         return true;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void readEntityFromNBT(NBTTagCompound compound)
     {
         super.readEntityFromNBT(compound);
         dataManager.set(PLOWING, compound.getBoolean("Plowing"));
+        for(int i = 0; i < TOOLS.length; i++)
+        {
+            this.dataManager.set(TOOLS[i], this.inventory.getStackInSlot(i));
+        }
     }
 
     @Override
@@ -129,14 +142,18 @@ public class EntityPlowCart extends AbstractDrawnInventory
         compound.setBoolean("Plowing", dataManager.get(PLOWING));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void entityInit()
     {
         super.entityInit();
         this.dataManager.register(PLOWING, false);
+        for(int i = 0; i < TOOLS.length; i++)
+        {
+            this.dataManager.register(TOOLS[i], ItemStack.EMPTY);
+        }
     }
     
-    @SuppressWarnings("incomplete-switch")
     private void handleTool(BlockPos pos, int slot, EntityPlayer player)
     {
         IBlockState state = this.world.getBlockState(pos);
@@ -154,12 +171,16 @@ public class EntityPlowCart extends AbstractDrawnInventory
             {
                 switch (state.getValue(BlockDirt.VARIANT))
                 {
-                    case DIRT:
-                        this.world.setBlockState(pos, Blocks.FARMLAND.getDefaultState(), 11);
-                        itemstack.damageItem(1, player);
-                    case COARSE_DIRT:
-                        this.world.setBlockState(pos, Blocks.DIRT.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.DIRT), 11);
-                        itemstack.damageItem(1, player);
+                case DIRT:
+                    this.world.setBlockState(pos, Blocks.FARMLAND.getDefaultState(), 11);
+                    itemstack.damageItem(1, player);
+                    break;
+                case COARSE_DIRT:
+                    this.world.setBlockState(pos, Blocks.DIRT.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.DIRT), 11);
+                    itemstack.damageItem(1, player);
+                    break;
+                default:
+                    break;
                 }
             }
         }
@@ -171,5 +192,24 @@ public class EntityPlowCart extends AbstractDrawnInventory
                 itemstack.damageItem(1, player);
             }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void onInventoryChanged(IInventory invBasic)
+    {
+        for(int i = 0; i < TOOLS.length; i++)
+        {
+            if (this.dataManager.get(TOOLS[i]) != invBasic.getStackInSlot(i))
+            {
+                this.dataManager.set(TOOLS[i], this.inventory.getStackInSlot(i));
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public ItemStack getTool(int i)
+    {
+        return (ItemStack) this.dataManager.get(TOOLS[i]);
     }
 }

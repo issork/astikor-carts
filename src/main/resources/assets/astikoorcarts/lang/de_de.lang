@@ -1,6 +1,7 @@
 item.astikoorcarts:cargocart.name=Karren
 item.astikoorcarts:plowcart.name=Pflug
 item.astikoorcarts:wheel.name=Rad
+config.astikoorcarts:speedmodifier=Geschwindigkeitsmodifikator
 itemGroup.astikoorcarts=Astikoor Karren
 entity.astikoorcarts:cargocart.name=Karren
 entity.astikoorcarts:plowcart.name=Pflug

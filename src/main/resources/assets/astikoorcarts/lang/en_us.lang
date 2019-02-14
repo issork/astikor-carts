@@ -6,3 +6,4 @@ entity.astikoorcarts:cargocart.name=Cart
 entity.astikoorcarts:plowcart.name=Plow
 key.categories.astikoorcarts=Astikoor Carts
 key.astikoorcarts.desc=Action Key
+config.astikoorcarts:speedmodifier=Speed Modifier

@@ -4,6 +4,7 @@ import de.mennomax.astikoorcarts.entity.EntityCargoCart;
 import de.mennomax.astikoorcarts.init.ModKeybindings;
 import de.mennomax.astikoorcarts.packets.CPacketActionKey;
 import de.mennomax.astikoorcarts.packets.CPacketOpenCartGui;
+import de.mennomax.astikoorcarts.packets.CPacketToggleSlow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.inventory.GuiInventory;
@@ -20,13 +21,16 @@ public class ClientEventHandler
     {
         if (event.phase == TickEvent.Phase.END)
         {
-            if (Minecraft.getMinecraft().world == null)
+            if (Minecraft.getMinecraft().world != null)
             {
-                return;
-            }
-            if (ModKeybindings.keybindings.get(0).isPressed())
-            {
-                PacketHandler.INSTANCE.sendToServer(new CPacketActionKey());
+                if (ModKeybindings.keybindings.get(0).isPressed())
+                {
+                    PacketHandler.INSTANCE.sendToServer(new CPacketActionKey());
+                }
+                if (Minecraft.getMinecraft().gameSettings.keyBindSprint.isPressed())
+                {
+                    PacketHandler.INSTANCE.sendToServer(new CPacketToggleSlow());
+                }
             }
         }
     }

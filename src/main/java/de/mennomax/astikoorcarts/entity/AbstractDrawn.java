@@ -1,13 +1,19 @@
 package de.mennomax.astikoorcarts.entity;
 
+import java.util.UUID;
+
 import de.mennomax.astikoorcarts.capabilities.PullProvider;
+import de.mennomax.astikoorcarts.config.ModConfig;
 import de.mennomax.astikoorcarts.handler.PacketHandler;
 import de.mennomax.astikoorcarts.packets.SPacketDrawnUpdate;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.MoverType;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
@@ -32,6 +38,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public abstract class AbstractDrawn extends Entity implements IEntityAdditionalSpawnData
 {
+    public static final UUID PULL_SLOWLY_MODIFIER_UUID = UUID.fromString("49B0E52E-48F2-4D89-BED7-4F5DF26F1263");
+    public static final AttributeModifier PULL_SLOWLY_MODIFIER = (new AttributeModifier(PULL_SLOWLY_MODIFIER_UUID, "Pull slowly modifier", ModConfig.speedModifier, 2)).setSaved(false);
     protected Entity pulling;
     @SideOnly(Side.CLIENT)
     private float wheelrot;
@@ -49,6 +57,7 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
     public AbstractDrawn(World worldIn)
     {
         super(worldIn);
+        this.stepHeight = 1.2F;
     }
 
     @Override
@@ -102,11 +111,7 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
             
             if (this.world.isRemote)
             {
-                this.factor = -Math.sqrt(moveX * moveX + moveZ * moveZ);
-                if (Math.sqrt((moveX+lookX) * (moveX+lookX) + (moveZ+lookZ) * (moveZ+lookZ)) > 1)
-                {
-                    this.factor = -this.factor;
-                }
+                this.factor = Math.sqrt((moveX+lookX) * (moveX+lookX) + (moveZ+lookZ) * (moveZ+lookZ)) > 1 ? Math.sqrt(moveX * moveX + moveZ * moveZ) : -Math.sqrt(moveX * moveX + moveZ * moveZ);
             }
             this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
             this.tickLerp();
@@ -189,16 +194,16 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
     {
         if (this.pulling == null || entityIn == null)
         {
-            if (entityIn instanceof EntityLiving)
-            {
-                ((EntityLiving) entityIn).getNavigator().setPath(null, 0.0D);
-            }
             if (!this.world.isRemote)
             {
                 if (entityIn == null)
                 {
                     if (this.pulling != null)
                     {
+                        if (this.pulling instanceof EntityLivingBase)
+                        {
+                            ((EntityLivingBase) this.pulling).getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(AbstractDrawn.PULL_SLOWLY_MODIFIER);
+                        }
                         this.pulling.getCapability(PullProvider.PULL, null).setDrawn(null);
                         this.playSound(SoundEvents.ENTITY_ITEM_BREAK, 0.5F, 0.1F);
                     }
@@ -206,9 +211,9 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
                 }
                 else
                 {
-                    if (this.pulling != null)
+                    if (entityIn instanceof EntityLiving)
                     {
-                        this.setPulling(null);
+                        ((EntityLiving) entityIn).getNavigator().setPath(null, 0.0D);
                     }
                     entityIn.getCapability(PullProvider.PULL, null).setDrawn(this);
                     ((WorldServer) this.world).getEntityTracker().sendToTracking(this, PacketHandler.INSTANCE.getPacketFrom(new SPacketDrawnUpdate(entityIn.getEntityId(), this.getEntityId())));

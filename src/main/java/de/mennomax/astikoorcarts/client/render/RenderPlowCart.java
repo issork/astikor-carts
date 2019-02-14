@@ -9,7 +9,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 
@@ -56,25 +55,22 @@ public class RenderPlowCart extends Render<EntityPlowCart>
         // Render the tools on the plow
         for (int i = 0; i < entity.inventory.getSizeInventory(); i++)
         {
-            if (!(entity.inventory.getStackInSlot(i) == ItemStack.EMPTY))
+            GlStateManager.pushMatrix();
+            double offsetSides = 0.1D * ((i+1) & 1);
+            if (entity.getPlowing())
             {
-                GlStateManager.pushMatrix();
-                double offsetSides = 0.1D * ((i+1)%2);
-                if (entity.getPlowing())
-                {
-                    GlStateManager.translate(x + (1.45D + offsetSides) * MathHelper.sin((-36.0F + entityYaw+i*36.0F) * 0.017453292F), y+0.10D, z - (1.45D + offsetSides) * MathHelper.cos((-36.0F + entityYaw+i*36.0F) * 0.017453292F));
-                    GlStateManager.rotate(120.0F - entityYaw - 30.0F*i, 0.0F, 1.0F, 0.0F);
-                    GlStateManager.rotate(181.0F, 0.0F, 0.0F, 1.0F);
-                }
-                else
-                {
-                    GlStateManager.translate(x + (1.9D + offsetSides) * MathHelper.sin((-34.7F + entityYaw+i*34.7F) * 0.017453292F), y+0.90D, z - (1.9D + offsetSides) * MathHelper.cos((-34.7F + entityYaw+i*34.7F) * 0.017453292F));
-                    GlStateManager.rotate(120.0F - entityYaw - 30.0F*i, 0.0F, 1.0F, 0.0F);
-                    GlStateManager.rotate(207.0F, 0.0F, 0.0F, 1.0F);
-                }
-                Minecraft.getMinecraft().getRenderItem().renderItem(entity.inventory.getStackInSlot(i), ItemCameraTransforms.TransformType.FIXED);
-                GlStateManager.popMatrix();
+                GlStateManager.translate(x + (1.45D + offsetSides) * MathHelper.sin((-36.0F + entityYaw+i*36.0F) * 0.017453292F), y+0.10D, z - (1.45D + offsetSides) * MathHelper.cos((-36.0F + entityYaw+i*36.0F) * 0.017453292F));
+                GlStateManager.rotate(120.0F - entityYaw - 30.0F*i, 0.0F, 1.0F, 0.0F);
+                GlStateManager.rotate(181.0F, 0.0F, 0.0F, 1.0F);
             }
+            else
+            {
+                GlStateManager.translate(x + (1.9D + offsetSides) * MathHelper.sin((-34.7F + entityYaw+i*34.7F) * 0.017453292F), y+0.90D, z - (1.9D + offsetSides) * MathHelper.cos((-34.7F + entityYaw+i*34.7F) * 0.017453292F));
+                GlStateManager.rotate(120.0F - entityYaw - 30.0F*i, 0.0F, 1.0F, 0.0F);
+                GlStateManager.rotate(207.0F, 0.0F, 0.0F, 1.0F);
+            }
+            Minecraft.getMinecraft().getRenderItem().renderItem(((EntityPlowCart) entity).getTool(i), ItemCameraTransforms.TransformType.FIXED);
+            GlStateManager.popMatrix();
         }
         super.doRender(entity, x, y, z, entityYaw, partialTicks);
     }
