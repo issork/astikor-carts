@@ -21,6 +21,7 @@ public class PersistanceHandler
     public void onAttachCapability(AttachCapabilitiesEvent<Entity> event)
     {
         // null check because of a compability issue with MrCrayfish's Furniture Mod and probably others
+        // since this event is being fired even when an entity is initialized in the main menu
         if (event.getObject().world != null && !event.getObject().world.isRemote)
         {
             event.addCapability(new ResourceLocation(AstikorCarts.MODID), new PullProvider());

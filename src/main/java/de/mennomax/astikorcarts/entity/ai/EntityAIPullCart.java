@@ -17,10 +17,11 @@ public class EntityAIPullCart extends EntityAIBase
     @Override
     public boolean shouldExecute()
     {
-        if (living.hasCapability(PullProvider.PULL, null))
+        if (this.living.hasCapability(PullProvider.PULL, null))
         {
-            return living.getCapability(PullProvider.PULL, null).getDrawn() != null;
+            return this.living.getCapability(PullProvider.PULL, null).getDrawn() != null;
         }
         return false;
     }
+    
 }

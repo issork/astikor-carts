@@ -150,7 +150,7 @@ public class ModelCargoCart extends ModelBase
     {
         super.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, rotationYaw, rotationPitch, scale, entity);
         this.leftWheel.rotateAngleX = ((EntityCargoCart) entity).getWheelRotation();
-        this.rightWheel.rotateAngleX = ((EntityCargoCart) entity).getWheelRotation();
+        this.rightWheel.rotateAngleX = this.leftWheel.rotateAngleX;
 
         this.leftWheel.render(scale);
         this.rightWheel.render(scale);
