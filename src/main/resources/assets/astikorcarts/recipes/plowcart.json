@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "astikor_cart",
+  "pattern": [
+    "sss",
+    "psp",
+    "wpw"
+  ],
+  "key": {
+    "p": {
+      "type": "forge:ore_dict",
+      "ore": "plankWood"
+    },
+    "s": {
+      "item": "minecraft:stick"
+    },
+    "w": {
+      "item": "astikorcarts:wheel"
+    }
+  },
+  "result": {
+    "item": "astikorcarts:plowcart"
+  }
+}

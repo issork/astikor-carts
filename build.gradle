@@ -12,8 +12,8 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 
 
 version = "1.12.2-0.1.2.0"
-group = "de.mennomax.astikoorcarts" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "astikoorcarts"
+group = "de.mennomax.astikorcarts" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "astikorcarts"
 
 sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 compileJava {

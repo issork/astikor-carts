@@ -1,8 +1,0 @@
-item.astikoorcarts:cargocart.name=Телега
-item.astikoorcarts:plowcart.name=Плуг
-item.astikoorcarts:wheel.name=Колесо
-itemGroup.astikoorcarts=Astikoor Тележки
-entity.astikoorcarts:cargocart.name=Телега
-entity.astikoorcarts:plowcart.name=Плуг
-key.categories.astikoorcarts=Astikoor Тележки
-key.astikoorcarts.desc=Клавиша действия

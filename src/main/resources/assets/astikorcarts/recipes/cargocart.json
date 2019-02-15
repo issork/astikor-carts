@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "astikor_cart",
+  "pattern": [
+    "pcp",
+    "pcp",
+    "wpw"
+  ],
+  "key": {
+    "p": {
+      "type": "forge:ore_dict",
+      "ore": "plankWood"
+    },
+    "c": {
+      "item": "minecraft:chest"
+    },
+    "w": {
+      "item": "astikorcarts:wheel"
+    }
+  },
+  "result": {
+    "item": "astikorcarts:cargocart"
+  }
+}
