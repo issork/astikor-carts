@@ -1,5 +1,6 @@
 item.astikorcarts:cargocart.name=Karren
 item.astikorcarts:plowcart.name=Pflug
+item.astikorcarts:mobcart.name=Transportkarren
 item.astikorcarts:wheel.name=Rad
 itemGroup.astikorcarts=Astikor Karren
 entity.astikorcarts:cargocart.name=Karren

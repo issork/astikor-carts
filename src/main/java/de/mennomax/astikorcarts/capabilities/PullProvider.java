@@ -1,12 +1,11 @@
 package de.mennomax.astikorcarts.capabilities;
 
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.common.capabilities.ICapabilitySerializable;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
-public class PullProvider implements ICapabilitySerializable<NBTBase>
+public class PullProvider implements ICapabilityProvider
 {
     @CapabilityInject(IPull.class)
     public static final Capability<IPull> PULL = null;
@@ -27,17 +26,5 @@ public class PullProvider implements ICapabilitySerializable<NBTBase>
             return PULL.cast(this.instance);
         }
         return null;
-    }
-
-    @Override
-    public NBTBase serializeNBT()
-    {
-        return PULL.getStorage().writeNBT(PULL, this.instance, null);
-    }
-
-    @Override
-    public void deserializeNBT(NBTBase nbt)
-    {
-        PULL.getStorage().readNBT(PULL, this.instance, null, nbt);
     }
 }

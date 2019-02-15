@@ -1,5 +1,6 @@
 item.astikorcarts:cargocart.name=Cart
 item.astikorcarts:plowcart.name=Plow
+item.astikorcarts:mobcart.name=Transportation Cart
 item.astikorcarts:wheel.name=Wheel
 itemGroup.astikorcarts=Astikor Carts
 entity.astikorcarts:cargocart.name=Cart
