@@ -42,6 +42,8 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
     protected Entity pulling;
     private UUID firstPullingUUID;
     @SideOnly(Side.CLIENT)
+    private int firstPullingId = -1;
+    @SideOnly(Side.CLIENT)
     private float wheelrot;
     @SideOnly(Side.CLIENT)
     private double factor;
@@ -118,14 +120,7 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
         }
         else
         {
-            if (this.world.isRemote)
-            {
-                this.factor = 0.0D;
-            }
-            else
-            {
-                this.attemptReattach();
-            }
+            this.attemptReattach();
         }
         for (Entity entity : this.world.getEntitiesInAABBexcluding(this, this.getEntityBoundingBox(), EntitySelectors.getTeamCollisionPredicate(this)))
         {
@@ -227,6 +222,24 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
             this.pulling = entityIn;
         }
     }
+    
+    /**
+     * Attempts to attach this cart to a entity with the given Id and returns wether or not the entity existed in the world.
+     * 
+     * @param entityId The Id of the entity that should start pulling this cart.
+     * @return {@code true} if the entity existed in the client world, {@code false} else.
+     */
+    @SideOnly(Side.CLIENT)
+    public boolean setPullingId(int entityId)
+    {
+        Entity entity = this.world.getEntityByID(entityId);
+        if (entity != null)
+        {
+            this.setPulling(entity);
+            return true;
+        }
+        return false;
+    }
 
     /**
      * @return The current wheel rotation angle.
@@ -234,11 +247,10 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
     @SideOnly(Side.CLIENT)
     public float getWheelRotation()
     {
-        if (Minecraft.getMinecraft().isGamePaused())
+        if (this.pulling != null && !Minecraft.getMinecraft().isGamePaused())
         {
-            this.factor = 0F;
+            this.wheelrot -= 0.12F * this.factor;
         }
-        this.wheelrot -= 0.12F * this.factor;
         return this.wheelrot;
     }
 
@@ -331,15 +343,29 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
     
     private void attemptReattach()
     {
-        if (this.firstPullingUUID != null)
+        if (this.world.isRemote)
         {
-            Entity pulling = ((WorldServer) this.world).getEntityFromUuid(this.firstPullingUUID);
-            if (pulling != null)
+            if (this.firstPullingId != -1)
             {
-                this.setPulling(pulling);
-                this.firstPullingUUID = null;
+                if (this.setPullingId(this.firstPullingId))
+                {
+                    this.firstPullingId = -1;
+                }
             }
         }
+        else
+        {
+            if (this.firstPullingUUID != null)
+            {
+                Entity pulling = ((WorldServer) this.world).getEntityFromUuid(this.firstPullingUUID);
+                if (pulling != null)
+                {
+                    this.setPulling(pulling);
+                    this.firstPullingUUID = null;
+                }
+            }
+        }
+        
     }
 
     @Override
@@ -376,8 +402,11 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
     {
         if (additionalData.readableBytes() >= 4)
         {
-            int a = additionalData.readInt();
-            this.setPulling(world.getEntityByID(a));
+            int entityId = additionalData.readInt();
+            if (!this.setPullingId(entityId))
+            {
+                this.firstPullingId = entityId;
+            }
         }
     }
 

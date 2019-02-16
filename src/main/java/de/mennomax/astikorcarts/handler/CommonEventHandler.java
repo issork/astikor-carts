@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 @EventBusSubscriber(modid = AstikorCarts.MODID)
-public class PersistanceHandler
+public class CommonEventHandler
 {
     @SubscribeEvent
     public static void onAttachCapability(AttachCapabilitiesEvent<Entity> event)
