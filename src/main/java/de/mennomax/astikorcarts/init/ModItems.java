@@ -25,7 +25,7 @@ public class ModItems
     public static final Item PLOWCART = null;
     public static final Item MOBCART = null;
 
-    @EventBusSubscriber
+    @EventBusSubscriber(modid = AstikorCarts.MODID)
     public static class ItemRegistrationHandler
     {
         public static final Set<Item> ITEMSET = new HashSet<Item>();

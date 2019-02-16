@@ -4,11 +4,8 @@ import de.mennomax.astikorcarts.capabilities.IPull;
 import de.mennomax.astikorcarts.capabilities.PullFactory;
 import de.mennomax.astikorcarts.capabilities.PullStorage;
 import de.mennomax.astikorcarts.handler.GuiHandler;
-import de.mennomax.astikorcarts.handler.MissingMappingHandler;
 import de.mennomax.astikorcarts.handler.PacketHandler;
-import de.mennomax.astikorcarts.handler.PersistanceHandler;
 import de.mennomax.astikorcarts.proxy.IProxy;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -42,8 +39,6 @@ public class AstikorCarts
     @EventHandler
     public void init(FMLInitializationEvent event)
     {
-        MinecraftForge.EVENT_BUS.register(new MissingMappingHandler());
-        MinecraftForge.EVENT_BUS.register(new PersistanceHandler());
         NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
         proxy.init();
     }

@@ -20,7 +20,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
 @ObjectHolder(AstikorCarts.MODID)
 public class ModEntities
 {
-    @EventBusSubscriber
+    @EventBusSubscriber(modid = AstikorCarts.MODID)
     public static class EntityRegistrationHandler
     {
         private static int id = 0;

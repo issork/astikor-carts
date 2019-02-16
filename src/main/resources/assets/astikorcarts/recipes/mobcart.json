@@ -11,14 +11,11 @@
       "type": "forge:ore_dict",
       "ore": "plankWood"
     },
-    "c": {
-      "item": "minecraft:chest"
-    },
     "w": {
       "item": "astikorcarts:wheel"
     }
   },
   "result": {
-    "item": "astikorcarts:cargocart"
+    "item": "astikorcarts:mobcart"
   }
 }

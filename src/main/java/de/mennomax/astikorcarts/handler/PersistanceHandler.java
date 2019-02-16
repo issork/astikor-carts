@@ -8,12 +8,14 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+@EventBusSubscriber(modid = AstikorCarts.MODID)
 public class PersistanceHandler
 {
     @SubscribeEvent
-    public void onAttachCapability(AttachCapabilitiesEvent<Entity> event)
+    public static void onAttachCapability(AttachCapabilitiesEvent<Entity> event)
     {
         // null check because of a compability issue with MrCrayfish's Furniture Mod and probably others
         // since this event is being fired even when an entity is initialized in the main menu
@@ -24,14 +26,11 @@ public class PersistanceHandler
     }
     
     @SubscribeEvent
-    public void onEntityJoinWorld(EntityJoinWorldEvent event)
+    public static void onEntityJoinWorld(EntityJoinWorldEvent event)
     {
-        if (!event.getWorld().isRemote)
+        if (event.getEntity() instanceof EntityLiving)
         {
-            if (event.getEntity() instanceof EntityLiving)
-            {
-                ((EntityLiving) event.getEntity()).tasks.addTask(2, new EntityAIPullCart((EntityLiving) event.getEntity()));
-            }
+            ((EntityLiving) event.getEntity()).tasks.addTask(2, new EntityAIPullCart((EntityLiving) event.getEntity()));
         }
     }
 }

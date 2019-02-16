@@ -40,6 +40,7 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
     public static final UUID PULL_SLOWLY_MODIFIER_UUID = UUID.fromString("49B0E52E-48F2-4D89-BED7-4F5DF26F1263");
     public static final AttributeModifier PULL_SLOWLY_MODIFIER = (new AttributeModifier(PULL_SLOWLY_MODIFIER_UUID, "Pull slowly modifier", ModConfig.speedModifier, 2)).setSaved(false);
     protected Entity pulling;
+    private UUID firstPullingUUID;
     @SideOnly(Side.CLIENT)
     private float wheelrot;
     @SideOnly(Side.CLIENT)
@@ -121,13 +122,17 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
             {
                 this.factor = 0.0D;
             }
+            else
+            {
+                this.attemptReattach();
+            }
         }
         for (Entity entity : this.world.getEntitiesInAABBexcluding(this, this.getEntityBoundingBox(), EntitySelectors.getTeamCollisionPredicate(this)))
         {
             this.applyEntityCollision(entity);
         }
     }
-    
+
     /**
      * Handles the rotation of this cart and its components.
      * 
@@ -323,6 +328,19 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
     {
         return new ItemStack(this.getCartItem());
     }
+    
+    private void attemptReattach()
+    {
+        if (this.firstPullingUUID != null)
+        {
+            Entity pulling = ((WorldServer) this.world).getEntityFromUuid(this.firstPullingUUID);
+            if (pulling != null)
+            {
+                this.setPulling(pulling);
+                this.firstPullingUUID = null;
+            }
+        }
+    }
 
     @Override
     protected void entityInit()
@@ -334,13 +352,16 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
     @Override
     protected void readEntityFromNBT(NBTTagCompound compound)
     {
-        
+        this.firstPullingUUID = compound.getUniqueId("FirstPullingUUID");
     }
 
     @Override
     protected void writeEntityToNBT(NBTTagCompound compound)
     {
-        
+        if (this.pulling != null)
+        {
+            compound.setUniqueId("FirstPullingUUID", this.pulling.getUniqueID());
+        }
     }
 
     public void writeSpawnData(ByteBuf buffer)
@@ -355,7 +376,8 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
     {
         if (additionalData.readableBytes() >= 4)
         {
-            this.setPulling(world.getEntityByID(additionalData.readInt()));
+            int a = additionalData.readInt();
+            this.setPulling(world.getEntityByID(a));
         }
     }
 

@@ -25,25 +25,22 @@ public class EntityMobCart extends AbstractDrawn
     @Override
     public boolean processInitialInteract(EntityPlayer player, EnumHand hand)
     {
+        if (!this.world.isRemote)
         {
-            if (!this.world.isRemote)
+            if (player.isSneaking())
             {
-                if (player.isSneaking())
-                {
-                   for (Entity entity : this.getPassengers())
+               for (Entity entity : this.getPassengers())
+               {
+                   if (!(entity instanceof EntityPlayer))
                    {
-                       if (!(entity instanceof EntityPlayer))
-                       {
-                           entity.dismountRidingEntity();
-                           return true;
-                       }
+                       entity.dismountRidingEntity();
+                       return true;
                    }
-                }
-                else
-                {
-                    player.startRiding(this);
-                }
-
+               }
+            }
+            else
+            {
+                player.startRiding(this);
             }
         }
         return true;

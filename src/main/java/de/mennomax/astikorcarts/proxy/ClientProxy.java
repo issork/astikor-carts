@@ -1,9 +1,7 @@
 package de.mennomax.astikorcarts.proxy;
 
-import de.mennomax.astikorcarts.handler.ClientEventHandler;
 import de.mennomax.astikorcarts.init.ModEntities;
 import de.mennomax.astikorcarts.init.ModKeybindings;
-import net.minecraftforge.common.MinecraftForge;
 
 public class ClientProxy implements IProxy
 {
@@ -14,7 +12,6 @@ public class ClientProxy implements IProxy
 
     public void init()
     {
-        MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
         ModKeybindings.registerKeyBindings();
     }
 
