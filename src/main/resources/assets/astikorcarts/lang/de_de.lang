@@ -5,6 +5,7 @@ item.astikorcarts:wheel.name=Rad
 itemGroup.astikorcarts=Astikor Karren
 entity.astikorcarts:cargocart.name=Karren
 entity.astikorcarts:plowcart.name=Pflug
+entity.astikorcarts:mobcart.name=Transportkarren
 key.categories.astikorcarts=Astikor Karren
 key.astikorcarts.desc=Aktionstaste
 config.astikorcarts:speedmodifier=Geschwindigkeitsmodifikator

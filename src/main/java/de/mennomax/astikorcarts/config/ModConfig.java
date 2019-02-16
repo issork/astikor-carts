@@ -24,7 +24,7 @@ public class ModConfig
     @LangKey("entity.astikorcarts:plowcart.name")
     public static PlowCart plowCart = new PlowCart();
     
-    @LangKey("entity.astikorcarts:plowcart.name")
+    @LangKey("entity.astikorcarts:mobcart.name")
     public static MobCart mobCart = new MobCart();
 
     public static class CargoCart
