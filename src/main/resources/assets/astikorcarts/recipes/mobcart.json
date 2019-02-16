@@ -1,6 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "group": "astikor_cart",
   "pattern": [
     "ppp",
     "ppp",
