@@ -178,7 +178,7 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
      */
     public boolean canPull(Entity pullingIn)
     {
-        return true;
+        return false;
     }
 
     public Entity getPulling()

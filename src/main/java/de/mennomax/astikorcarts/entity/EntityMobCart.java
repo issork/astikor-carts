@@ -1,7 +1,9 @@
 package de.mennomax.astikorcarts.entity;
 
+import de.mennomax.astikorcarts.config.ModConfig;
 import de.mennomax.astikorcarts.init.ModItems;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.passive.EntityWaterMob;
@@ -20,6 +22,19 @@ public class EntityMobCart extends AbstractDrawn
         super(worldIn);
         this.setSize(1.375F, 1.4F);
         this.offsetFactor = 2.4D;
+    }
+    
+    @Override
+    public boolean canPull(Entity pullingIn)
+    {
+        for (String entry : ModConfig.mobCart.canPull)
+        {
+            if (entry.equals(pullingIn instanceof EntityPlayer ? "minecraft:player" : EntityList.getKey(pullingIn).toString()))
+            {
+                return true;
+            }
+        }
+        return false;
     }
     
     @Override
@@ -58,7 +73,7 @@ public class EntityMobCart extends AbstractDrawn
 
         if (!entity.isPassenger(this))
         {
-            if (!this.world.isRemote && !(this.getControllingPassenger() instanceof EntityPlayer) && this.getPassengers().size() < 2 && !entity.isRiding() && entity.width < this.width && entity instanceof EntityLivingBase && !(entity instanceof EntityWaterMob) && !(entity instanceof EntityPlayer))
+            if (!this.world.isRemote && this.pulling != entity && !(this.getControllingPassenger() instanceof EntityPlayer) && this.getPassengers().size() < 2 && !entity.isRiding() && entity.width < this.width && entity instanceof EntityLivingBase && !(entity instanceof EntityWaterMob) && !(entity instanceof EntityPlayer))
             {
                 entity.startRiding(this);
             }

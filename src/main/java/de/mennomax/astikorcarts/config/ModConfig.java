@@ -23,6 +23,9 @@ public class ModConfig
 
     @LangKey("entity.astikorcarts:plowcart.name")
     public static PlowCart plowCart = new PlowCart();
+    
+    @LangKey("entity.astikorcarts:plowcart.name")
+    public static MobCart mobCart = new MobCart();
 
     public static class CargoCart
     {
@@ -35,6 +38,16 @@ public class ModConfig
     }
 
     public static class PlowCart
+    {
+        public String[] canPull = {
+                "minecraft:horse",
+                "minecraft:donkey",
+                "minecraft:mule",
+                "minecraft:pig"
+        };
+    }
+    
+    public static class MobCart
     {
         public String[] canPull = {
                 "minecraft:horse",
