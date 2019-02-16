@@ -48,12 +48,15 @@ public class EntityPlowCart extends AbstractDrawnInventory implements IInventory
     }
 
     @Override
-    public boolean canPull(Entity pullingIn)
+    public boolean canBePulledBy(Entity pullingIn)
     {
-        String[] canPullArray = ModConfig.plowCart.canPull;
-        for (int i = 0; i < canPullArray.length; i++)
+        if (this.isPassenger(pullingIn))
         {
-            if (canPullArray[i].equals(pullingIn instanceof EntityPlayer ? "minecraft:player" : EntityList.getKey(pullingIn).toString()))
+            return false;
+        }
+        for (String entry : ModConfig.plowCart.canPull)
+        {
+            if (entry.equals(pullingIn instanceof EntityPlayer ? "minecraft:player" : EntityList.getKey(pullingIn).toString()))
             {
                 return true;
             }

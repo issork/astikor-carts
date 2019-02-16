@@ -25,8 +25,12 @@ public class EntityMobCart extends AbstractDrawn
     }
     
     @Override
-    public boolean canPull(Entity pullingIn)
+    public boolean canBePulledBy(Entity pullingIn)
     {
+        if (this.isPassenger(pullingIn))
+        {
+            return false;
+        }
         for (String entry : ModConfig.mobCart.canPull)
         {
             if (entry.equals(pullingIn instanceof EntityPlayer ? "minecraft:player" : EntityList.getKey(pullingIn).toString()))

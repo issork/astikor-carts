@@ -56,7 +56,7 @@ public class CPacketActionKey implements IMessage
                             closest = cart;
                         }
                     }
-                    if (closest.canPull(target))
+                    if (closest.canBePulledBy(target))
                     {
                         if(target.hasCapability(PullProvider.PULL, null))
                         {

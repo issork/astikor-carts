@@ -176,7 +176,7 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
      * @return {@code true}, if the entity is able pull this cart, {@code false}
      *         else.
      */
-    public boolean canPull(Entity pullingIn)
+    public boolean canBePulledBy(Entity pullingIn)
     {
         return false;
     }

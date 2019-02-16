@@ -51,7 +51,7 @@ public class SPacketDrawnUpdate implements IMessage
                 }
                 else
                 {
-                    cart.setPulling(Minecraft.getMinecraft().world.getEntityByID(message.pullingId));
+                    cart.setPullingId(message.pullingId);
                 }
             });
             return null;
