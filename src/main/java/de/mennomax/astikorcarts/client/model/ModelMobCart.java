@@ -56,7 +56,7 @@ public class ModelMobCart extends ModelBase
         this.boardFront = new ModelRenderer(this, 20, 28);
         this.boardFront.addBox(-9F, -5F, -15.5F, 18, 8, 2);
         
-        this.leftWheel = new ModelRenderer(this, 54, 23);
+        this.leftWheel = new ModelRenderer(this, 54, 21);
         this.leftWheel.setRotationPoint(14.5F, 5.0F, 1.0F);
         this.leftWheel.addBox(-2.0F, -1.0F, -1.0F, 1, 2, 2);
         for (int i = 0; i < 8; i++)
@@ -72,7 +72,7 @@ public class ModelMobCart extends ModelBase
             this.leftWheel.addChild(spoke);
         }
 
-        this.rightWheel = new ModelRenderer(this, 0, 42);
+        this.rightWheel = new ModelRenderer(this, 54, 21);
         this.rightWheel.mirror = true;
         this.rightWheel.setRotationPoint(-14.5F, 5.0F, 1.0F);
         this.rightWheel.addBox(1.0F, -1.0F, -1.0F, 1, 2, 2);

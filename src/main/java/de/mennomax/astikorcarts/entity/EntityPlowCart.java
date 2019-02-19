@@ -82,7 +82,7 @@ public class EntityPlowCart extends AbstractDrawnInventory implements IInventory
                 {
                     if(inventory.getStackInSlot(i) != ItemStack.EMPTY)
                     {
-                        float offset = -38.0F+i*38.0F;
+                        float offset = 38.0F+i*-38.0F;
                         double blockPosX = this.posX + MathHelper.sin((this.rotationYaw-offset) * 0.017453292F) * BLADEOFFSET;
                         double blockPosZ = this.posZ - MathHelper.cos((this.rotationYaw-offset) * 0.017453292F) * BLADEOFFSET;
                         BlockPos blockPos = new BlockPos(blockPosX, this.posY - 0.5D, blockPosZ);
@@ -167,7 +167,7 @@ public class EntityPlowCart extends AbstractDrawnInventory implements IInventory
             if (block == Blocks.GRASS || block == Blocks.GRASS_PATH)
             {
                 this.world.setBlockState(pos, Blocks.FARMLAND.getDefaultState(), 11);
-                itemstack.damageItem(1, player);
+                damageAndUpdateOnBreak(itemstack, player);
             }
             
             else if (block == Blocks.DIRT)
@@ -176,11 +176,11 @@ public class EntityPlowCart extends AbstractDrawnInventory implements IInventory
                 {
                 case DIRT:
                     this.world.setBlockState(pos, Blocks.FARMLAND.getDefaultState(), 11);
-                    itemstack.damageItem(1, player);
+                    damageAndUpdateOnBreak(itemstack, player);
                     break;
                 case COARSE_DIRT:
                     this.world.setBlockState(pos, Blocks.DIRT.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.DIRT), 11);
-                    itemstack.damageItem(1, player);
+                    damageAndUpdateOnBreak(itemstack, player);
                     break;
                 default:
                     break;
@@ -192,8 +192,17 @@ public class EntityPlowCart extends AbstractDrawnInventory implements IInventory
             if (block == Blocks.GRASS)
             {
                 this.world.setBlockState(pos, Blocks.GRASS_PATH.getDefaultState());
-                itemstack.damageItem(1, player);
+                damageAndUpdateOnBreak(itemstack, player);
             }
+        }
+    }
+    
+    private void damageAndUpdateOnBreak(ItemStack itemstack, EntityPlayer player)
+    {
+        itemstack.damageItem(1, player);
+        if (itemstack.isEmpty())
+        {
+            this.onInventoryChanged(this.inventory);
         }
     }
 
