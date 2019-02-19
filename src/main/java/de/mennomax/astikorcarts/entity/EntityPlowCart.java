@@ -43,7 +43,7 @@ public class EntityPlowCart extends AbstractDrawnInventory implements IInventory
         super(worldIn);
         this.setSize(1.5F, 1.4F);
         this.offsetFactor = 2.4D;
-        this.inventory = new InventoryBasic(this.getName(), true, 3);
+        this.initInventory(this.getName(), true, 3);
         this.inventory.addInventoryChangeListener(this);
     }
 

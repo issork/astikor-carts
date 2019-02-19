@@ -15,11 +15,23 @@ import net.minecraftforge.items.wrapper.InvWrapper;
 public abstract class AbstractDrawnInventory extends AbstractDrawn
 {
     public InventoryBasic inventory;
-    protected IItemHandler itemHandler = new InvWrapper(this.inventory);
+    protected IItemHandler itemHandler;
 
     public AbstractDrawnInventory(World worldIn)
     {
         super(worldIn);
+    }
+    
+    /**
+     * Initializes an inventory with an IInventory wrapper.
+     * @param title the title of the inventory
+     * @param customName wether or not this inventory has a custom name
+     * @param size the size of the inventory.
+     */
+    protected void initInventory(String title, boolean customName, int size)
+    {
+        this.inventory = new InventoryBasic(title, customName, size);
+        this.itemHandler = new InvWrapper(this.inventory);
     }
     
     @Override
@@ -70,7 +82,9 @@ public abstract class AbstractDrawnInventory extends AbstractDrawn
     public <T> T getCapability(net.minecraftforge.common.capabilities.Capability<T> capability, @Nullable net.minecraft.util.EnumFacing facing)
     {
         if (capability == net.minecraftforge.items.CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+        {
             return (T) itemHandler;
+        }
         return super.getCapability(capability, facing);
     }
 
