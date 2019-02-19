@@ -167,7 +167,7 @@ public class EntityPlowCart extends AbstractDrawnInventory implements IInventory
             if (block == Blocks.GRASS || block == Blocks.GRASS_PATH)
             {
                 this.world.setBlockState(pos, Blocks.FARMLAND.getDefaultState(), 11);
-                damageAndUpdateOnBreak(itemstack, player);
+                damageAndUpdateOnBreak(slot, itemstack, player);
             }
             
             else if (block == Blocks.DIRT)
@@ -176,11 +176,11 @@ public class EntityPlowCart extends AbstractDrawnInventory implements IInventory
                 {
                 case DIRT:
                     this.world.setBlockState(pos, Blocks.FARMLAND.getDefaultState(), 11);
-                    damageAndUpdateOnBreak(itemstack, player);
+                    damageAndUpdateOnBreak(slot, itemstack, player);
                     break;
                 case COARSE_DIRT:
                     this.world.setBlockState(pos, Blocks.DIRT.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.DIRT), 11);
-                    damageAndUpdateOnBreak(itemstack, player);
+                    damageAndUpdateOnBreak(slot, itemstack, player);
                     break;
                 default:
                     break;
@@ -192,17 +192,18 @@ public class EntityPlowCart extends AbstractDrawnInventory implements IInventory
             if (block == Blocks.GRASS)
             {
                 this.world.setBlockState(pos, Blocks.GRASS_PATH.getDefaultState());
-                damageAndUpdateOnBreak(itemstack, player);
+                damageAndUpdateOnBreak(slot, itemstack, player);
             }
         }
     }
     
-    private void damageAndUpdateOnBreak(ItemStack itemstack, EntityPlayer player)
+    @SuppressWarnings("unchecked")
+    private void damageAndUpdateOnBreak(int slot, ItemStack itemstack, EntityPlayer player)
     {
         itemstack.damageItem(1, player);
         if (itemstack.isEmpty())
         {
-            this.onInventoryChanged(this.inventory);
+            this.dataManager.set(TOOLS[slot], ItemStack.EMPTY);
         }
     }
 
