@@ -6,7 +6,6 @@ import net.minecraft.world.World;
 
 public class ItemMobCart extends AbstractCartItem
 {
-
     public ItemMobCart()
     {
         super("mobcart");

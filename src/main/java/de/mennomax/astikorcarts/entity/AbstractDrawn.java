@@ -42,7 +42,7 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
     protected Entity pulling;
     private UUID firstPullingUUID;
     @SideOnly(Side.CLIENT)
-    private int firstPullingId = -1;
+    private int firstPullingId;
     @SideOnly(Side.CLIENT)
     private float wheelrot;
     @SideOnly(Side.CLIENT)
@@ -60,6 +60,10 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
     {
         super(worldIn);
         this.stepHeight = 1.2F;
+        if(worldIn.isRemote)
+        {
+            this.firstPullingId = -1;
+        }
     }
 
     @Override
