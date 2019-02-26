@@ -78,7 +78,11 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
         {
             this.setDamageTaken(this.getDamageTaken() - 1.0F);
         }
+        this.prevPosX = this.posX;
+        this.prevPosY = this.posY;
+        this.prevPosZ = this.posZ;
         super.onUpdate();
+        this.tickLerp();
         if (!this.hasNoGravity())
         {
             this.motionY -= 0.04D;
@@ -109,7 +113,7 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
             double moveX = targetVec.x - this.posX + lookX * this.offsetFactor;
             double moveZ = targetVec.z - this.posZ + lookZ * this.offsetFactor;
             this.motionX = moveX;
-            if (!this.onGround && this.fallDistance == 0.0D)
+            if (this.pulling.isInWater() || (!this.pulling.onGround))
             {
                 this.motionY = targetVec.y - this.posY;
             }
@@ -119,13 +123,12 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
             {
                 this.factor = Math.sqrt((moveX+lookX) * (moveX+lookX) + (moveZ+lookZ) * (moveZ+lookZ)) > 1 ? Math.sqrt(moveX * moveX + moveZ * moveZ) : -Math.sqrt(moveX * moveX + moveZ * moveZ);
             }
-            this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
-            this.tickLerp();
         }
         else
         {
             this.attemptReattach();
         }
+        this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
         for (Entity entity : this.world.getEntitiesInAABBexcluding(this, this.getEntityBoundingBox(), EntitySelectors.getTeamCollisionPredicate(this)))
         {
             this.applyEntityCollision(entity);
@@ -216,7 +219,7 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
                 {
                     if (entityIn instanceof EntityLiving)
                     {
-                        ((EntityLiving) entityIn).getNavigator().setPath(null, 0.0D);
+                        ((EntityLiving) entityIn).getNavigator().clearPath();
                     }
                     entityIn.getCapability(PullProvider.PULL, null).setDrawn(this);
                     ((WorldServer) this.world).getEntityTracker().sendToTracking(this, PacketHandler.INSTANCE.getPacketFrom(new SPacketDrawnUpdate(entityIn.getEntityId(), this.getEntityId())));
@@ -416,7 +419,7 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
 
     private void tickLerp()
     {
-        if (this.lerpSteps > 0 && !this.pulling.canPassengerSteer())
+        if (this.lerpSteps > 0 && this.pulling != null && !this.pulling.canPassengerSteer())
         {
             double dx = this.posX + (this.lerpX - this.posX) / this.lerpSteps;
             double dy = this.posY + (this.lerpY - this.posY) / this.lerpSteps;
