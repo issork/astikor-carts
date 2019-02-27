@@ -1,0 +1,11 @@
+item.astikorcarts:cargocart.name=Carreta
+item.astikorcarts:plowcart.name=Arado
+item.astikorcarts:mobcart.name=Carreta de Transporte
+item.astikorcarts:wheel.name=Rueda
+itemGroup.astikorcarts=AstikorCarts
+entity.astikorcarts:cargocart.name=Carreta
+entity.astikorcarts:plowcart.name=Arado
+entity.astikorcarts:mobcart.name=Carreta de Transporte
+key.categories.astikorcarts=AstikorCarts
+key.astikorcarts.desc=Botón de Acción
+config.astikorcarts:speedmodifier=Modificador de la Velocidad

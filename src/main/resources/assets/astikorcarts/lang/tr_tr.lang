@@ -1,8 +1,8 @@
 item.astikorcarts:cargocart.name=At ArabasÄ±
 item.astikorcarts:plowcart.name=Pulluk
 item.astikorcarts:wheel.name=Tekerlek
-itemGroup.astikorcarts=Astikor At ArabalarÄ±
+itemGroup.astikorcarts=AstikorCarts
 entity.astikorcarts:cargocart.name=At ArabasÄ±
 entity.astikorcarts:plowcart.name=Pulluk
-key.categories.astikorcarts=Astikor At ArabalarÄ±
+key.categories.astikorcarts=AstikorCarts
 key.astikorcarts.desc=Etkinlik TuÅŸu

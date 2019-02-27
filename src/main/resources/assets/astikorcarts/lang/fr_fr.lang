@@ -1,0 +1,11 @@
+item.astikorcarts:cargocart.name=Chariot
+item.astikorcarts:plowcart.name=Charrue
+item.astikorcarts:mobcart.name=Chariot de Transportation
+item.astikorcarts:wheel.name=Roue
+itemGroup.astikorcarts=AstikorCarts
+entity.astikorcarts:cargocart.name=Chariot
+entity.astikorcarts:plowcart.name=Charrue
+entity.astikorcarts:mobcart.name=Chariot de Transportation
+key.categories.astikorcarts=AstikorCarts
+key.astikorcarts.desc=Bouton d'Action
+config.astikorcarts:speedmodifier=Modifieur de Vitesse

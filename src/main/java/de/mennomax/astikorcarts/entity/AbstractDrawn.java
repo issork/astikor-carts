@@ -44,17 +44,19 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
     @SideOnly(Side.CLIENT)
     private int firstPullingId;
     @SideOnly(Side.CLIENT)
-    private float wheelrot;
-    @SideOnly(Side.CLIENT)
-    private double factor;
     private int lerpSteps;
     private double lerpX;
     private double lerpY;
     private double lerpZ;
     private double lerpYaw;
+    // The distance between the cart and the pulling entity that should be maintained
+    protected double spacing;
+    private double factor;
+    @SideOnly(Side.CLIENT)
+    private float wheelrot;
+    private boolean fellLastTick;
     private static final DataParameter<Integer> TIME_SINCE_HIT = EntityDataManager.<Integer>createKey(AbstractDrawn.class, DataSerializers.VARINT);
     private static final DataParameter<Float> DAMAGE_TAKEN = EntityDataManager.<Float>createKey(AbstractDrawn.class, DataSerializers.FLOAT);
-    protected double offsetFactor;
 
     public AbstractDrawn(World worldIn)
     {
@@ -73,7 +75,10 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
         {
             this.setTimeSinceHit(this.getTimeSinceHit() - 1);
         }
-
+        if (!this.hasNoGravity())
+        {
+            this.motionY -= 0.04D;
+        }
         if (this.getDamageTaken() > 0.0F)
         {
             this.setDamageTaken(this.getDamageTaken() - 1.0F);
@@ -83,10 +88,6 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
         this.prevPosZ = this.posZ;
         super.onUpdate();
         this.tickLerp();
-        if (!this.hasNoGravity())
-        {
-            this.motionY -= 0.04D;
-        }
         if (this.pulling != null)
         {
             if (!this.world.isRemote)
@@ -110,15 +111,20 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
             }
             double lookX = MathHelper.sin(-this.rotationYaw * 0.017453292F - (float) Math.PI);
             double lookZ = MathHelper.cos(-this.rotationYaw * 0.017453292F - (float) Math.PI);
-            double moveX = targetVec.x - this.posX + lookX * this.offsetFactor;
-            double moveZ = targetVec.z - this.posZ + lookZ * this.offsetFactor;
+            double moveX = targetVec.x - this.posX + lookX * this.spacing;
+            double moveZ = targetVec.z - this.posZ + lookZ * this.spacing;
             this.motionX = moveX;
-            if (this.pulling.isInWater() || (!this.pulling.onGround))
+            if (!this.pulling.onGround && this.pulling.fallDistance == 0.0D)
             {
                 this.motionY = targetVec.y - this.posY;
+                this.fellLastTick = false;
+            }
+            else if (!fellLastTick)
+            {
+                this.motionY = 0.0D;
+                this.fellLastTick = true;
             }
             this.motionZ = moveZ;
-            
             if (this.world.isRemote)
             {
                 this.factor = Math.sqrt((moveX+lookX) * (moveX+lookX) + (moveZ+lookZ) * (moveZ+lookZ)) > 1 ? Math.sqrt(moveX * moveX + moveZ * moveZ) : -Math.sqrt(moveX * moveX + moveZ * moveZ);
@@ -126,6 +132,8 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
         }
         else
         {
+            this.motionX = 0.0D;
+            this.motionZ = 0.0D;
             this.attemptReattach();
         }
         this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
@@ -419,7 +427,7 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
 
     private void tickLerp()
     {
-        if (this.lerpSteps > 0 && this.pulling != null && !this.pulling.canPassengerSteer())
+        if (this.lerpSteps > 0)
         {
             double dx = this.posX + (this.lerpX - this.posX) / this.lerpSteps;
             double dy = this.posY + (this.lerpY - this.posY) / this.lerpSteps;
@@ -447,7 +455,7 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
     protected void addPassenger(Entity passenger)
     {
         super.addPassenger(passenger);
-        if (this.canPassengerSteer() && this.lerpSteps > 0)
+        if (this.lerpSteps > 0)
         {
             this.lerpSteps = 0;
             this.posX = this.lerpX;

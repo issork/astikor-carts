@@ -25,7 +25,7 @@ public class EntityCargoCart extends AbstractDrawnInventory implements IInventor
     {
         super(worldIn);
         this.setSize(1.5F, 1.4F);
-        this.offsetFactor = 2.4D;
+        this.spacing = 2.4D;
         this.initInventory(this.getName(), true, 54);
         this.inventory.addInventoryChangeListener(this);
     }

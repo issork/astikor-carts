@@ -21,7 +21,7 @@ public class EntityMobCart extends AbstractDrawn
     {
         super(worldIn);
         this.setSize(1.375F, 1.4F);
-        this.offsetFactor = 2.4D;
+        this.spacing = 2.4D;
     }
     
     @Override
