@@ -11,7 +11,8 @@
       "ore": "plankWood"
     },
     "s": {
-      "item": "minecraft:stick"
+      "type": "forge:ore_dict",
+      "ore": "stickWood"
     },
     "w": {
       "item": "astikorcarts:wheel"

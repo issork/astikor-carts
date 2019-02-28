@@ -11,7 +11,8 @@
       "ore": "plankWood"
     },
     "c": {
-      "item": "minecraft:chest"
+      "type": "forge:ore_dict",
+      "ore": "chestWood"
     },
     "w": {
       "item": "astikorcarts:wheel"
