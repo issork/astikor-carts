@@ -43,7 +43,6 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
     private UUID firstPullingUUID;
     @SideOnly(Side.CLIENT)
     private int firstPullingId;
-    @SideOnly(Side.CLIENT)
     private int lerpSteps;
     private double lerpX;
     private double lerpY;
@@ -51,6 +50,7 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
     private double lerpYaw;
     // The distance between the cart and the pulling entity that should be maintained
     protected double spacing;
+    @SideOnly(Side.CLIENT)
     private double factor;
     @SideOnly(Side.CLIENT)
     private float wheelrot;
@@ -455,7 +455,7 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
     protected void addPassenger(Entity passenger)
     {
         super.addPassenger(passenger);
-        if (this.lerpSteps > 0)
+        if (this.canPassengerSteer() && this.lerpSteps > 0)
         {
             this.lerpSteps = 0;
             this.posX = this.lerpX;
