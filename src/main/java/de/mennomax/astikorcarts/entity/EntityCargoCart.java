@@ -63,7 +63,7 @@ public class EntityCargoCart extends AbstractDrawnInventory implements IInventor
                 {
                     player.openGui(AstikorCarts.instance, 0, this.world, this.getEntityId(), 0, 0);
                 }
-                else
+                else if(this.pulling != player)
                 {
                     player.startRiding(this);
                 }

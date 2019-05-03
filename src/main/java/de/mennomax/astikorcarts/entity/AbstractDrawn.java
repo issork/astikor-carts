@@ -114,9 +114,14 @@ public abstract class AbstractDrawn extends Entity implements IEntityAdditionalS
             double moveX = targetVec.x - this.posX + lookX * this.spacing;
             double moveZ = targetVec.z - this.posZ + lookZ * this.spacing;
             this.motionX = moveX;
-            if (!this.pulling.onGround && this.pulling.fallDistance == 0.0D)
+//            if(this.pulling instanceof EntityPlayer && !this.world.isRemote)
+//            {
+//                System.out.println(this.pulling.fallDistance);
+//            }
+            if (!this.pulling.onGround && this.pulling.fallDistance == 0.0F)
             {
                 this.motionY = targetVec.y - this.posY;
+                this.fallDistance = 0.0F;
                 this.fellLastTick = false;
             }
             else if (!fellLastTick)

@@ -3,7 +3,7 @@ package de.mennomax.astikorcarts.handler;
 import de.mennomax.astikorcarts.client.gui.inventory.GuiPlow;
 import de.mennomax.astikorcarts.entity.EntityCargoCart;
 import de.mennomax.astikorcarts.entity.EntityPlowCart;
-import de.mennomax.astikorcarts.inventory.ContainerPlow;
+import de.mennomax.astikorcarts.inventory.ContainerPlowCart;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ContainerChest;
@@ -18,9 +18,11 @@ public class GuiHandler implements IGuiHandler
         switch (id)
         {
             case 0:
-                return new ContainerChest(player.inventory, ((EntityCargoCart) world.getEntityByID(x)).inventory, player);
+                EntityCargoCart cart = (EntityCargoCart) world.getEntityByID(x);
+                return new ContainerChest(player.inventory, cart.inventory, player);
             case 1:
-                return new ContainerPlow(player.inventory, ((EntityPlowCart) world.getEntityByID(x)).inventory);
+                EntityPlowCart plow = (EntityPlowCart) world.getEntityByID(x);
+                return new ContainerPlowCart(player.inventory, plow.inventory, plow, player);
             default:
                 return null;
         }
@@ -34,7 +36,8 @@ public class GuiHandler implements IGuiHandler
             case 0:
                 return new GuiChest(player.inventory, ((EntityCargoCart) world.getEntityByID(x)).inventory);
             case 1:
-                return new GuiPlow(player.inventory, ((EntityPlowCart) world.getEntityByID(x)).inventory);
+                EntityPlowCart plow = (EntityPlowCart) world.getEntityByID(x);
+                return new GuiPlow(player.inventory, plow.inventory, plow, player);
             default:
                 return null;
         }

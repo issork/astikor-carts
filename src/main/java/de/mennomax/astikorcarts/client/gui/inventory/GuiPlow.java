@@ -1,9 +1,11 @@
 package de.mennomax.astikorcarts.client.gui.inventory;
 
 import de.mennomax.astikorcarts.AstikorCarts;
-import de.mennomax.astikorcarts.inventory.ContainerPlow;
+import de.mennomax.astikorcarts.entity.EntityPlowCart;
+import de.mennomax.astikorcarts.inventory.ContainerPlowCart;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.util.ResourceLocation;
@@ -14,9 +16,9 @@ public class GuiPlow extends GuiContainer
     private final InventoryPlayer playerInventory;
     private final IInventory plowInventory;
     
-    public GuiPlow(InventoryPlayer playerInv, IInventory plowInv)
+    public GuiPlow(InventoryPlayer playerInv, IInventory plowInv, EntityPlowCart plowIn, EntityPlayer player)
     {
-        super(new ContainerPlow(playerInv, plowInv));
+        super(new ContainerPlowCart(playerInv, plowInv, plowIn, player));
         this.playerInventory = playerInv;
         this.plowInventory = plowInv;
     }

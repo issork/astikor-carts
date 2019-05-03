@@ -57,7 +57,7 @@ public class EntityMobCart extends AbstractDrawn
                    }
                }
             }
-            else
+            else if(this.pulling != player)
             {
                 player.startRiding(this);
             }

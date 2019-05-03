@@ -1,5 +1,6 @@
 package de.mennomax.astikorcarts.inventory;
 
+import de.mennomax.astikorcarts.entity.AbstractDrawn;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -9,16 +10,19 @@ import net.minecraft.item.ItemHoe;
 import net.minecraft.item.ItemSpade;
 import net.minecraft.item.ItemStack;
 
-public class ContainerPlow extends Container
+public class ContainerPlowCart extends Container
 {
     private final IInventory plowInventory;
+    private final AbstractDrawn drawn;
     
-    public ContainerPlow(InventoryPlayer playerInventory, IInventory plowInventory)
+    public ContainerPlowCart(InventoryPlayer playerInventory, IInventory plowInventory, AbstractDrawn drawn, EntityPlayer player)
     {
         this.plowInventory = plowInventory;
-        this.addSlotToContainer(new ContainerPlow.Tool(plowInventory, 0, 57, 24));
-        this.addSlotToContainer(new ContainerPlow.Tool(plowInventory, 1, 80, 17));
-        this.addSlotToContainer(new ContainerPlow.Tool(plowInventory, 2, 103, 24));
+        this.drawn = drawn;
+        plowInventory.openInventory(player);
+        this.addSlotToContainer(new ContainerPlowCart.Tool(plowInventory, 0, 57, 24));
+        this.addSlotToContainer(new ContainerPlowCart.Tool(plowInventory, 1, 80, 17));
+        this.addSlotToContainer(new ContainerPlowCart.Tool(plowInventory, 2, 103, 24));
         
         for (int i = 0; i < 3; ++i)
         {
@@ -37,7 +41,7 @@ public class ContainerPlow extends Container
     @Override
     public boolean canInteractWith(EntityPlayer playerIn)
     {
-        return this.plowInventory.isUsableByPlayer(playerIn);
+        return this.plowInventory.isUsableByPlayer(playerIn) && this.drawn.isEntityAlive() && this.drawn.getDistance(playerIn) < 8.0F;
     }
     
     public ItemStack transferStackInSlot(EntityPlayer playerIn, int index)
