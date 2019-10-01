@@ -1,0 +1,12 @@
+{
+  "item.astikorcarts.cargocart": "Cart",
+  "item.astikorcarts.plowcart": "Plow",
+  "item.astikorcarts.mobcart": "Transportation Cart",
+  "item.astikorcarts.wheel": "Wheel",
+  "itemGroup.astikorcarts": "AstikorCarts",
+  "entity.astikorcarts.cargocart": "Cart",
+  "entity.astikorcarts.plowcart": "Plow",
+  "entity.astikorcarts.mobcart": "Transportation Cart",
+  "key.categories.astikorcarts": "AstikorCarts",
+  "key.astikorcarts.desc": "Action Key"
+}

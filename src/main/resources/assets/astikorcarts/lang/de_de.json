@@ -1,0 +1,12 @@
+{
+  "item.astikorcarts.cargocart": "Karren",
+  "item.astikorcarts.plowcart": "Pflug",
+  "item.astikorcarts.mobcart": "Transportkarren",
+  "item.astikorcarts.wheel": "Rad",
+  "itemGroup.astikorcarts": "AstikorCarts",
+  "entity.astikorcarts.cargocart": "Karren",
+  "entity.astikorcarts.plowcart": "Pflug",
+  "entity.astikorcarts.mobcart": "Transportkarren",
+  "key.categories.astikorcarts": "AstikorCarts",
+  "key.astikorcarts.desc": "Aktionstaste"
+}

@@ -1,0 +1,10 @@
+{
+  "item.astikorcarts.cargocart": "Телега",
+  "item.astikorcarts.plowcart": "Плуг",
+  "item.astikorcarts.wheel": "Колесо",
+  "itemGroup.astikorcarts": "AstikorCarts",
+  "entity.astikorcarts.cargocart": "Телега",
+  "entity.astikorcarts.plowcart": "Плуг",
+  "key.categories.astikorcarts": "AstikorCarts",
+  "key.astikorcarts.desc": "Клавиша действия"
+}

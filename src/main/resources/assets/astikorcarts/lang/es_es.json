@@ -1,0 +1,12 @@
+{
+  "item.astikorcarts.cargocart": "Carreta",
+  "item.astikorcarts.plowcart": "Arado",
+  "item.astikorcarts.mobcart": "Carreta de Transporte",
+  "item.astikorcarts.wheel": "Rueda",
+  "itemGroup.astikorcarts": "AstikorCarts",
+  "entity.astikorcarts.cargocart": "Carreta",
+  "entity.astikorcarts.plowcart": "Arado",
+  "entity.astikorcarts.mobcart": "Carreta de Transporte",
+  "key.categories.astikorcarts": "AstikorCarts",
+  "key.astikorcarts.desc": "Botón de Acción"
+}

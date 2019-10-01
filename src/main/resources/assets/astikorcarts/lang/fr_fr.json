@@ -1,0 +1,12 @@
+{
+  "item.astikorcarts.cargocart": "Chariot",
+  "item.astikorcarts.plowcart": "Charrue",
+  "item.astikorcarts.mobcart": "Chariot de Transportation",
+  "item.astikorcarts.wheel": "Roue",
+  "itemGroup.astikorcarts": "AstikorCarts",
+  "entity.astikorcarts.cargocart": "Chariot",
+  "entity.astikorcarts.plowcart": "Charrue",
+  "entity.astikorcarts.mobcart": "Chariot de Transportation",
+  "key.categories.astikorcarts": "AstikorCarts",
+  "key.astikorcarts.desc": "Bouton d'Action"
+}
