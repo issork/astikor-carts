@@ -3,12 +3,15 @@ package de.mennomax.astikorcarts.entity;
 import com.google.common.collect.ImmutableList;
 
 import de.mennomax.astikorcarts.init.Items;
+import de.mennomax.astikorcarts.inventory.container.PlowCartContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.IInventoryChangedListener;
+import net.minecraft.inventory.container.SimpleNamedContainerProvider;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -19,6 +22,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.network.NetworkHooks;
 
 public class PlowCartEntity extends AbstractDrawnInventoryEntity implements IInventoryChangedListener
 {
@@ -86,14 +90,14 @@ public class PlowCartEntity extends AbstractDrawnInventoryEntity implements IInv
     {
         if (!this.world.isRemote)
         {
-//            if (player.isSneaking())
-//            {
-//                player.openGui(AstikorCarts.instance, 1, this.world, this.getEntityId(), 0, 0);
-//            }
-//            else
-//            {
+            if (player.isSneaking())
+            {
+                this.openContainer(player);
+            }
+            else
+            {
                 this.dataManager.set(PLOWING, !this.dataManager.get(PLOWING));
-//            }
+            }
         }
         return true;
     }
@@ -215,6 +219,14 @@ public class PlowCartEntity extends AbstractDrawnInventoryEntity implements IInv
         {
             this.dataManager.set(TOOLS.get(i), this.inventory.getStackInSlot(i));
         }
+    }
+    
+    public void openContainer(PlayerEntity player) {
+        NetworkHooks.openGui((ServerPlayerEntity) player, new SimpleNamedContainerProvider((id, inv, plyr) -> {
+            return new PlowCartContainer(id, inv, this);
+         }, this.getDisplayName()), (writer) -> {
+             writer.writeInt(this.getEntityId());
+         });
     }
     
 }

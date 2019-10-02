@@ -1,15 +1,19 @@
 package de.mennomax.astikorcarts.entity;
 
 import de.mennomax.astikorcarts.init.Items;
+import de.mennomax.astikorcarts.inventory.container.CargoCartContainer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.IInventoryChangedListener;
+import net.minecraft.inventory.container.SimpleNamedContainerProvider;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -22,6 +26,18 @@ public class CargoCartEntity extends AbstractDrawnInventoryEntity implements IIn
         super(entityTypeIn, worldIn);
         this.initInventory(54);
         this.inventory.addListener(this);
+    }
+    
+    @Override
+    public boolean processInitialInteract(PlayerEntity player, Hand hand) {
+        if (!this.world.isRemote)
+        {
+            if (player.isSneaking())
+            {
+                this.openContainer(player);
+            }
+        }
+        return true;
     }
     
     @Override
@@ -94,6 +110,12 @@ public class CargoCartEntity extends AbstractDrawnInventoryEntity implements IIn
                 this.dataManager.set(CARGO, newValue);
             }
         }
+    }
+    
+    public void openContainer(PlayerEntity player) {
+        player.openContainer(new SimpleNamedContainerProvider((id, inv, plyr) -> {
+           return new CargoCartContainer(id, inv, this);
+        }, this.getDisplayName()));
     }
 
 }

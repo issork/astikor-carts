@@ -35,13 +35,12 @@ import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
-import net.minecraft.world.server.ServerChunkProvider;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
-import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.fml.network.PacketDistributor;
 
 public abstract class AbstractDrawnEntity extends Entity implements IEntityAdditionalSpawnData {
 
@@ -145,15 +144,13 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
      * @return Whether the currently pulling entity should stop pulling this cart.
      */
     protected boolean shouldRemovePulling() {
-        if (this.pulling != null) {
-            if (this.collidedHorizontally) {
-                final Vec3d start = new Vec3d(this.posX, this.posY + this.getHeight(), this.posZ);
-                final Vec3d end = new Vec3d(this.pulling.posX, this.pulling.posY + this.getHeight() / 2, this.pulling.posZ);
-                RayTraceResult result = this.world.rayTraceBlocks(new RayTraceContext(start, end, BlockMode.COLLIDER, FluidMode.NONE, this));
-                if (result != null) {
-                    if (result.getType() == Type.BLOCK) {
-                        return true;
-                    }
+        if (this.collidedHorizontally) {
+            final Vec3d start = new Vec3d(this.posX, this.posY + this.getHeight(), this.posZ);
+            final Vec3d end = new Vec3d(this.pulling.posX, this.pulling.posY + this.getHeight() / 2, this.pulling.posZ);
+            RayTraceResult result = this.world.rayTraceBlocks(new RayTraceContext(start, end, BlockMode.COLLIDER, FluidMode.NONE, this));
+            if (result != null) {
+                if (result.getType() == Type.BLOCK) {
+                    return true;
                 }
             }
         }
@@ -180,7 +177,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
                         AstikorCarts.PULLMAP.remove(this.pulling.getEntityId());
                         this.playSound(SoundEvents.ENTITY_ITEM_BREAK, 0.5F, 0.1F);
                     }
-                    ((ServerChunkProvider) this.getEntityWorld().getChunkProvider()).sendToAllTracking(this, PacketHandler.channel.toVanillaPacket(new SPacketDrawnUpdate(-1, this.getEntityId()), NetworkDirection.PLAY_TO_CLIENT));
+                    PacketHandler.channel.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new SPacketDrawnUpdate(-1, this.getEntityId()));
                     this.pullingUUID = null;
                 } else {
                     if (entityIn instanceof MobEntity) {
@@ -190,7 +187,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
                         AstikorCarts.PULLMAP.put(this.pulling.getEntityId(), this.getEntityId());
                     }
                     this.playSound(SoundEvents.ENTITY_HORSE_ARMOR, 0.5F, 1.0F);
-                    ((ServerChunkProvider) this.getEntityWorld().getChunkProvider()).sendToAllTracking(this, PacketHandler.channel.toVanillaPacket(new SPacketDrawnUpdate(entityIn.getEntityId(), this.getEntityId()), NetworkDirection.PLAY_TO_CLIENT));
+                    PacketHandler.channel.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new SPacketDrawnUpdate(entityIn.getEntityId(), this.getEntityId()));
                     this.pullingUUID = entityIn.getUniqueID();
                 }
                 this.pulling = entityIn;

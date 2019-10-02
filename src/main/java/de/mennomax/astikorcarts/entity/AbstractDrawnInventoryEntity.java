@@ -44,10 +44,12 @@ public abstract class AbstractDrawnInventoryEntity extends AbstractDrawnEntity {
     @Override
     protected void readAdditional(CompoundNBT compound) {
         super.readAdditional(compound);
-        ListNBT invCompound = compound.getList("Items", 9);
+        ListNBT invCompound = compound.getList("Items", 10);
         for(int i = 0; i < invCompound.size(); i++) {
             CompoundNBT itemCompound = invCompound.getCompound(i);
-            this.inventory.setInventorySlotContents(itemCompound.getByte("Slot") & 255, ItemStack.read(itemCompound));
+            ItemStack itemstack = ItemStack.read(itemCompound);
+            this.inventory.setInventorySlotContents(itemCompound.getByte("Slot") & 255, itemstack);
+            System.out.println(itemstack + "READ");
         }
     }
     
@@ -82,5 +84,5 @@ public abstract class AbstractDrawnInventoryEntity extends AbstractDrawnEntity {
           return itemHandler.cast();
        return super.getCapability(capability, facing);
     }
-
+    
 }

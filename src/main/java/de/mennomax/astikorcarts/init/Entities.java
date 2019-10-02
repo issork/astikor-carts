@@ -17,6 +17,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ObjectHolder;
 
@@ -45,7 +46,8 @@ public class Entities {
         return entityType;
     }
 
-    public static void registerRenders() {
+    @SubscribeEvent
+    public static void registerRenders(final FMLClientSetupEvent event) {
         RenderingRegistry.registerEntityRenderingHandler(CargoCartEntity.class, CargoCartRenderer::new);
         RenderingRegistry.registerEntityRenderingHandler(PlowCartEntity.class, PlowCartRenderer::new);
         RenderingRegistry.registerEntityRenderingHandler(MobCartEntity.class, MobCartRenderer::new);

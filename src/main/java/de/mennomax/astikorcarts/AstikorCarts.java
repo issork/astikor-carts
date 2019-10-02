@@ -4,7 +4,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import de.mennomax.astikorcarts.entity.AbstractDrawnEntity;
 import de.mennomax.astikorcarts.entity.ai.goal.PullCartGoal;
-import de.mennomax.astikorcarts.init.Entities;
 import de.mennomax.astikorcarts.init.KeyBindings;
 import de.mennomax.astikorcarts.network.PacketHandler;
 import de.mennomax.astikorcarts.network.packets.CPacketActionKey;
@@ -19,9 +18,6 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 
 @Mod(AstikorCarts.MODID)
@@ -30,22 +26,9 @@ public class AstikorCarts {
     //TODO: Replace with better system
     public static final ConcurrentHashMap<Integer, Integer> PULLMAP = new ConcurrentHashMap<>();
 
-    @EventBusSubscriber(bus = Bus.MOD)
-    public static class setupHandler {
-        @SubscribeEvent
-        public static void commonSetup(final FMLCommonSetupEvent event) {
-            PacketHandler.registerPackets();
-        }
-
-        @SubscribeEvent
-        public static void clientSetup(final FMLClientSetupEvent event) {
-            KeyBindings.registerKeyBindings();
-            Entities.registerRenders();
-        }
-    }
-
     @EventBusSubscriber(value = Dist.CLIENT)
     public static class clientEventHandler {
+        
         @SubscribeEvent
         public static void clientTickEvent(final ClientTickEvent event) {
             if (event.phase == Phase.END) {
@@ -58,7 +41,10 @@ public class AstikorCarts {
                     }
                 }
                 for(Integer entityId : PULLMAP.values()) {
-                    ((AbstractDrawnEntity) Minecraft.getInstance().world.getEntityByID(entityId)).pulledTick();
+                    AbstractDrawnEntity entity = (AbstractDrawnEntity) Minecraft.getInstance().world.getEntityByID(entityId);
+                    if(entity != null) {
+                        entity.pulledTick();
+                    }
                 }
             }
         }
@@ -82,7 +68,10 @@ public class AstikorCarts {
         public static void worldTick(final WorldTickEvent event) {
             if(event.phase == Phase.END) {
                 for(Integer entityId : PULLMAP.values()) {
-                    ((AbstractDrawnEntity) event.world.getEntityByID(entityId)).pulledTick();
+                    AbstractDrawnEntity entity = (AbstractDrawnEntity) event.world.getEntityByID(entityId);
+                    if(entity != null) {
+                        entity.pulledTick();
+                    }
                 }
             }
         }
