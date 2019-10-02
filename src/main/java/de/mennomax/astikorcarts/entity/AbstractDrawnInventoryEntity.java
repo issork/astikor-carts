@@ -49,7 +49,6 @@ public abstract class AbstractDrawnInventoryEntity extends AbstractDrawnEntity {
             CompoundNBT itemCompound = invCompound.getCompound(i);
             ItemStack itemstack = ItemStack.read(itemCompound);
             this.inventory.setInventorySlotContents(itemCompound.getByte("Slot") & 255, itemstack);
-            System.out.println(itemstack + "READ");
         }
     }
     
