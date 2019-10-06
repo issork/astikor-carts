@@ -51,10 +51,10 @@ public class PlowCartEntity extends AbstractDrawnInventoryEntity implements IInv
     {
         super.pulledTick();
         PlayerEntity player = null;
-        if(this.getPulling().getControllingPassenger() instanceof PlayerEntity) {
-            player = (PlayerEntity) this.getPulling().getControllingPassenger();
-        } else if(this.getPulling() instanceof PlayerEntity) {
+        if(this.getPulling() instanceof PlayerEntity) {
             player = (PlayerEntity) this.getPulling();
+        } else if(this.getPulling().getControllingPassenger() instanceof PlayerEntity) {
+            player = (PlayerEntity) this.getPulling().getControllingPassenger();
         }
         if (!this.world.isRemote && this.dataManager.get(PLOWING) && player != null)
         {
@@ -86,16 +86,12 @@ public class PlowCartEntity extends AbstractDrawnInventoryEntity implements IInv
     }
 
     @Override
-    public boolean processInitialInteract(PlayerEntity player, Hand hand)
-    {
-        if (!this.world.isRemote)
-        {
-            if (player.isSneaking())
-            {
+    public boolean processInitialInteract(PlayerEntity player, Hand hand) {
+        if (!this.world.isRemote) {
+            if (player.isSneaking()) {
                 this.openContainer(player);
             }
-            else
-            {
+            else {
                 this.dataManager.set(PLOWING, !this.dataManager.get(PLOWING));
             }
         }
@@ -182,7 +178,7 @@ public class PlowCartEntity extends AbstractDrawnInventoryEntity implements IInv
 //            this.dataManager.set(TOOLS[slot], ItemStack.EMPTY);
 //        }
 //    }
-    public ItemStack getTool(int i)
+    public ItemStack getStackInSlot(int i)
     {
         return this.dataManager.get(TOOLS.get(i));
     }
@@ -198,7 +194,7 @@ public class PlowCartEntity extends AbstractDrawnInventoryEntity implements IInv
         super.registerData();
         this.dataManager.register(PLOWING, false);
         for(DataParameter<ItemStack> param : TOOLS) {
-            this.dataManager.register(param, new ItemStack(net.minecraft.item.Items.COBBLESTONE));
+            this.dataManager.register(param, ItemStack.EMPTY);
         }
     }
     

@@ -2,6 +2,7 @@ package de.mennomax.astikorcarts.network.packets;
 
 import java.util.function.Supplier;
 
+import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.entity.AbstractDrawnEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MobEntity;
@@ -24,7 +25,7 @@ public class CPacketToggleSlow {
         ServerPlayerEntity sender = ctx.get().getSender();
         ctx.get().enqueueWork(() -> {
             Entity ridden = sender.getRidingEntity();
-            if (ridden != null) {
+            if (AstikorCarts.SERVERPULLMAP.containsKey(ridden)) {
                 if (ridden instanceof MobEntity) {
                     if (((MobEntity) ridden).getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).hasModifier(AbstractDrawnEntity.PULL_SLOWLY_MODIFIER)) {
                         ((MobEntity) ridden).getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(AbstractDrawnEntity.PULL_SLOWLY_MODIFIER);

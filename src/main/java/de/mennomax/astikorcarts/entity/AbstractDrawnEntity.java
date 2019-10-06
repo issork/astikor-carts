@@ -5,6 +5,8 @@ import java.util.UUID;
 import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.network.PacketHandler;
 import de.mennomax.astikorcarts.network.packets.SPacketDrawnUpdate;
+import net.minecraft.block.BlockRenderType;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -22,10 +24,13 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.particles.BlockParticleData;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityPredicates;
 import net.minecraft.util.IndirectEntityDamageSource;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceContext.BlockMode;
@@ -55,6 +60,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     private double lerpYaw;
     private boolean fellLastTick;
     private double motionY;
+    protected double distanceTravelled;
     protected float wheelRotation[] = new float[2];
     private int pullingId = -1;
     private UUID pullingUUID = null;
@@ -64,6 +70,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     public AbstractDrawnEntity(EntityType<? extends Entity> entityTypeIn, World worldIn) {
         super(entityTypeIn, worldIn);
         this.stepHeight = 1.2F;
+        this.preventEntitySpawning = true;
     }
 
     @Override
@@ -82,10 +89,11 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         this.prevPosZ = this.posZ;
         this.prevRotationYaw = this.rotationYaw;
         super.tick();
-        tickLerp();
+        this.tickLerp();
         if (this.pulling == null) {
             this.setMotion(0, this.motionY, 0);
             this.move(MoverType.SELF, this.getMotion());
+            this.motionY = this.getMotion().y - 0.08F;
             this.attemptReattach();
         }
         for (Entity entity : this.world.getEntitiesInAABBexcluding(this, this.getBoundingBox(), EntityPredicates.pushableBy(this))) {
@@ -94,18 +102,12 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     }
 
     /**
-     * This method is called for every cart that is being pulled by another entity after all other
-     * entities have been ticked to ensure that the cart always behaves the same when being pulled.
+     * This method is called for every cart that is being pulled by another entity
+     * after all other
+     * entities have been ticked to ensure that the cart always behaves the same
+     * when being pulled.
      */
     public void pulledTick() {
-        if(this.pulling == null) {
-            return;
-        }
-        if (!this.pulling.isAlive()) {
-            AstikorCarts.PULLMAP.remove(this.pulling.getEntityId());
-            this.pulling = null;
-            return;
-        }
         if (!this.world.isRemote && shouldRemovePulling()) {
             this.setPulling(null);
             return;
@@ -122,7 +124,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         double lookZ = MathHelper.cos(-this.rotationYaw * 0.017453292F - (float) Math.PI);
         double moveX = targetVec.x - this.posX + lookX * this.spacing;
         double moveZ = targetVec.z - this.posZ + lookZ * this.spacing;
-        if (!this.pulling.onGround && this.pulling.fallDistance == 0.0F) {
+        if (!this.pulling.onGround && this.pulling.fallDistance <= 0.0F) {
             this.motionY = targetVec.y - this.posY;
             this.fallDistance = 0.0F;
             this.fellLastTick = false;
@@ -131,12 +133,16 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             this.fellLastTick = true;
         }
         this.setMotion(moveX, this.motionY, moveZ);
+        this.move(MoverType.SELF, this.getMotion());
+        Vec3d motion = getMotion();
+        this.distanceTravelled = Math.sqrt(motion.x * motion.x + motion.z * motion.z);
+        this.spawnWheelParticles();
+        this.motionY = motion.y - 0.08F;
         if (this.world.isRemote) {
-            //TODO: Make wheel rotate independently in tickWheels(double, double)
-//            boolean travelledForward = Math.sqrt((moveX-lookX) * (moveX-lookX) + (moveZ-lookZ) * (moveZ-lookZ)) > 1;
-//            double distanceTravelled = Math.sqrt(moveX * moveX + moveZ * moveZ);
-       }
-       this.move(MoverType.SELF, this.getMotion());
+            // TODO: Make wheel rotate independently in tickWheels(double, double)
+            // boolean travelledForward = Math.sqrt((moveX-lookX) * (moveX-lookX) +
+            // (moveZ-lookZ) * (moveZ-lookZ)) > 1;
+        }
     }
 
     /**
@@ -174,20 +180,17 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
                         if (this.pulling instanceof LivingEntity) {
                             ((LivingEntity) this.pulling).getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(PULL_SLOWLY_MODIFIER);
                         }
-                        AstikorCarts.PULLMAP.remove(this.pulling.getEntityId());
                         this.playSound(SoundEvents.ENTITY_ITEM_BREAK, 0.5F, 0.1F);
                     }
-                    PacketHandler.channel.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new SPacketDrawnUpdate(-1, this.getEntityId()));
+                    PacketHandler.CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new SPacketDrawnUpdate(-1, this.getEntityId()));
                     this.pullingUUID = null;
                 } else {
                     if (entityIn instanceof MobEntity) {
                         ((MobEntity) entityIn).getNavigator().clearPath();
                     }
-                    if (this.pulling != null) {
-                        AstikorCarts.PULLMAP.put(this.pulling.getEntityId(), this.getEntityId());
-                    }
+                    AstikorCarts.SERVERPULLMAP.put(entityIn, this);
                     this.playSound(SoundEvents.ENTITY_HORSE_ARMOR, 0.5F, 1.0F);
-                    PacketHandler.channel.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new SPacketDrawnUpdate(entityIn.getEntityId(), this.getEntityId()));
+                    PacketHandler.CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new SPacketDrawnUpdate(entityIn.getEntityId(), this.getEntityId()));
                     this.pullingUUID = entityIn.getUniqueID();
                 }
                 this.pulling = entityIn;
@@ -196,12 +199,9 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         } else {
             if (entityIn == null) {
                 this.pullingId = -1;
-                if (this.pulling != null) {
-                    AstikorCarts.PULLMAP.remove(this.pulling.getEntityId());
-                }
             } else {
                 this.pullingId = entityIn.getEntityId();
-                AstikorCarts.PULLMAP.put(entityIn.getEntityId(), this.getEntityId());
+                AstikorCarts.CLIENTPULLMAP.put(entityIn, this);
             }
             this.pulling = entityIn;
         }
@@ -243,7 +243,8 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
      */
     public void handleRotation(Vec3d targetVecIn) {
         this.rotationYaw = (float) Math.toDegrees(-Math.atan2(targetVecIn.x - this.posX, targetVecIn.z - this.posZ));
-        // System.out.println(Math.toDegrees(-Math.atan2(targetVecIn.x - this.posX, targetVecIn.z - this.posZ)));
+        // System.out.println(Math.toDegrees(-Math.atan2(targetVecIn.x - this.posX,
+        // targetVecIn.z - this.posZ)));
     }
 
     public void tickWheels(double distanceTravelled, double angle) {
@@ -265,14 +266,28 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         return this.pulling == null || entityIn == null || !this.pulling.isAlive();
     }
 
-    @Override
-    public boolean canBeCollidedWith() {
-        return true;
+    /**
+     * Sadly {@link Entity#spawnRunningParticles()} might look weird due to
+     * different tick order.
+     */
+    public void spawnWheelParticles() {
+        if (!this.isInWater() && this.distanceTravelled > 0.2F) {
+            this.createRunningParticles();
+        }
     }
 
     @Override
-    public boolean canBePushed() {
-        return true;
+    protected void createRunningParticles() {
+        BlockPos blockpos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.posY - 0.2F), MathHelper.floor(this.posZ));
+        BlockState blockstate = this.world.getBlockState(blockpos);
+        if (!blockstate.addRunningEffects(world, blockpos, this))
+            if (blockstate.getRenderType() != BlockRenderType.INVISIBLE) {
+                Vec3d vec3d = this.getMotion();
+                double xOffset = MathHelper.sin((this.rotationYaw - 90) * 0.017453292F) * 0.75D;
+                double zOffset = MathHelper.cos((this.rotationYaw - 90) * 0.017453292F) * 0.75D;
+                this.world.addParticle(new BlockParticleData(ParticleTypes.BLOCK, blockstate).setPos(blockpos), this.posX + xOffset, this.posY, this.posZ - zOffset, vec3d.x, vec3d.y, vec3d.z);
+                this.world.addParticle(new BlockParticleData(ParticleTypes.BLOCK, blockstate).setPos(blockpos), this.posX - xOffset, this.posY, this.posZ + zOffset, vec3d.x, vec3d.y, vec3d.z);
+            }
     }
 
     @Override
@@ -299,26 +314,44 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     }
 
     /**
-     * Called when the cart has been destroyed by a creative player or the carts health hit 0.
+     * Returns true if this entity should push and be pushed by other entities when
+     * colliding.
+     */
+    @Override
+    public boolean canBePushed() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeCollidedWith() {
+        return this.isAlive();
+    }
+
+    /**
+     * Called when the cart has been destroyed by a creative player or the carts
+     * health hit 0.
+     * 
      * @param source
      * @param byCreativePlayer
      */
     public void onDestroyed(DamageSource source, boolean byCreativePlayer) {
-        if(this.world.getGameRules().getBoolean(GameRules.DO_ENTITY_DROPS)) {
-            if(!byCreativePlayer) {
+        if (this.world.getGameRules().getBoolean(GameRules.DO_ENTITY_DROPS)) {
+            if (!byCreativePlayer) {
                 this.entityDropItem(this.getCartItem());
             }
             onDestroyedAndDoDrops(source);
         }
     }
-    
+
     /**
-     * This method is called from {@link #onDestroyed(DamageSource, boolean)} if the GameRules allow entities to drop items.
+     * This method is called from {@link #onDestroyed(DamageSource, boolean)} if the
+     * GameRules allow entities to drop items.
+     * 
      * @param source
      * @param byCreativePlayer
      */
     public void onDestroyedAndDoDrops(DamageSource source) {
-        
+
     }
 
     private void tickLerp() {
@@ -341,7 +374,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         this.lerpY = y;
         this.lerpZ = z;
         this.lerpYaw = yaw;
-        this.lerpSteps = 20;
+        this.lerpSteps = posRotationIncrements;
     }
 
     @Override

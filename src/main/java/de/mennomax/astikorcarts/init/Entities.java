@@ -32,8 +32,8 @@ public class Entities {
     @SubscribeEvent
     public static void registerEntities(final RegistryEvent.Register<EntityType<?>> event) {
         event.getRegistry().registerAll(buildType(CargoCartEntity::new, "cargocart", 1.5F, 1.4F),
-                buildType(PlowCartEntity::new, "plowcart", 1.5F, 1.4F),
-                buildType(MobCartEntity::new, "mobcart", 1.375F, 1.4F));
+                buildType(PlowCartEntity::new, "plowcart", 1.3F, 1.4F),
+                buildType(MobCartEntity::new, "mobcart", 1.3F, 1.4F));
     }
 
     public static EntityType<?> buildType(final IFactory<Entity> factoryIn, final String name, final float widthIn, final float heightIn) {

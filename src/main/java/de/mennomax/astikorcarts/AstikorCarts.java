@@ -1,6 +1,8 @@
 package de.mennomax.astikorcarts;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 
 import de.mennomax.astikorcarts.entity.AbstractDrawnEntity;
 import de.mennomax.astikorcarts.entity.ai.goal.PullCartGoal;
@@ -9,7 +11,9 @@ import de.mennomax.astikorcarts.network.PacketHandler;
 import de.mennomax.astikorcarts.network.packets.CPacketActionKey;
 import de.mennomax.astikorcarts.network.packets.CPacketToggleSlow;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
@@ -18,40 +22,32 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
+import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 
 @Mod(AstikorCarts.MODID)
 public class AstikorCarts {
     public static final String MODID = "astikorcarts";
-    //TODO: Replace with better system
-    public static final ConcurrentHashMap<Integer, Integer> PULLMAP = new ConcurrentHashMap<>();
+    public static final HashMap<Entity, AbstractDrawnEntity> CLIENTPULLMAP = new HashMap<>();
+    public static final HashMap<Entity, AbstractDrawnEntity> SERVERPULLMAP = new HashMap<>();
 
     @EventBusSubscriber(value = Dist.CLIENT)
     public static class clientEventHandler {
-        
+
         @SubscribeEvent
         public static void clientTickEvent(final ClientTickEvent event) {
             if (event.phase == Phase.END) {
                 if (Minecraft.getInstance().world != null) {
                     while (KeyBindings.KEYBINDINGS[0].isPressed()) {
-                        PacketHandler.channel.sendToServer(new CPacketActionKey());
+                        PacketHandler.CHANNEL.sendToServer(new CPacketActionKey());
                     }
                     while (Minecraft.getInstance().gameSettings.keyBindSprint.isPressed()) {
-                        PacketHandler.channel.sendToServer(new CPacketToggleSlow());
+                        PacketHandler.CHANNEL.sendToServer(new CPacketToggleSlow());
                     }
                 }
-                for(Integer entityId : PULLMAP.values()) {
-                    AbstractDrawnEntity entity = (AbstractDrawnEntity) Minecraft.getInstance().world.getEntityByID(entityId);
-                    if(entity != null) {
-                        entity.pulledTick();
-                    }
+                if (!Minecraft.getInstance().isGamePaused()) {
+                    tickPulled(CLIENTPULLMAP);
                 }
             }
-        }
-        
-        @SubscribeEvent
-        public static void stopServer(final FMLServerStoppedEvent event) {
-            PULLMAP.clear();
         }
     }
 
@@ -63,17 +59,35 @@ public class AstikorCarts {
                 ((MobEntity) event.getEntity()).goalSelector.addGoal(1, new PullCartGoal(event.getEntity()));
             }
         }
-        
+
         @SubscribeEvent
         public static void worldTick(final WorldTickEvent event) {
-            if(event.phase == Phase.END) {
-                for(Integer entityId : PULLMAP.values()) {
-                    AbstractDrawnEntity entity = (AbstractDrawnEntity) event.world.getEntityByID(entityId);
-                    if(entity != null) {
-                        entity.pulledTick();
-                    }
-                }
+            if (event.phase == Phase.END) {
+                tickPulled(SERVERPULLMAP);
             }
+        }
+
+        @SubscribeEvent
+        public static void stopServer(final FMLServerStoppingEvent event) {
+            CLIENTPULLMAP.clear();
+            SERVERPULLMAP.clear();
+        }
+    }
+
+    private static void tickPulled(HashMap<Entity, AbstractDrawnEntity> pullmap) {
+        Iterator<Entry<Entity, AbstractDrawnEntity>> iter = pullmap.entrySet().iterator();
+        while (iter.hasNext()) {
+            Entry<Entity, AbstractDrawnEntity> entry = iter.next();
+            AbstractDrawnEntity cart = entry.getValue();
+            if (!cart.isAlive() || cart.getPulling() == null || !cart.getPulling().isAlive()) {
+                if (entry.getKey() instanceof PlayerEntity) {
+                    cart.setPulling(null);
+                } else {
+                    iter.remove();
+                }
+                continue;
+            }
+            cart.pulledTick();
         }
     }
 }

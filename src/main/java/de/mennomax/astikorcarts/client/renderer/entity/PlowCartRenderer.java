@@ -10,6 +10,8 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 
@@ -67,7 +69,12 @@ public class PlowCartRenderer extends EntityRenderer<PlowCartEntity>
                 GlStateManager.rotatef(120.0F - entityYaw - 30.0F*i, 0.0F, 1.0F, 0.0F);
                 GlStateManager.rotatef(207.0F, 0.0F, 0.0F, 1.0F);
             }
-            Minecraft.getInstance().getItemRenderer().renderItem(entity.getTool(i), ItemCameraTransforms.TransformType.FIXED);
+            ItemStack stack = entity.getStackInSlot(i);
+            if(stack.getItem() instanceof BlockItem) {
+                GlStateManager.translated(0.0D, -0.1D, 0.0D);
+                GlStateManager.rotatef(180.0F, 0.0F, 0.0F, 1.0F);
+            }
+            Minecraft.getInstance().getItemRenderer().renderItem(stack, ItemCameraTransforms.TransformType.FIXED);
             GlStateManager.popMatrix();
         }
         super.doRender(entity, x, y, z, entityYaw, partialTicks);

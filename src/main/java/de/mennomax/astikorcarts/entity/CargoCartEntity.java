@@ -17,8 +17,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-public class CargoCartEntity extends AbstractDrawnInventoryEntity implements IInventoryChangedListener
-{
+public class CargoCartEntity extends AbstractDrawnInventoryEntity implements IInventoryChangedListener {
 
     private static final DataParameter<Integer> CARGO = EntityDataManager.<Integer>createKey(CargoCartEntity.class, DataSerializers.VARINT);
 
@@ -27,70 +26,65 @@ public class CargoCartEntity extends AbstractDrawnInventoryEntity implements IIn
         this.initInventory(54);
         this.inventory.addListener(this);
     }
-    
+
     @Override
     public boolean processInitialInteract(PlayerEntity player, Hand hand) {
-        if (!this.world.isRemote)
-        {
-            if (player.isSneaking())
-            {
+        if (!this.world.isRemote) {
+            if (player.isSneaking()) {
                 this.openContainer(player);
+            } else {
+                player.startRiding(this);
             }
         }
         return true;
     }
-    
+
     @Override
     public double getMountedYOffset() {
         return 0.62D;
     }
-    
+
     @Override
     public void updatePassenger(Entity passenger) {
-        if (this.isPassenger(passenger))
-        {
+        if (this.isPassenger(passenger)) {
             Vec3d vec3d = (new Vec3d(-0.68D, 0.0D, 0.0D)).rotateYaw(-this.rotationYaw * 0.017453292F - ((float) Math.PI / 2F));
             passenger.setPosition(this.posX + vec3d.x, this.posY + this.getMountedYOffset() + passenger.getYOffset(), this.posZ + vec3d.z);
         }
     }
-    
+
     public int getCargo() {
         return this.dataManager.get(CARGO);
     }
-    
+
     @Override
     public Item getCartItem() {
         return Items.CARGOCART;
     }
-    
+
     @Override
     protected void registerData() {
         super.registerData();
         this.dataManager.register(CARGO, 0);
     }
-    
+
     @Override
     protected void readAdditional(CompoundNBT compound) {
         super.readAdditional(compound);
         dataManager.set(CARGO, compound.getInt("Cargo"));
     }
-    
+
     @Override
     protected void writeAdditional(CompoundNBT compound) {
         super.writeAdditional(compound);
         compound.putInt("Cargo", dataManager.get(CARGO));
     }
-    
+
     @Override
-    public void onInventoryChanged(IInventory invBasic)
-    {
-        if (!this.world.isRemote)
-        {
+    public void onInventoryChanged(IInventory invBasic) {
+        if (!this.world.isRemote) {
             int tempload = 0;
-            for (int i = 0; i < this.inventory.getSizeInventory(); i++)
-            {
-                if (!this.inventory.getStackInSlot(i).isEmpty())
-                {
+            for (int i = 0; i < this.inventory.getSizeInventory(); i++) {
+                if (!this.inventory.getStackInSlot(i).isEmpty()) {
                     tempload++;
                 }
             }
@@ -105,16 +99,15 @@ public class CargoCartEntity extends AbstractDrawnInventoryEntity implements IIn
                 newValue = 1;
             else
                 newValue = 0;
-            if (this.dataManager.get(CARGO).intValue() != newValue)
-            {
+            if (this.dataManager.get(CARGO).intValue() != newValue) {
                 this.dataManager.set(CARGO, newValue);
             }
         }
     }
-    
+
     public void openContainer(PlayerEntity player) {
         player.openContainer(new SimpleNamedContainerProvider((id, inv, plyr) -> {
-           return new CargoCartContainer(id, inv, this);
+            return new CargoCartContainer(id, inv, this);
         }, this.getDisplayName()));
     }
 

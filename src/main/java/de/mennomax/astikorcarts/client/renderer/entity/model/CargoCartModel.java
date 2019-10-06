@@ -145,7 +145,8 @@ public class CargoCartModel extends EntityModel<CargoCartEntity>
     public void setRotationAngles(CargoCartEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 //        this.leftWheel.rotateAngleX = entityIn.getWheelRotation();
 //        this.rightWheel.rotateAngleX = this.leftWheel.rotateAngleX;
-
+//        this.leftWheel.rotateAngleX = this.leftWheel.rotateAngleX+0.1F*limbSwing;
+        rightWheel.rotateAngleX = leftWheel.rotateAngleX;
         this.leftWheel.render(scale);
         this.rightWheel.render(scale);
 

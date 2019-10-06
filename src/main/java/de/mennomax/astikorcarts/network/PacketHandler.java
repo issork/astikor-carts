@@ -17,17 +17,17 @@ public class PacketHandler {
 
     private static int id = 0;
     public static final String VERSION = "1";
-    public static final SimpleChannel channel = ChannelBuilder.named(new ResourceLocation(AstikorCarts.MODID, "main"))
+    public static final SimpleChannel CHANNEL = ChannelBuilder.named(new ResourceLocation(AstikorCarts.MODID, "main"))
             .networkProtocolVersion(() -> VERSION)
             .clientAcceptedVersions(VERSION::equals)
             .serverAcceptedVersions(VERSION::equals)
             .simpleChannel();
 
     @SubscribeEvent
-    public static void registerPackets(final FMLCommonSetupEvent event) {
-        channel.registerMessage(id++, CPacketActionKey.class, CPacketActionKey::encode, CPacketActionKey::decode, CPacketActionKey::handle);
-        channel.registerMessage(id++, CPacketToggleSlow.class, CPacketToggleSlow::encode, CPacketToggleSlow::decode, CPacketToggleSlow::handle);
-        channel.registerMessage(id++, SPacketDrawnUpdate.class, SPacketDrawnUpdate::encode, SPacketDrawnUpdate::decode, SPacketDrawnUpdate::handle);
+    public static void registerPackets(final FMLCommonSetupEvent event) {        
+        CHANNEL.registerMessage(id++, CPacketActionKey.class, CPacketActionKey::encode, CPacketActionKey::decode, CPacketActionKey::handle);
+        CHANNEL.registerMessage(id++, CPacketToggleSlow.class, CPacketToggleSlow::encode, CPacketToggleSlow::decode, CPacketToggleSlow::handle);
+        CHANNEL.registerMessage(id++, SPacketDrawnUpdate.class, SPacketDrawnUpdate::encode, SPacketDrawnUpdate::decode, SPacketDrawnUpdate::handle);
     }
 
 }

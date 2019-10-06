@@ -37,8 +37,18 @@ public abstract class AbstractDrawnInventoryEntity extends AbstractDrawnEntity {
     }
     
     @Override
+    public boolean replaceItemInInventory(int inventorySlot, ItemStack itemStackIn) {
+        if (inventorySlot >= 0 && inventorySlot < this.inventory.getSizeInventory()) {
+           this.inventory.setInventorySlotContents(inventorySlot, itemStackIn);
+           return true;
+        } else {
+           return false;
+        }
+     }
+    
+    @Override
     public void onDestroyedAndDoDrops(DamageSource source) {
-        InventoryHelper.dropInventoryItems(this.world, this, inventory);
+        InventoryHelper.dropInventoryItems(this.world, this, this.inventory);
     }
     
     @Override
