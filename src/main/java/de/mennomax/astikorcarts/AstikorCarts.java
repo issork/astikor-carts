@@ -5,16 +5,21 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 
 import de.mennomax.astikorcarts.entity.AbstractDrawnEntity;
+import de.mennomax.astikorcarts.entity.CargoCartEntity;
 import de.mennomax.astikorcarts.entity.ai.goal.PullCartGoal;
 import de.mennomax.astikorcarts.init.KeyBindings;
 import de.mennomax.astikorcarts.network.PacketHandler;
 import de.mennomax.astikorcarts.network.packets.CPacketActionKey;
+import de.mennomax.astikorcarts.network.packets.CPacketOpenCargoCartGui;
 import de.mennomax.astikorcarts.network.packets.CPacketToggleSlow;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.WorldTickEvent;
@@ -46,6 +51,17 @@ public class AstikorCarts {
                 }
                 if (!Minecraft.getInstance().isGamePaused()) {
                     tickPulled(CLIENTPULLMAP);
+                }
+            }
+        }
+        
+        @SubscribeEvent
+        public static void openGui(final GuiOpenEvent event) {
+            if (event.getGui() instanceof InventoryScreen) {
+                ClientPlayerEntity player = Minecraft.getInstance().player;
+                if(player.getRidingEntity() instanceof CargoCartEntity) {
+                    event.setCanceled(true);
+                    PacketHandler.CHANNEL.sendToServer(new CPacketOpenCargoCartGui(player.getRidingEntity().getEntityId()));
                 }
             }
         }
@@ -82,9 +98,8 @@ public class AstikorCarts {
             if (!cart.isAlive() || cart.getPulling() == null || !cart.getPulling().isAlive()) {
                 if (entry.getKey() instanceof PlayerEntity) {
                     cart.setPulling(null);
-                } else {
-                    iter.remove();
                 }
+                iter.remove();
                 continue;
             }
             cart.pulledTick();

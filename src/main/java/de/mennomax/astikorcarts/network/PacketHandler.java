@@ -2,6 +2,7 @@ package de.mennomax.astikorcarts.network;
 
 import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.network.packets.CPacketActionKey;
+import de.mennomax.astikorcarts.network.packets.CPacketOpenCargoCartGui;
 import de.mennomax.astikorcarts.network.packets.CPacketToggleSlow;
 import de.mennomax.astikorcarts.network.packets.SPacketDrawnUpdate;
 import net.minecraft.util.ResourceLocation;
@@ -28,6 +29,7 @@ public class PacketHandler {
         CHANNEL.registerMessage(id++, CPacketActionKey.class, CPacketActionKey::encode, CPacketActionKey::decode, CPacketActionKey::handle);
         CHANNEL.registerMessage(id++, CPacketToggleSlow.class, CPacketToggleSlow::encode, CPacketToggleSlow::decode, CPacketToggleSlow::handle);
         CHANNEL.registerMessage(id++, SPacketDrawnUpdate.class, SPacketDrawnUpdate::encode, SPacketDrawnUpdate::decode, SPacketDrawnUpdate::handle);
+        CHANNEL.registerMessage(id++, CPacketOpenCargoCartGui.class, CPacketOpenCargoCartGui::encode, CPacketOpenCargoCartGui::decode, CPacketOpenCargoCartGui::handle);
     }
 
 }

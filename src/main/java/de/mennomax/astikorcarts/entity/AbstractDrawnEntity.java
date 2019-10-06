@@ -58,7 +58,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     private double lerpY;
     private double lerpZ;
     private double lerpYaw;
-    private boolean fellLastTick;
+//    private boolean fellLastTick;
     private double motionY;
     protected double distanceTravelled;
     protected float wheelRotation[] = new float[2];
@@ -84,10 +84,6 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         if (this.getDamageTaken() > 0.0F) {
             this.setDamageTaken(this.getDamageTaken() - 1.0F);
         }
-        this.prevPosX = this.posX;
-        this.prevPosY = this.posY;
-        this.prevPosZ = this.posZ;
-        this.prevRotationYaw = this.rotationYaw;
         super.tick();
         this.tickLerp();
         if (this.pulling == null) {
@@ -124,14 +120,14 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         double lookZ = MathHelper.cos(-this.rotationYaw * 0.017453292F - (float) Math.PI);
         double moveX = targetVec.x - this.posX + lookX * this.spacing;
         double moveZ = targetVec.z - this.posZ + lookZ * this.spacing;
-        if (!this.pulling.onGround && this.pulling.fallDistance <= 0.0F) {
-            this.motionY = targetVec.y - this.posY;
-            this.fallDistance = 0.0F;
-            this.fellLastTick = false;
-        } else if (!fellLastTick) {
-            this.motionY = 0.0D;
-            this.fellLastTick = true;
-        }
+//        if (!this.pulling.onGround && this.pulling.fallDistance <= 0.0F) {
+//            this.motionY = targetVec.y - this.posY;
+//            this.fallDistance = 0.0F;
+//            this.fellLastTick = false;
+//        } else if (!fellLastTick) {
+//            this.motionY = 0.0D;
+//            this.fellLastTick = true;
+//        }
         this.setMotion(moveX, this.motionY, moveZ);
         this.move(MoverType.SELF, this.getMotion());
         Vec3d motion = getMotion();
@@ -364,6 +360,8 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             --this.lerpSteps;
             this.setPosition(dx, dy, dz);
             this.setRotation(this.rotationYaw, this.rotationPitch);
+        } else if (this.world.isRemote) {
+            this.setMotion(this.getMotion().scale(0.98D));
         }
     }
 
