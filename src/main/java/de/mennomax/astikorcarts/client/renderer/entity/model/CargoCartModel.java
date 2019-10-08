@@ -89,7 +89,7 @@ public class CargoCartModel extends EntityModel<CargoCartEntity>
         this.cargo[3].addBox(-12.0F, -7.0F, 1.0F, 20, 2, 3);
         this.cargo[3].rotateAngleY = -1.067F;
 
-        // --RIGHT-WHEEL----------------------------------
+        // --LEFT-WHEEL----------------------------------
         this.leftWheel = new RendererModel(this, 54, 23);
         this.leftWheel.setRotationPoint(14.5F, 5.0F, 1.0F);
         this.leftWheel.addBox(-2.0F, -1.0F, -1.0F, 2, 2, 2);
@@ -106,7 +106,7 @@ public class CargoCartModel extends EntityModel<CargoCartEntity>
             this.leftWheel.addChild(spoke);
         }
 
-        // --LEFT-WHEEL---------------------------------
+        // --RIGHT-WHEEL---------------------------------
         this.rightWheel = new RendererModel(this, 54, 23);
         this.rightWheel.setRotationPoint(-14.5F, 5.0F, 1.0F);
         this.rightWheel.addBox(0.0F, -1.0F, -1.0F, 2, 2, 2);

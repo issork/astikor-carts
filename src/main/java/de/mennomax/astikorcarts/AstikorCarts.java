@@ -27,7 +27,7 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
+import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 
 @Mod(AstikorCarts.MODID)
 public class AstikorCarts {
@@ -54,17 +54,18 @@ public class AstikorCarts {
                 }
             }
         }
-        
+
         @SubscribeEvent
         public static void openGui(final GuiOpenEvent event) {
             if (event.getGui() instanceof InventoryScreen) {
                 ClientPlayerEntity player = Minecraft.getInstance().player;
-                if(player.getRidingEntity() instanceof CargoCartEntity) {
+                if (player.getRidingEntity() instanceof CargoCartEntity) {
                     event.setCanceled(true);
                     PacketHandler.CHANNEL.sendToServer(new CPacketOpenCargoCartGui(player.getRidingEntity().getEntityId()));
                 }
             }
         }
+
     }
 
     @EventBusSubscriber
@@ -84,10 +85,11 @@ public class AstikorCarts {
         }
 
         @SubscribeEvent
-        public static void stopServer(final FMLServerStoppingEvent event) {
+        public static void stopServer(final FMLServerStoppedEvent event) {
             CLIENTPULLMAP.clear();
             SERVERPULLMAP.clear();
         }
+
     }
 
     private static void tickPulled(HashMap<Entity, AbstractDrawnEntity> pullmap) {
@@ -99,6 +101,10 @@ public class AstikorCarts {
                 if (entry.getKey() instanceof PlayerEntity) {
                     cart.setPulling(null);
                 }
+                iter.remove();
+                continue;
+            } else if (!cart.world.isRemote && cart.shouldRemovePulling()) {
+                cart.setPulling(null);
                 iter.remove();
                 continue;
             }

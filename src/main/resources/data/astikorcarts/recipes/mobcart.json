@@ -7,8 +7,7 @@
   ],
   "key": {
     "p": {
-      "type": "forge:ore_dict",
-      "ore": "plankWood"
+      "tag": "minecraft:planks"
     },
     "w": {
       "item": "astikorcarts:wheel"

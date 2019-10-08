@@ -14,6 +14,7 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -41,7 +42,7 @@ public class CargoCartEntity extends AbstractDrawnInventoryEntity implements IIn
 
     @Override
     public double getMountedYOffset() {
-        return 0.62D;
+        return 0.56D;
     }
 
     @Override
@@ -49,9 +50,15 @@ public class CargoCartEntity extends AbstractDrawnInventoryEntity implements IIn
         if (this.isPassenger(passenger)) {
             Vec3d vec3d = (new Vec3d(-0.68D, 0.0D, 0.0D)).rotateYaw(-this.rotationYaw * 0.017453292F - ((float) Math.PI / 2F));
             passenger.setPosition(this.posX + vec3d.x, this.posY + this.getMountedYOffset() + passenger.getYOffset(), this.posZ + vec3d.z);
+            passenger.setRenderYawOffset(this.rotationYaw + 180.0F);
+            float f2 = MathHelper.wrapDegrees(passenger.rotationYaw - this.rotationYaw + 180.0F);
+            float f1 = MathHelper.clamp(f2, -105.0F, 105.0F);
+            passenger.prevRotationYaw += f1 - f2;
+            passenger.rotationYaw += f1 - f2;
+            passenger.setRotationYawHead(passenger.rotationYaw);
         }
     }
-
+    
     public int getCargo() {
         return this.dataManager.get(CARGO);
     }

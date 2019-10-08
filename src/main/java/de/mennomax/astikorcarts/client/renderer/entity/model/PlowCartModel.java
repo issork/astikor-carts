@@ -78,7 +78,7 @@ public class PlowCartModel extends EntityModel<PlowCartEntity>
         this.plowHandleGrip.rotateAngleX = (float) Math.PI / 4.0F;
         this.plowShaftUpper[1].addChild(plowHandleGrip);
 
-        // --RIGHT-WHEEL----------------------------------
+        // --LEFT-WHEEL----------------------------------
         this.leftWheel = new RendererModel(this, 34, 4);
         this.leftWheel.setRotationPoint(14.5F, 5.0F, 1.0F);
         this.leftWheel.addBox(-2.0F, -1.0F, -1.0F, 2, 2, 2);
@@ -95,7 +95,7 @@ public class PlowCartModel extends EntityModel<PlowCartEntity>
             this.leftWheel.addChild(spoke);
         }
 
-        // --LEFT-WHEEL---------------------------------
+        // --RIGHT-WHEEL---------------------------------
         this.rightWheel = new RendererModel(this, 34, 4);
         this.rightWheel.mirror = true;
         this.rightWheel.setRotationPoint(-14.5F, 5.0F, 1.0F);

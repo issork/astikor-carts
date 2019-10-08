@@ -7,12 +7,10 @@
   ],
   "key": {
     "p": {
-      "type": "forge:ore_dict",
-      "ore": "plankWood"
+      "tag": "minecraft:planks"
     },
     "c": {
-      "type": "forge:ore_dict",
-      "ore": "chestWood"
+      "tag": "forge:chests/wooden"
     },
     "w": {
       "item": "astikorcarts:wheel"

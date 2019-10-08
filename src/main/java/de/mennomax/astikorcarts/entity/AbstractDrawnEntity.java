@@ -58,10 +58,10 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     private double lerpY;
     private double lerpZ;
     private double lerpYaw;
-//    private boolean fellLastTick;
-    private double motionY;
+    protected boolean pullingOnGroundLastTick;
     protected double distanceTravelled;
     protected float wheelRotation[] = new float[2];
+    protected double wheelOffset = 0.9F;
     private int pullingId = -1;
     private UUID pullingUUID = null;
     protected double spacing = 2.4D;
@@ -79,7 +79,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             this.setTimeSinceHit(this.getTimeSinceHit() - 1);
         }
         if (!this.hasNoGravity()) {
-            this.motionY -= 0.08D;
+            this.setMotion(0.0D, this.getMotion().y - 0.08D, 0.0D);
         }
         if (this.getDamageTaken() > 0.0F) {
             this.setDamageTaken(this.getDamageTaken() - 1.0F);
@@ -87,9 +87,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         super.tick();
         this.tickLerp();
         if (this.pulling == null) {
-            this.setMotion(0, this.motionY, 0);
             this.move(MoverType.SELF, this.getMotion());
-            this.motionY = this.getMotion().y - 0.08F;
             this.attemptReattach();
         }
         for (Entity entity : this.world.getEntitiesInAABBexcluding(this, this.getBoundingBox(), EntityPredicates.pushableBy(this))) {
@@ -101,14 +99,10 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
      * This method is called for every cart that is being pulled by another entity
      * after all other
      * entities have been ticked to ensure that the cart always behaves the same
-     * when being pulled.
+     * when being pulled. (unless this cart is being pulled by another cart)
      */
     public void pulledTick() {
-        if (!this.world.isRemote && shouldRemovePulling()) {
-            this.setPulling(null);
-            return;
-        }
-        Vec3d targetVec = this.getTargetVec();
+        final Vec3d targetVec = this.getTargetVec();
         this.handleRotation(targetVec);
         double dRotation = this.prevRotationYaw - this.rotationYaw;
         if (dRotation < -180.0D) {
@@ -120,20 +114,16 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         double lookZ = MathHelper.cos(-this.rotationYaw * 0.017453292F - (float) Math.PI);
         double moveX = targetVec.x - this.posX + lookX * this.spacing;
         double moveZ = targetVec.z - this.posZ + lookZ * this.spacing;
-//        if (!this.pulling.onGround && this.pulling.fallDistance <= 0.0F) {
-//            this.motionY = targetVec.y - this.posY;
-//            this.fallDistance = 0.0F;
-//            this.fellLastTick = false;
-//        } else if (!fellLastTick) {
-//            this.motionY = 0.0D;
-//            this.fellLastTick = true;
-//        }
-        this.setMotion(moveX, this.motionY, moveZ);
-        this.move(MoverType.SELF, this.getMotion());
-        Vec3d motion = getMotion();
+        final Vec3d motion = this.getMotion();
+        this.fallDistance = this.pulling.fallDistance;
+        if (!this.pulling.onGround && this.fallDistance == 0.0F && !this.pullingOnGroundLastTick) {
+            setMotion(motion.x, targetVec.y - this.posY, motion.z);
+        }
+        this.pullingOnGroundLastTick = this.pulling.onGround;
         this.distanceTravelled = Math.sqrt(motion.x * motion.x + motion.z * motion.z);
+        this.setMotion(moveX, motion.y, moveZ);
+        this.move(MoverType.SELF, this.getMotion());
         this.spawnWheelParticles();
-        this.motionY = motion.y - 0.08F;
         if (this.world.isRemote) {
             // TODO: Make wheel rotate independently in tickWheels(double, double)
             // boolean travelledForward = Math.sqrt((moveX-lookX) * (moveX-lookX) +
@@ -145,7 +135,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
      * 
      * @return Whether the currently pulling entity should stop pulling this cart.
      */
-    protected boolean shouldRemovePulling() {
+    public boolean shouldRemovePulling() {
         if (this.collidedHorizontally) {
             final Vec3d start = new Vec3d(this.posX, this.posY + this.getHeight(), this.posZ);
             final Vec3d end = new Vec3d(this.pulling.posX, this.pulling.posY + this.getHeight() / 2, this.pulling.posZ);
@@ -229,7 +219,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
      * @return The position this cart should always face and travel towards.
      */
     public Vec3d getTargetVec() {
-        return new Vec3d(this.pulling.posX, this.pulling.posY, this.pulling.posZ);
+        return this.pulling.getPositionVec();
     }
 
     /**
@@ -267,7 +257,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
      * different tick order.
      */
     public void spawnWheelParticles() {
-        if (!this.isInWater() && this.distanceTravelled > 0.2F) {
+        if (!this.isInWater() && this.distanceTravelled > 0.5F) {
             this.createRunningParticles();
         }
     }
@@ -279,10 +269,10 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         if (!blockstate.addRunningEffects(world, blockpos, this))
             if (blockstate.getRenderType() != BlockRenderType.INVISIBLE) {
                 Vec3d vec3d = this.getMotion();
-                double xOffset = MathHelper.sin((this.rotationYaw - 90) * 0.017453292F) * 0.75D;
-                double zOffset = MathHelper.cos((this.rotationYaw - 90) * 0.017453292F) * 0.75D;
-                this.world.addParticle(new BlockParticleData(ParticleTypes.BLOCK, blockstate).setPos(blockpos), this.posX + xOffset, this.posY, this.posZ - zOffset, vec3d.x, vec3d.y, vec3d.z);
-                this.world.addParticle(new BlockParticleData(ParticleTypes.BLOCK, blockstate).setPos(blockpos), this.posX - xOffset, this.posY, this.posZ + zOffset, vec3d.x, vec3d.y, vec3d.z);
+                double xOffset = MathHelper.sin((this.rotationYaw - 90) * 0.017453292F) * this.wheelOffset;
+                double zOffset = MathHelper.cos((this.rotationYaw - 90) * 0.017453292F) * this.wheelOffset;
+                this.world.addParticle(new BlockParticleData(ParticleTypes.BLOCK, blockstate).setPos(blockpos), this.posX + xOffset, this.posY, this.posZ - zOffset, vec3d.x * this.distanceTravelled, this.distanceTravelled, vec3d.z * this.distanceTravelled);
+                this.world.addParticle(new BlockParticleData(ParticleTypes.BLOCK, blockstate).setPos(blockpos), this.posX - xOffset, this.posY, this.posZ + zOffset, vec3d.x * this.distanceTravelled, this.distanceTravelled, vec3d.z * this.distanceTravelled);
             }
     }
 
@@ -307,20 +297,6 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             }
         }
         return true;
-    }
-
-    /**
-     * Returns true if this entity should push and be pushed by other entities when
-     * colliding.
-     */
-    @Override
-    public boolean canBePushed() {
-        return true;
-    }
-
-    @Override
-    public boolean canBeCollidedWith() {
-        return this.isAlive();
     }
 
     /**
@@ -360,9 +336,17 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             --this.lerpSteps;
             this.setPosition(dx, dy, dz);
             this.setRotation(this.rotationYaw, this.rotationPitch);
-        } else if (this.world.isRemote) {
-            this.setMotion(this.getMotion().scale(0.98D));
         }
+    }
+
+    @Override
+    public boolean isPushedByWater() {
+        return false;
+    }
+
+    @Override
+    public boolean canBeCollidedWith() {
+        return this.isAlive();
     }
 
     @Override

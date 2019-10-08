@@ -52,7 +52,7 @@ public class MobCartModel extends EntityModel<MobCartEntity> {
         this.boardFront = new RendererModel(this, 20, 28);
         this.boardFront.addBox(-9F, -5F, -15.5F, 18, 8, 2);
 
-        // --RIGHT-WHEEL----------------------------------
+        // --LEFT-WHEEL----------------------------------
         this.leftWheel = new RendererModel(this, 52, 21);
         this.leftWheel.setRotationPoint(14.5F, 5.0F, 1.0F);
         this.leftWheel.addBox(-2.0F, -1.0F, -1.0F, 2, 2, 2);
@@ -68,7 +68,7 @@ public class MobCartModel extends EntityModel<MobCartEntity> {
             this.leftWheel.addChild(spoke);
         }
 
-        // ---WHEEL---------------------------------
+        // --RIGHT-WHEEL---------------------------------
         this.rightWheel = new RendererModel(this, 52, 21);
         this.rightWheel.mirror = true;
         this.rightWheel.setRotationPoint(-14.5F, 5.0F, 1.0F);
