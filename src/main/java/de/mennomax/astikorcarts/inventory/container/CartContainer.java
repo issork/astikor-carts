@@ -3,27 +3,26 @@ package de.mennomax.astikorcarts.inventory.container;
 import de.mennomax.astikorcarts.entity.AbstractDrawnInventoryEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.items.ItemStackHandler;
 
 public abstract class CartContainer extends Container {
 
-    protected final IInventory cartInv;
+    protected final ItemStackHandler cartInv;
     protected final AbstractDrawnInventoryEntity cart;
 
     public CartContainer(ContainerType<?> type, int id, PlayerInventory playerInv, AbstractDrawnInventoryEntity cart) {
         super(type, id);
         this.cart = cart;
         this.cartInv = cart.inventory;
-        cartInv.openInventory(playerInv.player);
     }
 
     @Override
     public boolean canInteractWith(PlayerEntity playerIn) {
-        return cartInv.isUsableByPlayer(playerIn) && this.cart.isAlive() && this.cart.getDistance(playerIn) < 8.0F;
+        return this.cart.isAlive() && this.cart.getDistance(playerIn) < 8.0F;
     }
     
     @Override
@@ -32,11 +31,11 @@ public abstract class CartContainer extends Container {
         Slot slot = this.inventorySlots.get(index);
         if(slot != null && slot.getHasStack()) {
             ItemStack itemstack1 = slot.getStack();
-            if(index < cartInv.getSizeInventory()) {
-                if (!this.mergeItemStack(itemstack1, cartInv.getSizeInventory(), this.inventorySlots.size(), true)) {
+            if(index < cartInv.getSlots()) {
+                if (!this.mergeItemStack(itemstack1, cartInv.getSlots(), this.inventorySlots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if(!this.mergeItemStack(itemstack1, 0, cartInv.getSizeInventory(), false)) {
+            } else if(!this.mergeItemStack(itemstack1, 0, cartInv.getSlots(), false)) {
                 return ItemStack.EMPTY;
             }
             if(itemstack1.isEmpty()) {
@@ -51,7 +50,6 @@ public abstract class CartContainer extends Container {
     @Override
     public void onContainerClosed(PlayerEntity playerIn) {
         super.onContainerClosed(playerIn);
-        this.cartInv.closeInventory(playerIn);
     }
 
 }

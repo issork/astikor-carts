@@ -120,37 +120,29 @@ public class PlowCartModel extends EntityModel<PlowCartEntity>
         this.axis.render(scale);
         this.shaft.renderWithRotation(scale);
         this.shaftConnector.renderWithRotation(scale);
-        for (int i = 0; i < 3; ++i)
-        {
+        for (int i = 0; i < 3; ++i) {
             this.triangle[i].render(scale);
+        }
+        this.leftWheel.render(scale);
+        this.rightWheel.render(scale);
+        if (entityIn.getPlowing()) {
+            for(RendererModel renderer : this.plowShaftUpper) {
+                renderer.rotateAngleX = (float) Math.PI / 4.0F;
+            }
+        }
+        else {
+            for(RendererModel renderer : this.plowShaftUpper) {
+                renderer.rotateAngleX = (float) Math.PI / 2.5F;
+            }
+        }
+        for(RendererModel renderer : this.plowShaftUpper) {
+            renderer.render(scale);
         }
     }
 
     @Override
     public void setRotationAngles(PlowCartEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
-//        this.leftWheel.rotateAngleX = ((PlowCartEntity) entity).getWheelRotation();
-//        this.rightWheel.rotateAngleX = this.leftWheel.rotateAngleX;
-
-        this.leftWheel.render(scale);
-        this.rightWheel.render(scale);
-
-        if (entityIn.getPlowing())
-        {
-            for(RendererModel renderer : this.plowShaftUpper)
-            {
-                renderer.rotateAngleX = (float) Math.PI / 4.0F;
-            }
-        }
-        else
-        {
-            for(RendererModel renderer : this.plowShaftUpper)
-            {
-                renderer.rotateAngleX = (float) Math.PI / 2.5F;
-            }
-        }
-        for(RendererModel renderer : this.plowShaftUpper)
-        {
-            renderer.render(scale);
-        }
+        this.rightWheel.rotateAngleX = (float) (entityIn.getWheelRotation(0) + entityIn.getWheelRotationIncrement(0) * limbSwing);
+        this.leftWheel.rotateAngleX = (float) (entityIn.getWheelRotation(1) + entityIn.getWheelRotationIncrement(1) * limbSwing);
     }
 }

@@ -3,10 +3,11 @@ package de.mennomax.astikorcarts.inventory.container;
 import de.mennomax.astikorcarts.entity.AbstractDrawnInventoryEntity;
 import de.mennomax.astikorcarts.init.Inventories;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.SlotItemHandler;
 
 public class PlowCartContainer extends CartContainer {
     
@@ -34,12 +35,12 @@ public class PlowCartContainer extends CartContainer {
         }
     }
     
-    static class PlowSlot extends Slot {
-
-        public PlowSlot(IInventory inventoryIn, int index, int xPosition, int yPosition) {
-            super(inventoryIn, index, xPosition, yPosition);
-        }
+    static class PlowSlot extends SlotItemHandler {
         
+        public PlowSlot(IItemHandler itemHandler, int index, int xPosition, int yPosition) {
+            super(itemHandler, index, xPosition, yPosition);
+        }
+
         @Override
         public boolean isItemValid(ItemStack stack) {
             //TODO: Handle slot once plow config is implemented

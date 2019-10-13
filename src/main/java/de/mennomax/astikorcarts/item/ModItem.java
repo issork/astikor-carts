@@ -1,13 +1,13 @@
 package de.mennomax.astikorcarts.item;
 
-import de.mennomax.astikorcarts.AstikorCarts;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 
 public class ModItem extends Item {
 
-    public ModItem(Properties properties, String name) {
+    public ModItem(Properties properties, ResourceLocation name) {
         super(properties);
-        this.setRegistryName(AstikorCarts.MODID, name);
+        this.setRegistryName(name);
     }
 
 }

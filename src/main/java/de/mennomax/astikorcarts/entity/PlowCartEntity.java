@@ -4,13 +4,12 @@ import com.google.common.collect.ImmutableList;
 
 import de.mennomax.astikorcarts.init.Items;
 import de.mennomax.astikorcarts.inventory.container.PlowCartContainer;
+import de.mennomax.astikorcarts.util.CartItemHandler;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.IInventoryChangedListener;
 import net.minecraft.inventory.container.SimpleNamedContainerProvider;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -23,15 +22,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.items.ItemStackHandler;
 
-public class PlowCartEntity extends AbstractDrawnInventoryEntity implements IInventoryChangedListener
-{
-    public PlowCartEntity(EntityType<? extends Entity> entityTypeIn, World worldIn) {
-        super(entityTypeIn, worldIn);
-        this.spacing = 2.0D;
-        this.initInventory(3);
-        this.inventory.addListener(this);
-    }
+public class PlowCartEntity extends AbstractDrawnInventoryEntity {
 
     private static final DataParameter<Boolean> PLOWING = EntityDataManager.<Boolean>createKey(PlowCartEntity.class, DataSerializers.BOOLEAN);
     private static final double BLADEOFFSET = 1.7D;
@@ -40,6 +33,24 @@ public class PlowCartEntity extends AbstractDrawnInventoryEntity implements IInv
         EntityDataManager.createKey(PlowCartEntity.class, DataSerializers.ITEMSTACK),
         EntityDataManager.createKey(PlowCartEntity.class, DataSerializers.ITEMSTACK)
     );
+    
+    public PlowCartEntity(EntityType<? extends Entity> entityTypeIn, World worldIn) {
+        super(entityTypeIn, worldIn);
+        this.spacing = 2.0D;
+    }
+    
+    @Override
+    protected ItemStackHandler initInventory() {
+        return new CartItemHandler(3, this) {
+            @Override
+            protected void onContentsChanged(int slot) {
+                for(int i = 0; i < TOOLS.size(); i++)
+                {
+                    CART.getDataManager().set(TOOLS.get(i), this.getStackInSlot(i));
+                }
+            }
+        };
+    }
 
     public boolean getPlowing()
     {
@@ -60,7 +71,7 @@ public class PlowCartEntity extends AbstractDrawnInventoryEntity implements IInv
         {
             if (this.prevPosX != this.posX || this.prevPosZ != this.posZ)
             {
-                for (int i = 0; i < this.inventory.getSizeInventory(); i++)
+                for (int i = 0; i < this.inventory.getSlots(); i++)
                 {
                     if(inventory.getStackInSlot(i) != ItemStack.EMPTY)
                     {
@@ -178,14 +189,12 @@ public class PlowCartEntity extends AbstractDrawnInventoryEntity implements IInv
 //            this.dataManager.set(TOOLS[slot], ItemStack.EMPTY);
 //        }
 //    }
-    public ItemStack getStackInSlot(int i)
-    {
+    public ItemStack getStackInSlot(int i) {
         return this.dataManager.get(TOOLS.get(i));
     }
     
     @Override
-    public Item getCartItem()
-    {
+    public Item getCartItem() {
         return Items.PLOWCART;
     }
     
@@ -208,14 +217,13 @@ public class PlowCartEntity extends AbstractDrawnInventoryEntity implements IInv
         super.writeAdditional(compound);
     }
 
-    @Override
-    public void onInventoryChanged(IInventory invBasic)
-    {
-        for(int i = 0; i < TOOLS.size(); i++)
-        {
-            this.dataManager.set(TOOLS.get(i), this.inventory.getStackInSlot(i));
-        }
-    }
+//    @Override
+//    public void onInventoryChanged(IInventory invBasic) {
+//        for(int i = 0; i < TOOLS.size(); i++)
+//        {
+//            this.dataManager.set(TOOLS.get(i), this.inventory.getStackInSlot(i));
+//        }
+//    }
     
     public void openContainer(PlayerEntity player) {
         NetworkHooks.openGui((ServerPlayerEntity) player, new SimpleNamedContainerProvider((id, inv, plyr) -> {

@@ -4,6 +4,7 @@ import de.mennomax.astikorcarts.entity.AbstractDrawnInventoryEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.Slot;
+import net.minecraftforge.items.SlotItemHandler;
 
 public class CargoCartContainer extends CartContainer {
     
@@ -13,7 +14,7 @@ public class CargoCartContainer extends CartContainer {
 
         for(int i = 0; i <  6; ++i) {
            for(int j = 0; j < 9; ++j) {
-              this.addSlot(new Slot(this.cartInv, j + i * 9, 8 + j * 18, 18 + i * 18));
+              this.addSlot(new SlotItemHandler(this.cartInv, j + i * 9, 8 + j * 18, 18 + i * 18));
            }
         }
 
@@ -26,6 +27,11 @@ public class CargoCartContainer extends CartContainer {
         for(int x = 0; x < 9; ++x) {
            this.addSlot(new Slot(playerInv, x, 8 + x * 18, 161 + upperInvHeight));
         }
+    }
+    
+    @Override
+    public void detectAndSendChanges() {
+        super.detectAndSendChanges();
     }
 
 }

@@ -18,7 +18,6 @@ import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ObjectHolder;
 
 @ObjectHolder(AstikorCarts.MODID)
@@ -40,7 +39,6 @@ public class Entities {
         final ResourceLocation resourceLocation = new ResourceLocation(AstikorCarts.MODID, name);
         final EntityType<?> entityType = EntityType.Builder.create(factoryIn, EntityClassification.MISC)
                 .size(widthIn, heightIn)
-                .setCustomClientFactory((pkg, world) -> ForgeRegistries.ENTITIES.getValue(resourceLocation).create(world))
                 .build(resourceLocation.toString());
         entityType.setRegistryName(name);
         return entityType;

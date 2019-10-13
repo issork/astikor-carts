@@ -6,6 +6,7 @@ import de.mennomax.astikorcarts.item.ModItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.Properties;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -23,10 +24,11 @@ public class Items {
     @SubscribeEvent
     public static void registerItems(final RegistryEvent.Register<Item> event) {
         event.getRegistry().registerAll(
-                new ModItem(new Properties().group(ItemGroup.MATERIALS), "wheel"),
-                new CartItem("cargocart"),
-                new CartItem("plowcart"),
-                new CartItem("mobcart"));
+                new ModItem(new Properties().group(ItemGroup.MATERIALS), new ResourceLocation(AstikorCarts.MODID, "wheel")),
+                new CartItem(AstikorCarts.MODID, "cargocart"),
+                new CartItem(AstikorCarts.MODID, "plowcart"),
+                new CartItem(AstikorCarts.MODID, "mobcart")
+        );
     }
 
 }

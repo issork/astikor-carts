@@ -103,7 +103,7 @@ public class MobCartModel extends EntityModel<MobCartEntity> {
 
     @Override
     public void setRotationAngles(MobCartEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
-        this.leftWheel.rotateAngleX = entityIn.getWheelRotation(0) * limbSwing;
-        this.rightWheel.rotateAngleX = this.leftWheel.rotateAngleX;
+        this.rightWheel.rotateAngleX = (float) (entityIn.getWheelRotation(0) + entityIn.getWheelRotationIncrement(0) * limbSwing);
+        this.leftWheel.rotateAngleX = (float) (entityIn.getWheelRotation(1) + entityIn.getWheelRotationIncrement(1) * limbSwing);
     }
 }

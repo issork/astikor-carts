@@ -2,11 +2,10 @@ package de.mennomax.astikorcarts.entity;
 
 import de.mennomax.astikorcarts.init.Items;
 import de.mennomax.astikorcarts.inventory.container.CargoCartContainer;
+import de.mennomax.astikorcarts.util.CartItemHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.IInventoryChangedListener;
 import net.minecraft.inventory.container.SimpleNamedContainerProvider;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.CompoundNBT;
@@ -17,15 +16,43 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.items.ItemStackHandler;
 
-public class CargoCartEntity extends AbstractDrawnInventoryEntity implements IInventoryChangedListener {
+public class CargoCartEntity extends AbstractDrawnInventoryEntity {
 
     private static final DataParameter<Integer> CARGO = EntityDataManager.<Integer>createKey(CargoCartEntity.class, DataSerializers.VARINT);
 
     public CargoCartEntity(EntityType<? extends Entity> entityTypeIn, World worldIn) {
         super(entityTypeIn, worldIn);
-        this.initInventory(54);
-        this.inventory.addListener(this);
+    }
+    
+    @Override
+    protected ItemStackHandler initInventory() {
+        return new CartItemHandler(54, this) {
+            @Override
+            protected void onContentsChanged(int slot) {
+                int tempload = 0;
+                for (int i = 0; i < this.getSlots(); i++) {
+                    if (!this.getStackInSlot(i).isEmpty()) {
+                        tempload++;
+                    }
+                }
+                int newValue;
+                if (tempload > 31)
+                    newValue = 4;
+                else if (tempload > 16)
+                    newValue = 3;
+                else if (tempload > 8)
+                    newValue = 2;
+                else if (tempload > 3)
+                    newValue = 1;
+                else
+                    newValue = 0;
+                if (CART.getDataManager().get(CARGO).intValue() != newValue) {
+                    CART.getDataManager().set(CARGO, newValue);
+                }
+            }
+        };
     }
 
     @Override
@@ -84,32 +111,6 @@ public class CargoCartEntity extends AbstractDrawnInventoryEntity implements IIn
     protected void writeAdditional(CompoundNBT compound) {
         super.writeAdditional(compound);
         compound.putInt("Cargo", dataManager.get(CARGO));
-    }
-
-    @Override
-    public void onInventoryChanged(IInventory invBasic) {
-        if (!this.world.isRemote) {
-            int tempload = 0;
-            for (int i = 0; i < this.inventory.getSizeInventory(); i++) {
-                if (!this.inventory.getStackInSlot(i).isEmpty()) {
-                    tempload++;
-                }
-            }
-            int newValue;
-            if (tempload > 31)
-                newValue = 4;
-            else if (tempload > 16)
-                newValue = 3;
-            else if (tempload > 8)
-                newValue = 2;
-            else if (tempload > 3)
-                newValue = 1;
-            else
-                newValue = 0;
-            if (this.dataManager.get(CARGO).intValue() != newValue) {
-                this.dataManager.set(CARGO, newValue);
-            }
-        }
     }
 
     public void openContainer(PlayerEntity player) {

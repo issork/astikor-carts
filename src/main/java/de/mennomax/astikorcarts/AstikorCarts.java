@@ -17,7 +17,6 @@ import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
@@ -97,14 +96,7 @@ public class AstikorCarts {
         while (iter.hasNext()) {
             Entry<Entity, AbstractDrawnEntity> entry = iter.next();
             AbstractDrawnEntity cart = entry.getValue();
-            if (!cart.isAlive() || cart.getPulling() == null || !cart.getPulling().isAlive()) {
-                if (entry.getKey() instanceof PlayerEntity) {
-                    cart.setPulling(null);
-                }
-                iter.remove();
-                continue;
-            } else if (!cart.world.isRemote && cart.shouldRemovePulling()) {
-                cart.setPulling(null);
+            if(cart.shouldStopPulledTick()) {
                 iter.remove();
                 continue;
             }

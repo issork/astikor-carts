@@ -4,42 +4,32 @@ import javax.annotation.Nullable;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.wrapper.InvWrapper;
+import net.minecraftforge.items.ItemStackHandler;
 
 public abstract class AbstractDrawnInventoryEntity extends AbstractDrawnEntity {
     
-    public Inventory inventory;
-    private LazyOptional<IItemHandler> itemHandler = null;
+    public ItemStackHandler inventory = this.initInventory();
+    private LazyOptional<ItemStackHandler> itemHandler = LazyOptional.of(() -> this.inventory);
     
     public AbstractDrawnInventoryEntity(EntityType<? extends Entity> entityTypeIn, World worldIn) {
         super(entityTypeIn, worldIn);
     }
     
-    /**
-     * Initializes an inventory with an IInventory wrapper.
-     * @param size the size of the inventory.
-     */
-    protected void initInventory(int size) {
-        this.inventory = new Inventory(size);
-        this.itemHandler = LazyOptional.of(() -> new InvWrapper(this.inventory));
-    }
+    protected abstract ItemStackHandler initInventory();
     
     @Override
     public boolean replaceItemInInventory(int inventorySlot, ItemStack itemStackIn) {
-        if (inventorySlot >= 0 && inventorySlot < this.inventory.getSizeInventory()) {
-           this.inventory.setInventorySlotContents(inventorySlot, itemStackIn);
+        if (inventorySlot >= 0 && inventorySlot < this.inventory.getSlots()) {
+           this.inventory.setStackInSlot(inventorySlot, itemStackIn);
            return true;
         } else {
            return false;
@@ -48,34 +38,21 @@ public abstract class AbstractDrawnInventoryEntity extends AbstractDrawnEntity {
     
     @Override
     public void onDestroyedAndDoDrops(DamageSource source) {
-        InventoryHelper.dropInventoryItems(this.world, this, this.inventory);
+        for(int i = 0; i < inventory.getSlots(); i++) {
+            InventoryHelper.spawnItemStack(this.world, this.posX, this.posY, this.posZ, inventory.getStackInSlot(i));
+        }
     }
     
     @Override
     protected void readAdditional(CompoundNBT compound) {
         super.readAdditional(compound);
-        ListNBT invCompound = compound.getList("Items", 10);
-        for(int i = 0; i < invCompound.size(); i++) {
-            CompoundNBT itemCompound = invCompound.getCompound(i);
-            ItemStack itemstack = ItemStack.read(itemCompound);
-            this.inventory.setInventorySlotContents(itemCompound.getByte("Slot") & 255, itemstack);
-        }
+        inventory.deserializeNBT(compound.getCompound("Items"));
     }
     
     @Override
     protected void writeAdditional(CompoundNBT compound) {
         super.writeAdditional(compound);
-        ListNBT invCompound = new ListNBT();
-        for(int i = 0; i < this.inventory.getSizeInventory(); i++) {
-            ItemStack itemstack = this.inventory.getStackInSlot(i);
-            if(!itemstack.isEmpty()) {
-                CompoundNBT itemCompound = new CompoundNBT();
-                itemCompound.putByte("Slot", (byte) i);
-                itemstack.write(itemCompound);
-                invCompound.add(itemCompound);
-            }
-        }
-        compound.put("Items", invCompound);
+        compound.put("Items", inventory.serializeNBT());
     }
     
     @Override
