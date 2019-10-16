@@ -8,13 +8,13 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 
 public class CPacketOpenCargoCartGui {
-    
+
     private int cartId;
-    
+
     public CPacketOpenCargoCartGui(int cartId) {
         this.cartId = cartId;
     }
-    
+
     public static void encode(CPacketOpenCargoCartGui packet, PacketBuffer buffer) {
         buffer.writeInt(packet.cartId);
     }

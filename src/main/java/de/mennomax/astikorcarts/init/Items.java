@@ -27,8 +27,7 @@ public class Items {
                 new ModItem(new Properties().group(ItemGroup.MATERIALS), new ResourceLocation(AstikorCarts.MODID, "wheel")),
                 new CartItem(AstikorCarts.MODID, "cargocart"),
                 new CartItem(AstikorCarts.MODID, "plowcart"),
-                new CartItem(AstikorCarts.MODID, "mobcart")
-        );
+                new CartItem(AstikorCarts.MODID, "mobcart"));
     }
 
 }

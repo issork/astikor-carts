@@ -19,7 +19,6 @@ public class CartWheel {
     private double posZ;
     private double prevPosX;
     private double prevPosZ;
-    private float distanceTravelled;
     private AbstractDrawnEntity cart;
 
     public CartWheel(AbstractDrawnEntity cartIn, float offsetXIn, float offsetZIn, float circumferenceIn) {
@@ -32,7 +31,7 @@ public class CartWheel {
     }
 
     public CartWheel(AbstractDrawnEntity cartIn, float offsetX) {
-        this(cartIn, offsetX, 0.0F, (float) ((10 * Math.PI * 2) / 16));
+        this(cartIn, offsetX, 0.0F, (float) (10 * Math.PI * 2 / 16));
     }
 
     public void tick(double lookX, double lookZ) {
@@ -43,20 +42,20 @@ public class CartWheel {
         this.posZ = cart.posZ + lookZ * offsetZ - MathHelper.cos((float) Math.toRadians(cart.rotationYaw - 90)) * this.offsetX;
         double dx = posX - prevPosX;
         double dz = posZ - prevPosZ;
-        this.distanceTravelled = (float) Math.sqrt(dx * dx + dz * dz);
-        double dxNormalized = dx/distanceTravelled;
-        double dzNormalized = dz/distanceTravelled;
-        boolean travelledForward = Math.sqrt((dxNormalized-lookX) * (dxNormalized-lookX) + (dzNormalized-lookZ) * (dzNormalized-lookZ)) < 1;
-        if(this.distanceTravelled > 0.2) {
+        float distanceTravelled = (float) Math.sqrt(dx * dx + dz * dz);
+        double dxNormalized = dx / distanceTravelled;
+        double dzNormalized = dz / distanceTravelled;
+        boolean travelledForward = Math.sqrt((dxNormalized - lookX) * (dxNormalized - lookX) + (dzNormalized - lookZ) * (dzNormalized - lookZ)) < 1;
+        if (distanceTravelled > 0.2) {
             BlockPos blockpos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(cart.posY - 0.2F), MathHelper.floor(this.posZ));
             BlockState blockstate = cart.world.getBlockState(blockpos);
             if (!blockstate.addRunningEffects(cart.world, blockpos, cart)) {
                 if (blockstate.getRenderType() != BlockRenderType.INVISIBLE) {
-                    cart.world.addParticle(new BlockParticleData(ParticleTypes.BLOCK, blockstate).setPos(blockpos), this.posX, cart.posY, this.posZ, dx, this.distanceTravelled, dz);
+                    cart.world.addParticle(new BlockParticleData(ParticleTypes.BLOCK, blockstate).setPos(blockpos), this.posX, cart.posY, this.posZ, dx, distanceTravelled, dz);
                 }
             }
         }
-        this.rotationIncrement = (travelledForward ? this.distanceTravelled : -this.distanceTravelled) * this.circumference * 0.2F;
+        this.rotationIncrement = (travelledForward ? distanceTravelled : -distanceTravelled) * this.circumference * 0.2F;
     }
 
     public void clearIncrement() {

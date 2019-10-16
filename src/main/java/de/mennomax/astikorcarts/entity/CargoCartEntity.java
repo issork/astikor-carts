@@ -1,8 +1,11 @@
 package de.mennomax.astikorcarts.entity;
 
+import java.util.ArrayList;
+
+import de.mennomax.astikorcarts.config.AstikorCartsConfig;
 import de.mennomax.astikorcarts.init.Items;
 import de.mennomax.astikorcarts.inventory.container.CargoCartContainer;
-import de.mennomax.astikorcarts.util.CartItemHandler;
+import de.mennomax.astikorcarts.util.CartItemStackHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -25,10 +28,15 @@ public class CargoCartEntity extends AbstractDrawnInventoryEntity {
     public CargoCartEntity(EntityType<? extends Entity> entityTypeIn, World worldIn) {
         super(entityTypeIn, worldIn);
     }
-    
+
+    @Override
+    protected ArrayList<String> getAllowedEntityList() {
+        return AstikorCartsConfig.COMMON.CARGOCART.get();
+    }
+
     @Override
     protected ItemStackHandler initInventory() {
-        return new CartItemHandler(54, this) {
+        return new CartItemStackHandler<CargoCartEntity>(54, this) {
             @Override
             protected void onContentsChanged(int slot) {
                 int tempload = 0;
@@ -85,7 +93,7 @@ public class CargoCartEntity extends AbstractDrawnInventoryEntity {
             passenger.setRotationYawHead(passenger.rotationYaw);
         }
     }
-    
+
     public int getCargo() {
         return this.dataManager.get(CARGO);
     }

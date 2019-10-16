@@ -25,7 +25,7 @@ public class PacketHandler {
             .simpleChannel();
 
     @SubscribeEvent
-    public static void registerPackets(final FMLCommonSetupEvent event) {        
+    public static void registerPackets(final FMLCommonSetupEvent event) {
         CHANNEL.registerMessage(id++, CPacketActionKey.class, CPacketActionKey::encode, CPacketActionKey::decode, CPacketActionKey::handle);
         CHANNEL.registerMessage(id++, CPacketToggleSlow.class, CPacketToggleSlow::encode, CPacketToggleSlow::decode, CPacketToggleSlow::handle);
         CHANNEL.registerMessage(id++, SPacketDrawnUpdate.class, SPacketDrawnUpdate::encode, SPacketDrawnUpdate::decode, SPacketDrawnUpdate::handle);

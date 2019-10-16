@@ -18,12 +18,10 @@ public class CargoCartModel extends EntityModel<CargoCartEntity> {
     private RendererModel leftWheel;
     private RendererModel rightWheel;
 
-    public CargoCartModel()
-    {
-        System.out.println("A");
+    public CargoCartModel() {
         this.textureWidth = 128;
         this.textureHeight = 64;
-        
+
         // --BOTTOM-BOARD--------------------------------------
         this.boardBottom = new RendererModel(this, 0, 0);
         this.boardBottom.addBox(-14.5F, -11.0F, 3.0F, 29, 22, 1);
@@ -93,8 +91,7 @@ public class CargoCartModel extends EntityModel<CargoCartEntity> {
         this.leftWheel = new RendererModel(this, 54, 23);
         this.leftWheel.setRotationPoint(14.5F, 5.0F, 1.0F);
         this.leftWheel.addBox(-2.0F, -1.0F, -1.0F, 2, 2, 2);
-        for (int i = 0; i < 8; i++)
-        {
+        for (int i = 0; i < 8; i++) {
             RendererModel rim = new RendererModel(this, 60, 0);
             rim.addBox(-2.0F, -4.5F, 9.86F, 2, 9, 1);
             rim.rotateAngleX = i * (float) Math.PI / 4.0F;
@@ -110,8 +107,7 @@ public class CargoCartModel extends EntityModel<CargoCartEntity> {
         this.rightWheel = new RendererModel(this, 54, 23);
         this.rightWheel.setRotationPoint(-14.5F, 5.0F, 1.0F);
         this.rightWheel.addBox(0.0F, -1.0F, -1.0F, 2, 2, 2);
-        for (int i = 0; i < 8; i++)
-        {
+        for (int i = 0; i < 8; i++) {
             RendererModel rim = new RendererModel(this, 60, 0);
             rim.addBox(0.0F, -4.5F, 9.86F, 2, 9, 1);
             rim.rotateAngleX = i * (float) Math.PI / 4.0F;

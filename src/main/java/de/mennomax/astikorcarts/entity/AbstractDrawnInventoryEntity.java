@@ -16,59 +16,59 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 
 public abstract class AbstractDrawnInventoryEntity extends AbstractDrawnEntity {
-    
+
     public ItemStackHandler inventory = this.initInventory();
     private LazyOptional<ItemStackHandler> itemHandler = LazyOptional.of(() -> this.inventory);
-    
+
     public AbstractDrawnInventoryEntity(EntityType<? extends Entity> entityTypeIn, World worldIn) {
         super(entityTypeIn, worldIn);
     }
-    
+
     protected abstract ItemStackHandler initInventory();
-    
+
     @Override
     public boolean replaceItemInInventory(int inventorySlot, ItemStack itemStackIn) {
         if (inventorySlot >= 0 && inventorySlot < this.inventory.getSlots()) {
-           this.inventory.setStackInSlot(inventorySlot, itemStackIn);
-           return true;
+            this.inventory.setStackInSlot(inventorySlot, itemStackIn);
+            return true;
         } else {
-           return false;
+            return false;
         }
-     }
-    
+    }
+
     @Override
     public void onDestroyedAndDoDrops(DamageSource source) {
-        for(int i = 0; i < inventory.getSlots(); i++) {
+        for (int i = 0; i < inventory.getSlots(); i++) {
             InventoryHelper.spawnItemStack(this.world, this.posX, this.posY, this.posZ, inventory.getStackInSlot(i));
         }
     }
-    
+
     @Override
     protected void readAdditional(CompoundNBT compound) {
         super.readAdditional(compound);
         inventory.deserializeNBT(compound.getCompound("Items"));
     }
-    
+
     @Override
     protected void writeAdditional(CompoundNBT compound) {
         super.writeAdditional(compound);
         compound.put("Items", inventory.serializeNBT());
     }
-    
+
     @Override
     public void remove(boolean keepData) {
-       super.remove(keepData);
-       if (!keepData && itemHandler != null) {
-          itemHandler.invalidate();
-          itemHandler = null;
-       }
+        super.remove(keepData);
+        if (!keepData && itemHandler != null) {
+            itemHandler.invalidate();
+            itemHandler = null;
+        }
     }
-    
+
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> capability, @Nullable Direction facing) {
-       if (this.isAlive() && capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && itemHandler != null)
-          return itemHandler.cast();
-       return super.getCapability(capability, facing);
+        if (this.isAlive() && capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && itemHandler != null)
+            return itemHandler.cast();
+        return super.getCapability(capability, facing);
     }
-    
+
 }

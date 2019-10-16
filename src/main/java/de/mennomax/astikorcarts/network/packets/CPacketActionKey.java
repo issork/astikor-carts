@@ -24,7 +24,7 @@ public class CPacketActionKey {
         ctx.get().enqueueWork(() -> {
             ServerPlayerEntity player = ctx.get().getSender();
             Entity pulling = player.isPassenger() ? player.getRidingEntity() : player;
-            AbstractDrawnEntity closest = AstikorCarts.SERVERPULLMAP.get(pulling);        
+            AbstractDrawnEntity closest = AstikorCarts.SERVERPULLMAP.get(pulling);
             if (closest == null) {
                 List<AbstractDrawnEntity> result = player.world.getEntitiesWithinAABB(AbstractDrawnEntity.class, player.getBoundingBox().grow(3), entity -> entity != player.getRidingEntity());
                 if (result.isEmpty()) {

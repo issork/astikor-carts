@@ -23,7 +23,7 @@ import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class CartItem extends ModItem {
-    
+
     private RegistryObject<EntityType<?>> cart;
 
     public CartItem(String modid, String name) {

@@ -1,8 +1,0 @@
-{
-	"replace":false,
-	"values": [
-		"astikorcarts:cargocart",
-		"astikorcarts:plowcart",
-		"astikorcarts:mobcart"
-	]
-}

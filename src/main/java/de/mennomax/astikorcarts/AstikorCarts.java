@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+import de.mennomax.astikorcarts.config.AstikorCartsConfig;
 import de.mennomax.astikorcarts.entity.AbstractDrawnEntity;
 import de.mennomax.astikorcarts.entity.CargoCartEntity;
 import de.mennomax.astikorcarts.entity.ai.goal.PullCartGoal;
@@ -24,8 +25,10 @@ import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.WorldTickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 
 @Mod(AstikorCarts.MODID)
@@ -33,6 +36,10 @@ public class AstikorCarts {
     public static final String MODID = "astikorcarts";
     public static final HashMap<Entity, AbstractDrawnEntity> CLIENTPULLMAP = new HashMap<>();
     public static final HashMap<Entity, AbstractDrawnEntity> SERVERPULLMAP = new HashMap<>();
+
+    public AstikorCarts() {
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, AstikorCartsConfig.COMMONSPEC);
+    }
 
     @EventBusSubscriber(value = Dist.CLIENT)
     public static class clientEventHandler {
@@ -96,11 +103,13 @@ public class AstikorCarts {
         while (iter.hasNext()) {
             Entry<Entity, AbstractDrawnEntity> entry = iter.next();
             AbstractDrawnEntity cart = entry.getValue();
-            if(cart.shouldStopPulledTick()) {
+            if (cart.shouldStopPulledTick()) {
                 iter.remove();
                 continue;
             }
-            cart.pulledTick();
+            if (!(cart.pulling instanceof AbstractDrawnEntity)) {
+                cart.pulledTick();
+            }
         }
     }
 }

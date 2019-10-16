@@ -23,7 +23,7 @@ import net.minecraftforge.registries.ObjectHolder;
 @ObjectHolder(AstikorCarts.MODID)
 @EventBusSubscriber(bus = Bus.MOD, modid = AstikorCarts.MODID)
 public class Entities {
-    
+
     public static final EntityType<?> CARGOCART = null;
     public static final EntityType<?> PLOWCART = null;
     public static final EntityType<?> MOBCART = null;

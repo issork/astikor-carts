@@ -3,11 +3,11 @@ package de.mennomax.astikorcarts.util;
 import de.mennomax.astikorcarts.entity.AbstractDrawnEntity;
 import net.minecraftforge.items.ItemStackHandler;
 
-public class CartItemHandler extends ItemStackHandler {
-    
-    protected final AbstractDrawnEntity CART;
-    
-    public CartItemHandler(int slots, AbstractDrawnEntity cart) {
+public class CartItemStackHandler<T extends AbstractDrawnEntity> extends ItemStackHandler {
+
+    protected final T CART;
+
+    public CartItemStackHandler(int slots, T cart) {
         super(slots);
         this.CART = cart;
     }

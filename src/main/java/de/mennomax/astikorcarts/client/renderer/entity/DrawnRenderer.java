@@ -8,9 +8,9 @@ import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 
 public abstract class DrawnRenderer<T extends AbstractDrawnEntity> extends EntityRenderer<T> {
-    
+
     protected EntityModel<T> model;
-    
+
     protected DrawnRenderer(EntityRendererManager renderManager, EntityModel<T> modelIn) {
         super(renderManager);
         model = modelIn;
@@ -46,5 +46,5 @@ public abstract class DrawnRenderer<T extends AbstractDrawnEntity> extends Entit
     public void setupTranslation(double x, double y, double z) {
         GlStateManager.translated(x, y + 1.0F, z);
     }
-    
+
 }

@@ -1,13 +1,16 @@
 package de.mennomax.astikorcarts.entity;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 import de.mennomax.astikorcarts.AstikorCarts;
+import de.mennomax.astikorcarts.config.AstikorCartsConfig;
 import de.mennomax.astikorcarts.network.PacketHandler;
 import de.mennomax.astikorcarts.network.packets.SPacketDrawnUpdate;
 import de.mennomax.astikorcarts.util.CartWheel;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -50,7 +53,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     private static final DataParameter<Integer> TIME_SINCE_HIT = EntityDataManager.<Integer>createKey(AbstractDrawnEntity.class, DataSerializers.VARINT);
     private static final DataParameter<Float> DAMAGE_TAKEN = EntityDataManager.<Float>createKey(AbstractDrawnEntity.class, DataSerializers.FLOAT);
     public static final UUID PULL_SLOWLY_MODIFIER_UUID = UUID.fromString("49B0E52E-48F2-4D89-BED7-4F5DF26F1263");
-    public static final AttributeModifier PULL_SLOWLY_MODIFIER = (new AttributeModifier(PULL_SLOWLY_MODIFIER_UUID, "Pull slowly modifier", -0.65, Operation.MULTIPLY_TOTAL)).setSaved(false);
+    public static final AttributeModifier PULL_SLOWLY_MODIFIER = (new AttributeModifier(PULL_SLOWLY_MODIFIER_UUID, "Pull slowly modifier", AstikorCartsConfig.COMMON.SPEEDMODIFIER.get().doubleValue(), Operation.MULTIPLY_TOTAL)).setSaved(false);
     private int lerpSteps;
     private double lerpX;
     private double lerpY;
@@ -62,6 +65,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     private UUID pullingUUID = null;
     protected double spacing = 2.4D;
     public Entity pulling;
+    protected AbstractDrawnEntity drawn;
 
     public AbstractDrawnEntity(EntityType<? extends Entity> entityTypeIn, World worldIn) {
         super(entityTypeIn, worldIn);
@@ -126,8 +130,11 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             }
         }
         updatePassengers();
+        if (drawn != null) {
+            drawn.pulledTick();
+        }
     }
-    
+
     public void initWheels() {
         this.wheels = Arrays.asList(new CartWheel(this, 0.9F), new CartWheel(this, -0.9F));
     }
@@ -151,7 +158,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     }
 
     public void updatePassengers() {
-        for(Entity passenger : this.getPassengers()) {
+        for (Entity passenger : this.getPassengers()) {
             this.updatePassenger(passenger);
         }
     }
@@ -172,8 +179,9 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
                     if (this.pulling != null) {
                         if (this.pulling instanceof LivingEntity) {
                             ((LivingEntity) this.pulling).getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(PULL_SLOWLY_MODIFIER);
+                        } else if (this.pulling instanceof AbstractDrawnEntity) {
+                            ((AbstractDrawnEntity) this.pulling).drawn = null;
                         }
-                        this.playSound(SoundEvents.ENTITY_ITEM_BREAK, 0.5F, 0.1F);
                     }
                     PacketHandler.CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new SPacketDrawnUpdate(-1, this.getEntityId()));
                     this.pullingUUID = null;
@@ -182,22 +190,36 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
                         ((MobEntity) entityIn).getNavigator().clearPath();
                     }
                     AstikorCarts.SERVERPULLMAP.put(entityIn, this);
-                    this.playSound(SoundEvents.ENTITY_HORSE_ARMOR, 0.5F, 1.0F);
                     PacketHandler.CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new SPacketDrawnUpdate(entityIn.getEntityId(), this.getEntityId()));
                     this.pullingUUID = entityIn.getUniqueID();
                 }
                 this.pulling = entityIn;
+                if (entityIn instanceof AbstractDrawnEntity) {
+                    ((AbstractDrawnEntity) entityIn).drawn = this;
+                }
 
             }
         } else {
             if (entityIn == null) {
+                if (this.pulling != null) {
+                    ((AbstractDrawnEntity) this.pulling).drawn = null;
+                }
                 this.pullingId = -1;
-                for(CartWheel wheel : this.wheels) {
+                for (CartWheel wheel : this.wheels) {
                     wheel.clearIncrement();
+                }
+                if (this.ticksExisted > 20) {
+                    this.world.playSound(Minecraft.getInstance().player, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_ITEM_BREAK, this.getSoundCategory(), 0.5F, 0.1F);
                 }
             } else {
                 this.pullingId = entityIn.getEntityId();
                 AstikorCarts.CLIENTPULLMAP.put(entityIn, this);
+                if (this.ticksExisted > 20) {
+                    this.world.playSound(Minecraft.getInstance().player, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_HORSE_ARMOR, this.getSoundCategory(), 0.5F, 1.0F);
+                }
+                if (entityIn instanceof AbstractDrawnEntity) {
+                    ((AbstractDrawnEntity) entityIn).drawn = this;
+                }
             }
             this.pulling = entityIn;
         }
@@ -223,7 +245,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             }
         }
     }
-    
+
     public boolean shouldStopPulledTick() {
         if (!this.isAlive() || this.getPulling() == null || !this.getPulling().isAlive()) {
             if (this.pulling != null && this.pulling instanceof PlayerEntity) {
@@ -241,7 +263,8 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
 
     /**
      * 
-     * @return The position this cart should always face and travel towards. Relative to the cart position.
+     * @return The position this cart should always face and travel towards.
+     *         Relative to the cart position.
      */
     public Vec3d getRelativeTargetVec() {
         return new Vec3d(this.pulling.posX - this.posX, this.pulling.posY - this.posY, this.pulling.posZ - this.posZ);
@@ -259,7 +282,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     public double getWheelRotation(int wheel) {
         return this.wheels.get(wheel).getRotation();
     }
-    
+
     public double getWheelRotationIncrement(int wheel) {
         return this.wheels.get(wheel).getRotationIncrement();
     }
@@ -272,7 +295,18 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
      * @param entityIn
      */
     protected boolean canBePulledBy(Entity entityIn) {
-        return this.pulling == null || entityIn == null || !this.pulling.isAlive();
+        if (entityIn == null) {
+            return true;
+        }
+        return (this.pulling == null || !this.pulling.isAlive()) && !this.isPassenger(entityIn) && isInPullList(entityIn.getType().getRegistryName().toString());
+    }
+
+    protected boolean isInPullList(String entityId) {
+        return this.getAllowedEntityList().contains(entityId);
+    }
+
+    protected ArrayList<String> getAllowedEntityList() {
+        return new ArrayList<String>();
     }
 
     @Override
@@ -351,13 +385,13 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     @Override
     @OnlyIn(Dist.CLIENT)
     public void setPositionAndRotationDirect(double x, double y, double z, float yaw, float pitch, int posRotationIncrements, boolean teleport) {
-//        if(this.distanceTravelled < 0) {
+        // if(this.distanceTravelled < 0) {
         this.lerpX = x;
         this.lerpY = y;
         this.lerpZ = z;
         this.lerpYaw = yaw;
         this.lerpSteps = posRotationIncrements;
-//        }
+        // }
     }
 
     @Override
@@ -371,7 +405,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             this.rotationYaw = (float) this.lerpYaw;
         }
     }
-    
+
     @Override
     protected void removePassenger(Entity passenger) {
         super.removePassenger(passenger);

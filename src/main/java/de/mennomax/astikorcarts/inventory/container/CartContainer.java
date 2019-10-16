@@ -24,21 +24,21 @@ public abstract class CartContainer extends Container {
     public boolean canInteractWith(PlayerEntity playerIn) {
         return this.cart.isAlive() && this.cart.getDistance(playerIn) < 8.0F;
     }
-    
+
     @Override
     public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.inventorySlots.get(index);
-        if(slot != null && slot.getHasStack()) {
+        if (slot != null && slot.getHasStack()) {
             ItemStack itemstack1 = slot.getStack();
-            if(index < cartInv.getSlots()) {
+            if (index < cartInv.getSlots()) {
                 if (!this.mergeItemStack(itemstack1, cartInv.getSlots(), this.inventorySlots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if(!this.mergeItemStack(itemstack1, 0, cartInv.getSlots(), false)) {
+            } else if (!this.mergeItemStack(itemstack1, 0, cartInv.getSlots(), false)) {
                 return ItemStack.EMPTY;
             }
-            if(itemstack1.isEmpty()) {
+            if (itemstack1.isEmpty()) {
                 slot.putStack(ItemStack.EMPTY);
             } else {
                 slot.onSlotChanged();
@@ -46,7 +46,7 @@ public abstract class CartContainer extends Container {
         }
         return itemstack;
     }
-    
+
     @Override
     public void onContainerClosed(PlayerEntity playerIn) {
         super.onContainerClosed(playerIn);

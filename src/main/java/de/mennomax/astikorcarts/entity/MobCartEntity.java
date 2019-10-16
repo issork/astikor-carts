@@ -1,5 +1,8 @@
 package de.mennomax.astikorcarts.entity;
 
+import java.util.ArrayList;
+
+import de.mennomax.astikorcarts.config.AstikorCartsConfig;
 import de.mennomax.astikorcarts.init.Items;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -17,6 +20,11 @@ public class MobCartEntity extends AbstractDrawnEntity {
 
     public MobCartEntity(EntityType<? extends Entity> entityTypeIn, World worldIn) {
         super(entityTypeIn, worldIn);
+    }
+
+    @Override
+    protected ArrayList<String> getAllowedEntityList() {
+        return AstikorCartsConfig.COMMON.MOBCART.get();
     }
 
     @Override
@@ -38,7 +46,8 @@ public class MobCartEntity extends AbstractDrawnEntity {
     @Override
     public void applyEntityCollision(Entity entityIn) {
         if (!entityIn.isPassenger(this)) {
-            if (!this.world.isRemote && this.getPulling() != entityIn && !(this.getControllingPassenger() instanceof Entity) && this.getPassengers().size() < 2 && !entityIn.isPassenger() && entityIn.getWidth() < this.getWidth() && entityIn instanceof LivingEntity&& !(entityIn instanceof WaterMobEntity) && !(entityIn instanceof PlayerEntity)) {
+            if (!this.world.isRemote && this.getPulling() != entityIn && !(this.getControllingPassenger() instanceof Entity) && this.getPassengers().size() < 2 && !entityIn.isPassenger() && entityIn.getWidth() < this.getWidth() && entityIn instanceof LivingEntity
+                    && !(entityIn instanceof WaterMobEntity) && !(entityIn instanceof PlayerEntity)) {
                 entityIn.startRiding(this);
             } else {
                 super.applyEntityCollision(entityIn);
@@ -50,7 +59,7 @@ public class MobCartEntity extends AbstractDrawnEntity {
     protected boolean canFitPassenger(Entity passenger) {
         return this.getPassengers().size() < 2;
     }
-    
+
     @Override
     public double getMountedYOffset() {
         return 0.7D;

@@ -18,21 +18,20 @@ import net.minecraftforge.registries.ObjectHolder;
 @ObjectHolder(AstikorCarts.MODID)
 @EventBusSubscriber(modid = AstikorCarts.MODID, bus = Bus.MOD)
 public class Inventories {
-    
+
     public static final ContainerType<PlowCartContainer> PLOWCARTCONTAINER = null;
-    
+
     @SubscribeEvent
     public static void clientSetup(final FMLClientSetupEvent event) {
         ScreenManager.registerFactory(PLOWCARTCONTAINER, PlowScreen::new);
     }
-    
+
     @SubscribeEvent
     public static void registerContainerTypes(final RegistryEvent.Register<ContainerType<?>> event) {
         event.getRegistry().registerAll(
-                createType(PlowCartContainer::new, "plowcartcontainer")
-        );
+                createType(PlowCartContainer::new, "plowcartcontainer"));
     }
-    
+
     private static ContainerType<?> createType(IContainerFactory<? extends CartContainer> container, String name) {
         return IForgeContainerType.create(container::create).setRegistryName(AstikorCarts.MODID, name);
     }
