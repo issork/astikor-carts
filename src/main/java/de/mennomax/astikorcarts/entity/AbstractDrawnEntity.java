@@ -176,12 +176,10 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         if (!this.world.isRemote) {
             if (this.canBePulledBy(entityIn)) {
                 if (entityIn == null) {
-                    if (this.pulling != null) {
-                        if (this.pulling instanceof LivingEntity) {
-                            ((LivingEntity) this.pulling).getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(PULL_SLOWLY_MODIFIER);
-                        } else if (this.pulling instanceof AbstractDrawnEntity) {
-                            ((AbstractDrawnEntity) this.pulling).drawn = null;
-                        }
+                    if (this.pulling instanceof LivingEntity) {
+                        ((LivingEntity) this.pulling).getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(PULL_SLOWLY_MODIFIER);
+                    } else if (this.pulling instanceof AbstractDrawnEntity) {
+                        ((AbstractDrawnEntity) this.pulling).drawn = null;
                     }
                     PacketHandler.CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new SPacketDrawnUpdate(-1, this.getEntityId()));
                     this.pullingUUID = null;
@@ -189,14 +187,16 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
                     if (entityIn instanceof MobEntity) {
                         ((MobEntity) entityIn).getNavigator().clearPath();
                     }
-                    AstikorCarts.SERVERPULLMAP.put(entityIn, this);
+                    if(!(entityIn instanceof AbstractDrawnEntity)) {
+                        AstikorCarts.SERVERPULLMAP.put(entityIn, this);
+                    }
                     PacketHandler.CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new SPacketDrawnUpdate(entityIn.getEntityId(), this.getEntityId()));
                     this.pullingUUID = entityIn.getUniqueID();
                 }
-                this.pulling = entityIn;
                 if (entityIn instanceof AbstractDrawnEntity) {
                     ((AbstractDrawnEntity) entityIn).drawn = this;
                 }
+                this.pulling = entityIn;
 
             }
         } else {
@@ -213,7 +213,9 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
                 }
             } else {
                 this.pullingId = entityIn.getEntityId();
-                AstikorCarts.CLIENTPULLMAP.put(entityIn, this);
+                if(!(entityIn instanceof AbstractDrawnEntity)) {
+                    AstikorCarts.CLIENTPULLMAP.put(entityIn, this);
+                }
                 if (this.ticksExisted > 20) {
                     this.world.playSound(Minecraft.getInstance().player, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_HORSE_ARMOR, this.getSoundCategory(), 0.5F, 1.0F);
                 }

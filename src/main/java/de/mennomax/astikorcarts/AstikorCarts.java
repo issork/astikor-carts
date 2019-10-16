@@ -107,9 +107,7 @@ public class AstikorCarts {
                 iter.remove();
                 continue;
             }
-            if (!(cart.pulling instanceof AbstractDrawnEntity)) {
-                cart.pulledTick();
-            }
+            cart.pulledTick();
         }
     }
 }
