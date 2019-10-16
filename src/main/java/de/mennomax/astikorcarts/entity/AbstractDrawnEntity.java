@@ -201,7 +201,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             }
         } else {
             if (entityIn == null) {
-                if (this.pulling != null) {
+                if (this.pulling instanceof AbstractDrawnEntity) {
                     ((AbstractDrawnEntity) this.pulling).drawn = null;
                 }
                 this.pullingId = -1;
