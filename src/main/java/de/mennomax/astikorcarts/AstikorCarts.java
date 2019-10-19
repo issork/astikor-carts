@@ -42,7 +42,7 @@ public class AstikorCarts {
     }
 
     @EventBusSubscriber(value = Dist.CLIENT)
-    public static class clientEventHandler {
+    public static class ClientEventHandler {
 
         @SubscribeEvent
         public static void clientTickEvent(final ClientTickEvent event) {
@@ -75,7 +75,7 @@ public class AstikorCarts {
     }
 
     @EventBusSubscriber
-    public static class commonEventHandler {
+    public static class CommonEventHandler {
         @SubscribeEvent
         public static void joinWorld(final EntityJoinWorldEvent event) {
             if (!event.getWorld().isRemote && event.getEntity() instanceof MobEntity) {
@@ -95,7 +95,6 @@ public class AstikorCarts {
             CLIENTPULLMAP.clear();
             SERVERPULLMAP.clear();
         }
-
     }
 
     private static void tickPulled(HashMap<Entity, AbstractDrawnEntity> pullmap) {

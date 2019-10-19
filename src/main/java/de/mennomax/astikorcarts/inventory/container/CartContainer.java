@@ -2,7 +2,6 @@ package de.mennomax.astikorcarts.inventory.container;
 
 import de.mennomax.astikorcarts.entity.AbstractDrawnInventoryEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.Slot;
@@ -14,7 +13,7 @@ public abstract class CartContainer extends Container {
     protected final ItemStackHandler cartInv;
     protected final AbstractDrawnInventoryEntity cart;
 
-    public CartContainer(ContainerType<?> type, int id, PlayerInventory playerInv, AbstractDrawnInventoryEntity cart) {
+    public CartContainer(ContainerType<?> type, int id, AbstractDrawnInventoryEntity cart) {
         super(type, id);
         this.cart = cart;
         this.cartInv = cart.inventory;

@@ -9,7 +9,7 @@ import net.minecraftforge.items.SlotItemHandler;
 public class CargoCartContainer extends CartContainer {
 
     public CargoCartContainer(int id, PlayerInventory playerInv, AbstractDrawnInventoryEntity cart) {
-        super(ContainerType.GENERIC_9X6, id, playerInv, cart);
+        super(ContainerType.GENERIC_9X6, id, cart);
         int upperInvHeight = 36;
 
         for (int i = 0; i < 6; ++i) {
@@ -27,11 +27,6 @@ public class CargoCartContainer extends CartContainer {
         for (int x = 0; x < 9; ++x) {
             this.addSlot(new Slot(playerInv, x, 8 + x * 18, 161 + upperInvHeight));
         }
-    }
-
-    @Override
-    public void detectAndSendChanges() {
-        super.detectAndSendChanges();
     }
 
 }

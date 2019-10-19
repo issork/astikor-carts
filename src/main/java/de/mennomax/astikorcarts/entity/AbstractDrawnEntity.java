@@ -104,7 +104,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
      */
     public void pulledTick() {
         this.rotationPitch = 0.0F;
-        final Vec3d targetVec = this.getRelativeTargetVec();
+        Vec3d targetVec = this.getRelativeTargetVec();
         this.handleRotation(targetVec);
         double dRotation = this.prevRotationYaw - this.rotationYaw;
         if (dRotation < -180.0D) {
@@ -118,7 +118,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         double moveX = targetVec.x - lookX * this.spacing;
         double moveZ = targetVec.z - lookZ * this.spacing;
         this.fallDistance = this.pulling.fallDistance;
-        if (!this.pulling.onGround && this.fallDistance == 0.0F && !this.pullingOnGroundLastTick) {
+        if ((!this.pulling.onGround && this.fallDistance == 0.0F && !this.pullingOnGroundLastTick)) {
             setMotion(moveX, targetVec.y, moveZ);
         }
         this.pullingOnGroundLastTick = this.pulling.onGround;
@@ -127,6 +127,11 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         if (this.world.isRemote) {
             for (CartWheel wheel : this.wheels) {
                 wheel.tick(lookX, lookZ);
+            }
+        } else {
+            targetVec = this.getRelativeTargetVec();
+            if(Math.sqrt(targetVec.x * targetVec.x + targetVec.z * targetVec.z) > this.spacing+0.5) {
+                this.setPulling(null);
             }
         }
         updatePassengers();
@@ -209,7 +214,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
                     wheel.clearIncrement();
                 }
                 if (this.ticksExisted > 20) {
-                    this.world.playSound(Minecraft.getInstance().player, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_ITEM_BREAK, this.getSoundCategory(), 0.5F, 0.1F);
+                    this.playDetachSound();
                 }
             } else {
                 this.pullingId = entityIn.getEntityId();
@@ -217,7 +222,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
                     AstikorCarts.CLIENTPULLMAP.put(entityIn, this);
                 }
                 if (this.ticksExisted > 20) {
-                    this.world.playSound(Minecraft.getInstance().player, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_HORSE_ARMOR, this.getSoundCategory(), 0.5F, 1.0F);
+                    this.playAttachSound();
                 }
                 if (entityIn instanceof AbstractDrawnEntity) {
                     ((AbstractDrawnEntity) entityIn).drawn = this;
@@ -225,6 +230,16 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             }
             this.pulling = entityIn;
         }
+    }
+    
+    @OnlyIn(Dist.CLIENT)
+    private void playAttachSound() {
+        this.world.playSound(Minecraft.getInstance().player, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_HORSE_ARMOR, this.getSoundCategory(), 0.5F, 1.0F);
+    }
+    
+    @OnlyIn(Dist.CLIENT)
+    private void playDetachSound() {
+        this.world.playSound(Minecraft.getInstance().player, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_ITEM_BREAK, this.getSoundCategory(), 0.5F, 0.1F);
     }
 
     /**
@@ -387,13 +402,11 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     @Override
     @OnlyIn(Dist.CLIENT)
     public void setPositionAndRotationDirect(double x, double y, double z, float yaw, float pitch, int posRotationIncrements, boolean teleport) {
-        // if(this.distanceTravelled < 0) {
         this.lerpX = x;
         this.lerpY = y;
         this.lerpZ = z;
         this.lerpYaw = yaw;
         this.lerpSteps = posRotationIncrements;
-        // }
     }
 
     @Override

@@ -16,7 +16,7 @@ public class PlowCartContainer extends CartContainer {
     }
 
     public PlowCartContainer(int id, PlayerInventory playerInv, AbstractDrawnInventoryEntity cart) {
-        super(Inventories.PLOWCARTCONTAINER, id, playerInv, cart);
+        super(Inventories.PLOWCARTCONTAINER, id, cart);
         this.addSlot(new PlowSlot(this.cartInv, 0, 57, 24));
         this.addSlot(new PlowSlot(this.cartInv, 1, 80, 17));
         this.addSlot(new PlowSlot(this.cartInv, 2, 103, 24));
@@ -40,7 +40,6 @@ public class PlowCartContainer extends CartContainer {
 
         @Override
         public boolean isItemValid(ItemStack stack) {
-            // TODO: Handle slot once plow config is implemented
             return true;
         }
 

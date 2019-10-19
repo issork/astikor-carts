@@ -3,7 +3,6 @@ package de.mennomax.astikorcarts.item;
 import java.util.List;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -19,16 +18,12 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class CartItem extends ModItem {
 
-    private RegistryObject<EntityType<?>> cart;
-
     public CartItem(String modid, String name) {
         super(new Properties().maxStackSize(1).group(ItemGroup.TRANSPORTATION), new ResourceLocation(modid, name));
-        this.cart = RegistryObject.of(this.getRegistryName(), ForgeRegistries.ENTITIES);
     }
 
     @Override
@@ -51,7 +46,7 @@ public class CartItem extends ModItem {
             }
 
             if (result.getType() == Type.BLOCK) {
-                Entity cart = this.cart.get().create(worldIn);
+                Entity cart = ForgeRegistries.ENTITIES.getValue(this.getRegistryName()).create(worldIn);
                 cart.setPosition(result.getHitVec().x, result.getHitVec().y, result.getHitVec().z);
                 cart.rotationYaw = (playerIn.rotationYaw + 180) % 360;
                 if (!worldIn.isCollisionBoxesEmpty(cart, cart.getBoundingBox().grow(0.1F, -0.1F, 0.1F))) {

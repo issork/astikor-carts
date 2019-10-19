@@ -16,10 +16,7 @@ public class PullCartGoal extends Goal {
 
     @Override
     public boolean shouldExecute() {
-        if (AstikorCarts.SERVERPULLMAP.containsKey(mob)) {
-            return true;
-        }
-        return false;
+        return AstikorCarts.SERVERPULLMAP.containsKey(mob);
     }
 
 }
