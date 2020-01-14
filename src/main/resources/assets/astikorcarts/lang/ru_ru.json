@@ -2,9 +2,11 @@
   "item.astikorcarts.cargocart": "Телега",
   "item.astikorcarts.plowcart": "Плуг",
   "item.astikorcarts.wheel": "Колесо",
+  "item.astikorcarts.mobcart": "Телега для мобов",
   "itemGroup.astikorcarts": "AstikorCarts",
   "entity.astikorcarts.cargocart": "Телега",
   "entity.astikorcarts.plowcart": "Плуг",
+  "entity.astikorcarts.mobcart": "Телега для мобов",
   "key.categories.astikorcarts": "AstikorCarts",
   "key.astikorcarts.desc": "Клавиша действия"
 }
