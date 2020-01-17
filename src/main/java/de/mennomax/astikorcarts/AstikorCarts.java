@@ -79,7 +79,7 @@ public class AstikorCarts {
                 final ClientPlayerEntity player = Minecraft.getInstance().player;
                 if (player.getRidingEntity() instanceof CargoCartEntity) {
                     event.setCanceled(true);
-                    PacketHandler.CHANNEL.sendToServer(new CPacketOpenCargoCartGui(player.getRidingEntity().getEntityId()));
+                    PacketHandler.CHANNEL.sendToServer(new CPacketOpenCargoCartGui());
                 }
             }
         }
