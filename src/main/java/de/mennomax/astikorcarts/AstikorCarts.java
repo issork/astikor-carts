@@ -12,10 +12,12 @@ import de.mennomax.astikorcarts.network.packets.CPacketToggleSlow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MobEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.client.event.InputUpdateEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.WorldTickEvent;
@@ -45,14 +47,24 @@ public class AstikorCarts {
     public static class ClientEventHandler {
 
         @SubscribeEvent
+        public static void onInputUpdate(final InputUpdateEvent event) {
+            final Minecraft mc = Minecraft.getInstance();
+            final Entity ridden = mc.player.getRidingEntity();
+            if (AstikorCarts.CLIENTPULLMAP.containsKey(ridden)) {
+                final KeyBinding binding = mc.gameSettings.keyBindSprint;
+                while (binding.isPressed()) {
+                    PacketHandler.CHANNEL.sendToServer(new CPacketToggleSlow());
+                    KeyBinding.setKeyBindState(binding.getKey(), false);
+                }
+            }
+        }
+
+        @SubscribeEvent
         public static void clientTickEvent(final ClientTickEvent event) {
             if (event.phase == Phase.END) {
                 if (Minecraft.getInstance().world != null) {
                     while (KeyBindings.KEYBINDINGS[0].isPressed()) {
                         PacketHandler.CHANNEL.sendToServer(new CPacketActionKey());
-                    }
-                    while (Minecraft.getInstance().gameSettings.keyBindSprint.isPressed()) {
-                        PacketHandler.CHANNEL.sendToServer(new CPacketToggleSlow());
                     }
                 }
                 if (!Minecraft.getInstance().isGamePaused()) {
