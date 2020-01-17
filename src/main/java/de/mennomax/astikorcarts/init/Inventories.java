@@ -33,7 +33,7 @@ public class Inventories {
     }
 
     private static ContainerType<?> createType(final IContainerFactory<? extends CartContainer> container, final String name) {
-        return IForgeContainerType.create(container::create).setRegistryName(AstikorCarts.MODID, name);
+        return IForgeContainerType.create(container).setRegistryName(AstikorCarts.MODID, name);
     }
 
 }

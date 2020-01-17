@@ -46,7 +46,7 @@ public class PlowCartEntity extends AbstractDrawnInventoryEntity {
 
     @Override
     protected ArrayList<String> getAllowedEntityList() {
-        return AstikorCartsConfig.COMMON.PLOWCART.get();
+        return AstikorCartsConfig.COMMON.plowPullable.get();
     }
 
     @Override

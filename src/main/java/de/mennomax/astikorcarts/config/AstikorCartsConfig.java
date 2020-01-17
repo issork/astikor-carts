@@ -30,36 +30,36 @@ public class AstikorCartsConfig {
 
     public static class Common {
 
-        public final DoubleValue SPEEDMODIFIER;
-        public final ConfigValue<ArrayList<String>> CARGOCART;
-        public final ConfigValue<ArrayList<String>> PLOWCART;
-        public final ConfigValue<ArrayList<String>> MOBCART;
-        public final ConfigValue<Config> REPLACEMAP;
+        public final DoubleValue speedModifier;
+        public final ConfigValue<ArrayList<String>> cargoPullable;
+        public final ConfigValue<ArrayList<String>> plowPullable;
+        public final ConfigValue<ArrayList<String>> mobPullable;
+        public final ConfigValue<Config> plowReplace;
         // public final ConfigValue<Config> BREAKMAP;
         // public final ConfigValue<Config> PLACEMAP;
 
         Common(final Builder builder) {
             builder.push("common");
 
-            this.SPEEDMODIFIER = builder.comment("Speed modifier for when the sprint key is pressed while riding a living entity")
+            this.speedModifier = builder.comment("Speed modifier for when the sprint key is pressed while riding a living entity")
                 .worldRestart()
                 .defineInRange("speedModifier", -0.65, -1.0, 0.0);
 
-            this.CARGOCART = builder.comment("List of entities that are allowed to pull this cart.")
+            this.cargoPullable = builder.comment("List of entities that are allowed to pull this cart.")
                 .define("cargoCart.pullEntities", new ArrayList<String>(Arrays.asList(
                     "minecraft:horse",
                     "minecraft:donkey",
                     "minecraft:mule",
                     "minecraft:pig")));
 
-            this.PLOWCART = builder.comment("List of entities that are allowed to pull this cart.")
+            this.plowPullable = builder.comment("List of entities that are allowed to pull this cart.")
                 .define("plowCart.pullEntities", new ArrayList<String>(Arrays.asList(
                     "minecraft:horse",
                     "minecraft:donkey",
                     "minecraft:mule",
                     "minecraft:pig")));
 
-            this.MOBCART = builder.comment("List of entities that are allowed to pull this cart.")
+            this.mobPullable = builder.comment("List of entities that are allowed to pull this cart.")
                 .define("mobCart.pullEntities", new ArrayList<String>(Arrays.asList(
                     "minecraft:horse",
                     "minecraft:donkey",
@@ -74,7 +74,7 @@ public class AstikorCartsConfig {
             final Map<String, Object> shovelReplaceMap = new HashMap<>();
             shovelReplaceMap.put("minecraft:grass_path", Arrays.asList("minecraft:grass_block", "minecraft:dirt"));
             itemReplaceMap.put("#forge:tools/shovels", Config.wrap(shovelReplaceMap, TomlFormat.instance()));
-            this.REPLACEMAP = builder.comment("<new block> -> <old blocks> mappings to replace blocks (for example to till dirt with a hoe)."
+            this.plowReplace = builder.comment("<new block> -> <old blocks> mappings to replace blocks (for example to till dirt with a hoe)."
                 + "\nIf the item can be damaged, it will be damaged, else it will be consumed - unless the player is in creative mode."
                 + "\nItem and the value list also supports tags.")
                 .define("plowCart.replaceMap", Config.wrap(itemReplaceMap, TomlFormat.instance()));

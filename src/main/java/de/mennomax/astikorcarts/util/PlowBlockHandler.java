@@ -41,16 +41,16 @@ public class PlowBlockHandler {
         this.slot = slotIn;
         this.plow = plowIn;
         final String registryName = this.stack.getItem().getRegistryName().toString();
-        Config itemReplaceMap = AstikorCartsConfig.COMMON.REPLACEMAP.get().get(registryName);
+        Config itemReplaceMap = AstikorCartsConfig.COMMON.plowReplace.get().get(registryName);
         if (itemReplaceMap == null) {
             // TODO: Remove once #6236 has been merged
             if (this.stack.getItem() instanceof HoeItem) {
-                itemReplaceMap = AstikorCartsConfig.COMMON.REPLACEMAP.get().get("#forge:tools/hoes");
+                itemReplaceMap = AstikorCartsConfig.COMMON.plowReplace.get().get("#forge:tools/hoes");
             } else if (this.stack.getItem() instanceof ShovelItem) {
-                itemReplaceMap = AstikorCartsConfig.COMMON.REPLACEMAP.get().get("#forge:tools/shovels");
+                itemReplaceMap = AstikorCartsConfig.COMMON.plowReplace.get().get("#forge:tools/shovels");
             } else {
                 for (final ResourceLocation rl : this.stack.getItem().getTags()) {
-                    if ((itemReplaceMap = AstikorCartsConfig.COMMON.REPLACEMAP.get().get(rl.toString())) != null) {
+                    if ((itemReplaceMap = AstikorCartsConfig.COMMON.plowReplace.get().get(rl.toString())) != null) {
                         break;
                     }
                 }

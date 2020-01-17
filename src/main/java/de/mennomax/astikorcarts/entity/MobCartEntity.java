@@ -24,7 +24,7 @@ public class MobCartEntity extends AbstractDrawnEntity {
 
     @Override
     protected ArrayList<String> getAllowedEntityList() {
-        return AstikorCartsConfig.COMMON.MOBCART.get();
+        return AstikorCartsConfig.COMMON.mobPullable.get();
     }
 
     @Override

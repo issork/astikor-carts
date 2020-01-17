@@ -31,7 +31,7 @@ public class CargoCartEntity extends AbstractDrawnInventoryEntity {
 
     @Override
     protected ArrayList<String> getAllowedEntityList() {
-        return AstikorCartsConfig.COMMON.CARGOCART.get();
+        return AstikorCartsConfig.COMMON.cargoPullable.get();
     }
 
     @Override
@@ -56,7 +56,7 @@ public class CargoCartEntity extends AbstractDrawnInventoryEntity {
                     newValue = 1;
                 else
                     newValue = 0;
-                if (this.cart.getDataManager().get(CARGO).intValue() != newValue) {
+                if (this.cart.getDataManager().get(CARGO) != newValue) {
                     this.cart.getDataManager().set(CARGO, newValue);
                 }
             }
