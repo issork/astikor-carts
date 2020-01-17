@@ -9,13 +9,13 @@ import net.minecraft.util.ResourceLocation;
 public class MobCartRenderer extends DrawnRenderer<MobCartEntity> {
     private static final ResourceLocation TEXTURE = new ResourceLocation(AstikorCarts.MODID, "textures/entity/mobcart.png");
 
-    public MobCartRenderer(EntityRendererManager renderManager) {
+    public MobCartRenderer(final EntityRendererManager renderManager) {
         super(renderManager, new MobCartModel());
         this.shadowSize = 1.0F;
     }
 
     @Override
-    protected ResourceLocation getEntityTexture(MobCartEntity entity) {
+    protected ResourceLocation getEntityTexture(final MobCartEntity entity) {
         return TEXTURE;
     }
 

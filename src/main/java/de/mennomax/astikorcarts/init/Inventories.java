@@ -29,10 +29,10 @@ public class Inventories {
     @SubscribeEvent
     public static void registerContainerTypes(final RegistryEvent.Register<ContainerType<?>> event) {
         event.getRegistry().registerAll(
-                createType(PlowCartContainer::new, "plowcartcontainer"));
+            createType(PlowCartContainer::new, "plowcartcontainer"));
     }
 
-    private static ContainerType<?> createType(IContainerFactory<? extends CartContainer> container, String name) {
+    private static ContainerType<?> createType(final IContainerFactory<? extends CartContainer> container, final String name) {
         return IForgeContainerType.create(container::create).setRegistryName(AstikorCarts.MODID, name);
     }
 

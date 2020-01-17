@@ -32,16 +32,16 @@ public class Entities {
     @SubscribeEvent
     public static void registerEntities(final RegistryEvent.Register<EntityType<?>> event) {
         event.getRegistry().registerAll(buildType(CargoCartEntity::new, "cargocart", 1.5F, 1.4F),
-                buildType(PlowCartEntity::new, "plowcart", 1.3F, 1.4F),
-                buildType(MobCartEntity::new, "mobcart", 1.3F, 1.4F));
+            buildType(PlowCartEntity::new, "plowcart", 1.3F, 1.4F),
+            buildType(MobCartEntity::new, "mobcart", 1.3F, 1.4F));
     }
 
     public static EntityType<?> buildType(final IFactory<Entity> factoryIn, final String name, final float widthIn, final float heightIn) {
         final ResourceLocation resourceLocation = new ResourceLocation(AstikorCarts.MODID, name);
         final EntityType<?> entityType = EntityType.Builder.create(factoryIn, EntityClassification.MISC)
-                .size(widthIn, heightIn)
-                .setCustomClientFactory((pkg, world) -> ForgeRegistries.ENTITIES.getValue(resourceLocation).create(world))
-                .build(resourceLocation.toString());
+            .size(widthIn, heightIn)
+            .setCustomClientFactory((pkg, world) -> ForgeRegistries.ENTITIES.getValue(resourceLocation).create(world))
+            .build(resourceLocation.toString());
         entityType.setRegistryName(name);
         return entityType;
     }

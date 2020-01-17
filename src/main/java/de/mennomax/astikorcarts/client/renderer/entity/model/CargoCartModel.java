@@ -8,15 +8,15 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class CargoCartModel extends EntityModel<CargoCartEntity> {
-    private RendererModel boardBottom;
-    private RendererModel axis;
-    private RendererModel shaft;
-    private RendererModel boardFront;
-    private RendererModel[] boardsSide = new RendererModel[4];
-    private RendererModel[] boardsRear = new RendererModel[2];
-    private RendererModel[] cargo = new RendererModel[4];
-    private RendererModel leftWheel;
-    private RendererModel rightWheel;
+    private final RendererModel boardBottom;
+    private final RendererModel axis;
+    private final RendererModel shaft;
+    private final RendererModel boardFront;
+    private final RendererModel[] boardsSide = new RendererModel[4];
+    private final RendererModel[] boardsRear = new RendererModel[2];
+    private final RendererModel[] cargo = new RendererModel[4];
+    private final RendererModel leftWheel;
+    private final RendererModel rightWheel;
 
     public CargoCartModel() {
         this.textureWidth = 128;
@@ -92,12 +92,12 @@ public class CargoCartModel extends EntityModel<CargoCartEntity> {
         this.leftWheel.setRotationPoint(14.5F, 5.0F, 1.0F);
         this.leftWheel.addBox(-2.0F, -1.0F, -1.0F, 2, 2, 2);
         for (int i = 0; i < 8; i++) {
-            RendererModel rim = new RendererModel(this, 60, 0);
+            final RendererModel rim = new RendererModel(this, 60, 0);
             rim.addBox(-2.0F, -4.5F, 9.86F, 2, 9, 1);
             rim.rotateAngleX = i * (float) Math.PI / 4.0F;
             this.leftWheel.addChild(rim);
 
-            RendererModel spoke = new RendererModel(this, 60, 10);
+            final RendererModel spoke = new RendererModel(this, 60, 10);
             spoke.addBox(-1.5F, 1.0F, -0.5F, 1, 9, 1);
             spoke.rotateAngleX = i * (float) Math.PI / 4.0F;
             this.leftWheel.addChild(spoke);
@@ -108,12 +108,12 @@ public class CargoCartModel extends EntityModel<CargoCartEntity> {
         this.rightWheel.setRotationPoint(-14.5F, 5.0F, 1.0F);
         this.rightWheel.addBox(0.0F, -1.0F, -1.0F, 2, 2, 2);
         for (int i = 0; i < 8; i++) {
-            RendererModel rim = new RendererModel(this, 60, 0);
+            final RendererModel rim = new RendererModel(this, 60, 0);
             rim.addBox(0.0F, -4.5F, 9.86F, 2, 9, 1);
             rim.rotateAngleX = i * (float) Math.PI / 4.0F;
             this.rightWheel.addChild(rim);
 
-            RendererModel spoke = new RendererModel(this, 60, 10);
+            final RendererModel spoke = new RendererModel(this, 60, 10);
             spoke.addBox(0.5F, 1.0F, -0.5F, 1, 9, 1);
             spoke.rotateAngleX = i * (float) Math.PI / 4.0F;
             this.rightWheel.addChild(spoke);
@@ -121,7 +121,7 @@ public class CargoCartModel extends EntityModel<CargoCartEntity> {
     }
 
     @Override
-    public void render(CargoCartEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+    public void render(final CargoCartEntity entityIn, final float limbSwing, final float limbSwingAmount, final float ageInTicks, final float netHeadYaw, final float headPitch, final float scale) {
         this.setRotationAngles(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
         this.axis.render(scale);
         this.shaft.renderWithRotation(scale);
@@ -141,7 +141,7 @@ public class CargoCartModel extends EntityModel<CargoCartEntity> {
     }
 
     @Override
-    public void setRotationAngles(CargoCartEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+    public void setRotationAngles(final CargoCartEntity entityIn, final float limbSwing, final float limbSwingAmount, final float ageInTicks, final float netHeadYaw, final float headPitch, final float scale) {
         this.rightWheel.rotateAngleX = (float) (entityIn.getWheelRotation(0) + entityIn.getWheelRotationIncrement(0) * limbSwing);
         this.leftWheel.rotateAngleX = (float) (entityIn.getWheelRotation(1) + entityIn.getWheelRotationIncrement(1) * limbSwing);
     }

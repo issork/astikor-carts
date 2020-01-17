@@ -13,28 +13,28 @@ public abstract class CartContainer extends Container {
     protected final ItemStackHandler cartInv;
     protected final AbstractDrawnInventoryEntity cart;
 
-    public CartContainer(ContainerType<?> type, int id, AbstractDrawnInventoryEntity cart) {
+    public CartContainer(final ContainerType<?> type, final int id, final AbstractDrawnInventoryEntity cart) {
         super(type, id);
         this.cart = cart;
         this.cartInv = cart.inventory;
     }
 
     @Override
-    public boolean canInteractWith(PlayerEntity playerIn) {
+    public boolean canInteractWith(final PlayerEntity playerIn) {
         return this.cart.isAlive() && this.cart.getDistance(playerIn) < 8.0F;
     }
 
     @Override
-    public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
-        ItemStack itemstack = ItemStack.EMPTY;
-        Slot slot = this.inventorySlots.get(index);
+    public ItemStack transferStackInSlot(final PlayerEntity playerIn, final int index) {
+        final ItemStack itemstack = ItemStack.EMPTY;
+        final Slot slot = this.inventorySlots.get(index);
         if (slot != null && slot.getHasStack()) {
-            ItemStack itemstack1 = slot.getStack();
-            if (index < cartInv.getSlots()) {
-                if (!this.mergeItemStack(itemstack1, cartInv.getSlots(), this.inventorySlots.size(), true)) {
+            final ItemStack itemstack1 = slot.getStack();
+            if (index < this.cartInv.getSlots()) {
+                if (!this.mergeItemStack(itemstack1, this.cartInv.getSlots(), this.inventorySlots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (!this.mergeItemStack(itemstack1, 0, cartInv.getSlots(), false)) {
+            } else if (!this.mergeItemStack(itemstack1, 0, this.cartInv.getSlots(), false)) {
                 return ItemStack.EMPTY;
             }
             if (itemstack1.isEmpty()) {
@@ -47,7 +47,7 @@ public abstract class CartContainer extends Container {
     }
 
     @Override
-    public void onContainerClosed(PlayerEntity playerIn) {
+    public void onContainerClosed(final PlayerEntity playerIn) {
         super.onContainerClosed(playerIn);
     }
 

@@ -5,6 +5,6 @@ import net.minecraft.util.math.BlockPos;
 
 public interface PlowExecutor {
 
-    public void tillBlock(PlayerEntity player, BlockPos pos);
+    void tillBlock(PlayerEntity player, BlockPos pos);
 
 }

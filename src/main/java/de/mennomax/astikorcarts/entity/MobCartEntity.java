@@ -1,7 +1,5 @@
 package de.mennomax.astikorcarts.entity;
 
-import java.util.ArrayList;
-
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
 import de.mennomax.astikorcarts.init.Items;
 import net.minecraft.entity.Entity;
@@ -16,9 +14,11 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
+
 public class MobCartEntity extends AbstractDrawnEntity {
 
-    public MobCartEntity(EntityType<? extends Entity> entityTypeIn, World worldIn) {
+    public MobCartEntity(final EntityType<? extends Entity> entityTypeIn, final World worldIn) {
         super(entityTypeIn, worldIn);
     }
 
@@ -28,10 +28,10 @@ public class MobCartEntity extends AbstractDrawnEntity {
     }
 
     @Override
-    public boolean processInitialInteract(PlayerEntity player, Hand hand) {
+    public boolean processInitialInteract(final PlayerEntity player, final Hand hand) {
         if (!this.world.isRemote) {
             if (player.isSneaking()) {
-                for (Entity entity : this.getPassengers()) {
+                for (final Entity entity : this.getPassengers()) {
                     if (!(entity instanceof PlayerEntity)) {
                         entity.stopRiding();
                     }
@@ -44,10 +44,10 @@ public class MobCartEntity extends AbstractDrawnEntity {
     }
 
     @Override
-    public void applyEntityCollision(Entity entityIn) {
+    public void applyEntityCollision(final Entity entityIn) {
         if (!entityIn.isPassenger(this)) {
-            if (!this.world.isRemote && this.getPulling() != entityIn && !(this.getControllingPassenger() instanceof Entity) && this.getPassengers().size() < 2 && !entityIn.isPassenger() && entityIn.getWidth() < this.getWidth() && entityIn instanceof LivingEntity
-                    && !(entityIn instanceof WaterMobEntity) && !(entityIn instanceof PlayerEntity)) {
+            if (!this.world.isRemote && this.getPulling() != entityIn && this.getControllingPassenger() == null && this.getPassengers().size() < 2 && !entityIn.isPassenger() && entityIn.getWidth() < this.getWidth() && entityIn instanceof LivingEntity
+                && !(entityIn instanceof WaterMobEntity) && !(entityIn instanceof PlayerEntity)) {
                 entityIn.startRiding(this);
             } else {
                 super.applyEntityCollision(entityIn);
@@ -56,7 +56,7 @@ public class MobCartEntity extends AbstractDrawnEntity {
     }
 
     @Override
-    protected boolean canFitPassenger(Entity passenger) {
+    protected boolean canFitPassenger(final Entity passenger) {
         return this.getPassengers().size() < 2;
     }
 
@@ -66,7 +66,7 @@ public class MobCartEntity extends AbstractDrawnEntity {
     }
 
     @Override
-    public void updatePassenger(Entity passenger) {
+    public void updatePassenger(final Entity passenger) {
         if (this.isPassenger(passenger)) {
             double f = -0.1D;
 
@@ -78,16 +78,16 @@ public class MobCartEntity extends AbstractDrawnEntity {
                 }
             }
 
-            Vec3d vec3d = new Vec3d(f, 0.0D, 0.0D).rotateYaw(-this.rotationYaw * 0.017453292F - ((float) Math.PI / 2F));
+            final Vec3d vec3d = new Vec3d(f, 0.0D, 0.0D).rotateYaw(-this.rotationYaw * 0.017453292F - ((float) Math.PI / 2F));
             passenger.setPosition(this.posX + vec3d.x, this.posY + this.getMountedYOffset() + passenger.getYOffset(), this.posZ + vec3d.z);
             passenger.setRenderYawOffset(this.rotationYaw);
-            float f2 = MathHelper.wrapDegrees(passenger.rotationYaw - this.rotationYaw);
-            float f1 = MathHelper.clamp(f2, -105.0F, 105.0F);
+            final float f2 = MathHelper.wrapDegrees(passenger.rotationYaw - this.rotationYaw);
+            final float f1 = MathHelper.clamp(f2, -105.0F, 105.0F);
             passenger.prevRotationYaw += f1 - f2;
             passenger.rotationYaw += f1 - f2;
             passenger.setRotationYawHead(passenger.rotationYaw);
             if (passenger instanceof AnimalEntity && this.getPassengers().size() > 1) {
-                int j = passenger.getEntityId() % 2 == 0 ? 90 : 270;
+                final int j = passenger.getEntityId() % 2 == 0 ? 90 : 270;
                 passenger.setRenderYawOffset(((AnimalEntity) passenger).renderYawOffset + j);
                 passenger.setRotationYawHead(passenger.getRotationYawHead() + j);
             }

@@ -5,11 +5,11 @@ import net.minecraftforge.items.ItemStackHandler;
 
 public class CartItemStackHandler<T extends AbstractDrawnEntity> extends ItemStackHandler {
 
-    protected final T CART;
+    protected final T cart;
 
-    public CartItemStackHandler(int slots, T cart) {
+    public CartItemStackHandler(final int slots, final T cart) {
         super(slots);
-        this.CART = cart;
+        this.cart = cart;
     }
 
 }

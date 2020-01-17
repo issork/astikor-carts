@@ -11,11 +11,11 @@ import net.minecraftforge.items.SlotItemHandler;
 
 public class PlowCartContainer extends CartContainer {
 
-    public PlowCartContainer(int id, PlayerInventory playerInv, PacketBuffer buf) {
+    public PlowCartContainer(final int id, final PlayerInventory playerInv, final PacketBuffer buf) {
         this(id, playerInv, (AbstractDrawnInventoryEntity) playerInv.player.world.getEntityByID(buf.readInt()));
     }
 
-    public PlowCartContainer(int id, PlayerInventory playerInv, AbstractDrawnInventoryEntity cart) {
+    public PlowCartContainer(final int id, final PlayerInventory playerInv, final AbstractDrawnInventoryEntity cart) {
         super(Inventories.PLOWCARTCONTAINER, id, cart);
         this.addSlot(new PlowSlot(this.cartInv, 0, 57, 24));
         this.addSlot(new PlowSlot(this.cartInv, 1, 80, 17));
@@ -34,12 +34,12 @@ public class PlowCartContainer extends CartContainer {
 
     static class PlowSlot extends SlotItemHandler {
 
-        public PlowSlot(IItemHandler itemHandler, int index, int xPosition, int yPosition) {
+        public PlowSlot(final IItemHandler itemHandler, final int index, final int xPosition, final int yPosition) {
             super(itemHandler, index, xPosition, yPosition);
         }
 
         @Override
-        public boolean isItemValid(ItemStack stack) {
+        public boolean isItemValid(final ItemStack stack) {
             return true;
         }
 

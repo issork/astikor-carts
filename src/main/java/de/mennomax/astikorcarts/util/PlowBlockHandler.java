@@ -1,12 +1,7 @@
 package de.mennomax.astikorcarts.util;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.Config.Entry;
-
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
 import de.mennomax.astikorcarts.entity.PlowCartEntity;
 import net.minecraft.block.Block;
@@ -25,32 +20,36 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 public class PlowBlockHandler {
 
     private final List<PlowExecutor> executors = new ArrayList<>(2);
-    private final ItemStack STACK;
-    private final int SLOT;
-    private final PlowCartEntity PLOW;
+    private final ItemStack stack;
+    private final int slot;
+    private final PlowCartEntity plow;
 
     /**
      * SupressWarnings because of cast from Object to List(String). Safe because the
      * object is a string list as defined in {@link AstikorCartsConfig}
      */
     @SuppressWarnings("unchecked")
-    public PlowBlockHandler(ItemStack stackIn, int slotIn, PlowCartEntity plowIn) {
-        STACK = stackIn;
-        SLOT = slotIn;
-        PLOW = plowIn;
-        String registryName = STACK.getItem().getRegistryName().toString();
+    public PlowBlockHandler(final ItemStack stackIn, final int slotIn, final PlowCartEntity plowIn) {
+        this.stack = stackIn;
+        this.slot = slotIn;
+        this.plow = plowIn;
+        final String registryName = this.stack.getItem().getRegistryName().toString();
         Config itemReplaceMap = AstikorCartsConfig.COMMON.REPLACEMAP.get().get(registryName);
         if (itemReplaceMap == null) {
             // TODO: Remove once #6236 has been merged
-            if (STACK.getItem() instanceof HoeItem) {
+            if (this.stack.getItem() instanceof HoeItem) {
                 itemReplaceMap = AstikorCartsConfig.COMMON.REPLACEMAP.get().get("#forge:tools/hoes");
-            } else if (STACK.getItem() instanceof ShovelItem) {
+            } else if (this.stack.getItem() instanceof ShovelItem) {
                 itemReplaceMap = AstikorCartsConfig.COMMON.REPLACEMAP.get().get("#forge:tools/shovels");
             } else {
-                for (ResourceLocation rl : STACK.getItem().getTags()) {
+                for (final ResourceLocation rl : this.stack.getItem().getTags()) {
                     if ((itemReplaceMap = AstikorCartsConfig.COMMON.REPLACEMAP.get().get(rl.toString())) != null) {
                         break;
                     }
@@ -58,22 +57,20 @@ public class PlowBlockHandler {
             }
         }
         if (itemReplaceMap != null) {
-            HashMap<ArrayList<Block>, Block> replaceMap = new HashMap<>();
-            for (Entry entry : itemReplaceMap.entrySet()) {
-                ArrayList<Block> blockList = new ArrayList<>();
-                for (String blockId : ((List<String>) entry.getValue())) {
-                    Block toAdd = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockId));
+            final HashMap<ArrayList<Block>, Block> replaceMap = new HashMap<>();
+            for (final Entry entry : itemReplaceMap.entrySet()) {
+                final ArrayList<Block> blockList = new ArrayList<>();
+                for (final String blockId : ((List<String>) entry.getValue())) {
+                    final Block toAdd = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockId));
                     if (toAdd == null) {
-                        for (Block block : BlockTags.getCollection().get(new ResourceLocation(blockId)).getAllElements()) {
-                            blockList.add(block);
-                        }
+                        blockList.addAll(BlockTags.getCollection().get(new ResourceLocation(blockId)).getAllElements());
                     } else {
                         blockList.add(toAdd);
                     }
                 }
                 replaceMap.put(blockList, ForgeRegistries.BLOCKS.getValue(new ResourceLocation(entry.getKey())));
             }
-            executors.add(new ReplaceHandler(replaceMap));
+            this.executors.add(new ReplaceHandler(replaceMap));
         }
         // Config breakOrPlaceMap =
         // AstikorCartsConfig.COMMON.BREAKMAP.get().get(stack.getItem().getRegistryName().toString());
@@ -84,8 +81,8 @@ public class PlowBlockHandler {
         // }
     }
 
-    public void tillBlock(PlayerEntity player, BlockPos blockPos) {
-        for (PlowExecutor exe : executors) {
+    public void tillBlock(final PlayerEntity player, final BlockPos blockPos) {
+        for (final PlowExecutor exe : this.executors) {
             exe.tillBlock(player, blockPos);
         }
     }
@@ -94,20 +91,20 @@ public class PlowBlockHandler {
 
         private final HashMap<ArrayList<Block>, Block> replaceMap;
 
-        public ReplaceHandler(HashMap<ArrayList<Block>, Block> replaceMapIn) {
+        public ReplaceHandler(final HashMap<ArrayList<Block>, Block> replaceMapIn) {
             this.replaceMap = replaceMapIn;
         }
 
         @Override
-        public void tillBlock(PlayerEntity player, BlockPos pos) {
-            BlockState toReplaceState = player.world.getBlockState(pos);
-            Block replaceWith = getFirstMatch(replaceMap, toReplaceState);
+        public void tillBlock(final PlayerEntity player, final BlockPos pos) {
+            final BlockState toReplaceState = player.world.getBlockState(pos);
+            final Block replaceWith = PlowBlockHandler.this.getFirstMatch(this.replaceMap, toReplaceState);
             if (replaceWith != null) {
-                BreakEvent event = new BlockEvent.BreakEvent(player.world, pos, toReplaceState, player);
+                final BreakEvent event = new BlockEvent.BreakEvent(player.world, pos, toReplaceState, player);
                 MinecraftForge.EVENT_BUS.post(event);
                 if (!event.isCanceled()) {
                     player.world.setBlockState(pos, replaceWith.getDefaultState());
-                    handleStackDamage(player, STACK);
+                    PlowBlockHandler.this.handleStackDamage(player, PlowBlockHandler.this.stack);
                 }
             }
         }
@@ -138,28 +135,28 @@ public class PlowBlockHandler {
     //
     // }
 
-    private void handleStackDamage(PlayerEntity player, ItemStack stack) {
+    private void handleStackDamage(final PlayerEntity player, final ItemStack stack) {
         if (!player.isCreative()) {
             if (stack.isDamageable()) {
-                ItemStack copy = stack.copy();
+                final ItemStack copy = stack.copy();
                 stack.damageItem(1, player, e -> {});
                 if (stack.isEmpty()) {
                     ForgeEventFactory.onPlayerDestroyItem(player, copy, null);
-                    PLOW.updateSlot(SLOT);
-                    PLOW.world.playSound(PLOW.posX, PLOW.posY, PLOW.posZ, SoundEvents.ENTITY_ITEM_BREAK, PLOW.getSoundCategory(), 0.8F, 0.8F + PLOW.world.rand.nextFloat() * 0.4F, false);
+                    this.plow.updateSlot(this.slot);
+                    this.plow.world.playSound(this.plow.posX, this.plow.posY, this.plow.posZ, SoundEvents.ENTITY_ITEM_BREAK, this.plow.getSoundCategory(), 0.8F, 0.8F + this.plow.world.rand.nextFloat() * 0.4F, false);
                 }
             } else {
                 stack.shrink(1);
                 if (stack.isEmpty()) {
-                    PLOW.updateSlot(SLOT);
+                    this.plow.updateSlot(this.slot);
                 }
             }
         }
     }
 
-    private Block getFirstMatch(HashMap<ArrayList<Block>, Block> replaceMap, BlockState toReplaceState) {
-        for (ArrayList<Block> matchList : replaceMap.keySet()) {
-            for (Block match : matchList) {
+    private Block getFirstMatch(final HashMap<ArrayList<Block>, Block> replaceMap, final BlockState toReplaceState) {
+        for (final ArrayList<Block> matchList : replaceMap.keySet()) {
+            for (final Block match : matchList) {
                 if (match == toReplaceState.getBlock()) {
                     return replaceMap.get(matchList);
                 }

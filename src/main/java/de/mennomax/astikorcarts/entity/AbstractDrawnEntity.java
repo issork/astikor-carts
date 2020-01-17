@@ -1,10 +1,5 @@
 package de.mennomax.astikorcarts.entity;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-
 import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
 import de.mennomax.astikorcarts.network.PacketHandler;
@@ -48,10 +43,15 @@ import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraftforge.fml.network.PacketDistributor;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+
 public abstract class AbstractDrawnEntity extends Entity implements IEntityAdditionalSpawnData {
 
-    private static final DataParameter<Integer> TIME_SINCE_HIT = EntityDataManager.<Integer>createKey(AbstractDrawnEntity.class, DataSerializers.VARINT);
-    private static final DataParameter<Float> DAMAGE_TAKEN = EntityDataManager.<Float>createKey(AbstractDrawnEntity.class, DataSerializers.FLOAT);
+    private static final DataParameter<Integer> TIME_SINCE_HIT = EntityDataManager.createKey(AbstractDrawnEntity.class, DataSerializers.VARINT);
+    private static final DataParameter<Float> DAMAGE_TAKEN = EntityDataManager.createKey(AbstractDrawnEntity.class, DataSerializers.FLOAT);
     public static final UUID PULL_SLOWLY_MODIFIER_UUID = UUID.fromString("49B0E52E-48F2-4D89-BED7-4F5DF26F1263");
     public static final AttributeModifier PULL_SLOWLY_MODIFIER = (new AttributeModifier(PULL_SLOWLY_MODIFIER_UUID, "Pull slowly modifier", AstikorCartsConfig.COMMON.SPEEDMODIFIER.get().doubleValue(), Operation.MULTIPLY_TOTAL)).setSaved(false);
     private int lerpSteps;
@@ -67,7 +67,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     public Entity pulling;
     protected AbstractDrawnEntity drawn;
 
-    public AbstractDrawnEntity(EntityType<? extends Entity> entityTypeIn, World worldIn) {
+    public AbstractDrawnEntity(final EntityType<? extends Entity> entityTypeIn, final World worldIn) {
         super(entityTypeIn, worldIn);
         this.stepHeight = 1.2F;
         this.preventEntitySpawning = true;
@@ -91,7 +91,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             this.move(MoverType.SELF, this.getMotion());
             this.attemptReattach();
         }
-        for (Entity entity : this.world.getEntitiesInAABBexcluding(this, this.getBoundingBox(), EntityPredicates.pushableBy(this))) {
+        for (final Entity entity : this.world.getEntitiesInAABBexcluding(this, this.getBoundingBox(), EntityPredicates.pushableBy(this))) {
             this.applyEntityCollision(entity);
         }
     }
@@ -106,37 +106,37 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         this.rotationPitch = 0.0F;
         Vec3d targetVec = this.getRelativeTargetVec();
         this.handleRotation(targetVec);
-        double dRotation = this.prevRotationYaw - this.rotationYaw;
+        final double dRotation = this.prevRotationYaw - this.rotationYaw;
         if (dRotation < -180.0D) {
             this.prevRotationYaw += 360.0F;
         } else if (dRotation >= 180.0D) {
             this.prevRotationYaw -= 360.0F;
         }
-        double targetVecLength = Math.sqrt(targetVec.x * targetVec.x + targetVec.z * targetVec.z);
-        double lookX = targetVec.x / targetVecLength;
-        double lookZ = targetVec.z / targetVecLength;
-        double moveX = targetVec.x - lookX * this.spacing;
-        double moveZ = targetVec.z - lookZ * this.spacing;
+        final double targetVecLength = Math.sqrt(targetVec.x * targetVec.x + targetVec.z * targetVec.z);
+        final double lookX = targetVec.x / targetVecLength;
+        final double lookZ = targetVec.z / targetVecLength;
+        final double moveX = targetVec.x - lookX * this.spacing;
+        final double moveZ = targetVec.z - lookZ * this.spacing;
         this.fallDistance = this.pulling.fallDistance;
         if ((!this.pulling.onGround && this.fallDistance == 0.0F && !this.pullingOnGroundLastTick)) {
-            setMotion(moveX, targetVec.y, moveZ);
+            this.setMotion(moveX, targetVec.y, moveZ);
         }
         this.pullingOnGroundLastTick = this.pulling.onGround;
         this.setMotion(moveX, this.getMotion().y, moveZ);
         this.move(MoverType.SELF, this.getMotion());
         if (this.world.isRemote) {
-            for (CartWheel wheel : this.wheels) {
+            for (final CartWheel wheel : this.wheels) {
                 wheel.tick(lookX, lookZ);
             }
         } else {
             targetVec = this.getRelativeTargetVec();
-            if(Math.sqrt(targetVec.x * targetVec.x + targetVec.z * targetVec.z) > this.spacing+0.5) {
+            if (Math.sqrt(targetVec.x * targetVec.x + targetVec.z * targetVec.z) > this.spacing + 0.5) {
                 this.setPulling(null);
             }
         }
-        updatePassengers();
-        if (drawn != null) {
-            drawn.pulledTick();
+        this.updatePassengers();
+        if (this.drawn != null) {
+            this.drawn.pulledTick();
         }
     }
 
@@ -145,25 +145,22 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     }
 
     /**
-     * 
      * @return Whether the currently pulling entity should stop pulling this cart.
      */
     public boolean shouldRemovePulling() {
         if (this.collidedHorizontally) {
             final Vec3d start = new Vec3d(this.posX, this.posY + this.getHeight(), this.posZ);
             final Vec3d end = new Vec3d(this.pulling.posX, this.pulling.posY + this.getHeight() / 2, this.pulling.posZ);
-            RayTraceResult result = this.world.rayTraceBlocks(new RayTraceContext(start, end, BlockMode.COLLIDER, FluidMode.NONE, this));
+            final RayTraceResult result = this.world.rayTraceBlocks(new RayTraceContext(start, end, BlockMode.COLLIDER, FluidMode.NONE, this));
             if (result != null) {
-                if (result.getType() == Type.BLOCK) {
-                    return true;
-                }
+                return result.getType() == Type.BLOCK;
             }
         }
         return false;
     }
 
     public void updatePassengers() {
-        for (Entity passenger : this.getPassengers()) {
+        for (final Entity passenger : this.getPassengers()) {
             this.updatePassenger(passenger);
         }
     }
@@ -174,10 +171,10 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
 
     /**
      * Attaches the cart to an entity so that the cart follows it.
-     * 
+     *
      * @param entityIn new pulling entity
      */
-    public void setPulling(Entity entityIn) {
+    public void setPulling(final Entity entityIn) {
         if (!this.world.isRemote) {
             if (this.canBePulledBy(entityIn)) {
                 if (entityIn == null) {
@@ -192,7 +189,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
                     if (entityIn instanceof MobEntity) {
                         ((MobEntity) entityIn).getNavigator().clearPath();
                     }
-                    if(!(entityIn instanceof AbstractDrawnEntity)) {
+                    if (!(entityIn instanceof AbstractDrawnEntity)) {
                         AstikorCarts.SERVERPULLMAP.put(entityIn, this);
                     }
                     PacketHandler.CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new SPacketDrawnUpdate(entityIn.getEntityId(), this.getEntityId()));
@@ -210,7 +207,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
                     ((AbstractDrawnEntity) this.pulling).drawn = null;
                 }
                 this.pullingId = -1;
-                for (CartWheel wheel : this.wheels) {
+                for (final CartWheel wheel : this.wheels) {
                     wheel.clearIncrement();
                 }
                 if (this.ticksExisted > 20) {
@@ -218,7 +215,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
                 }
             } else {
                 this.pullingId = entityIn.getEntityId();
-                if(!(entityIn instanceof AbstractDrawnEntity)) {
+                if (!(entityIn instanceof AbstractDrawnEntity)) {
                     AstikorCarts.CLIENTPULLMAP.put(entityIn, this);
                 }
                 if (this.ticksExisted > 20) {
@@ -231,12 +228,12 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             this.pulling = entityIn;
         }
     }
-    
+
     @OnlyIn(Dist.CLIENT)
     private void playAttachSound() {
         this.world.playSound(Minecraft.getInstance().player, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_HORSE_ARMOR, this.getSoundCategory(), 0.5F, 1.0F);
     }
-    
+
     @OnlyIn(Dist.CLIENT)
     private void playDetachSound() {
         this.world.playSound(Minecraft.getInstance().player, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_ITEM_BREAK, this.getSoundCategory(), 0.5F, 0.1F);
@@ -248,14 +245,14 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     private void attemptReattach() {
         if (this.world.isRemote) {
             if (this.pullingId != -1) {
-                Entity entity = this.world.getEntityByID(this.pullingId);
+                final Entity entity = this.world.getEntityByID(this.pullingId);
                 if (entity != null && entity.isAlive()) {
                     this.setPulling(entity);
                 }
             }
         } else {
             if (this.pullingUUID != null) {
-                Entity entity = ((ServerWorld) this.world).getEntityByUuid(this.pullingUUID);
+                final Entity entity = ((ServerWorld) this.world).getEntityByUuid(this.pullingUUID);
                 if (entity != null && entity.isAlive()) {
                     this.setPulling(entity);
                 }
@@ -279,9 +276,8 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     }
 
     /**
-     * 
      * @return The position this cart should always face and travel towards.
-     *         Relative to the cart position.
+     * Relative to the cart position.
      */
     public Vec3d getRelativeTargetVec() {
         return new Vec3d(this.pulling.posX - this.posX, this.pulling.posY - this.posY, this.pulling.posZ - this.posZ);
@@ -289,18 +285,18 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
 
     /**
      * Handles the rotation of this cart and its components.
-     * 
+     *
      * @param targetVecIn
      */
-    public void handleRotation(Vec3d targetVecIn) {
+    public void handleRotation(final Vec3d targetVecIn) {
         this.rotationYaw = (float) Math.toDegrees(-Math.atan2(targetVecIn.x, targetVecIn.z));
     }
 
-    public double getWheelRotation(int wheel) {
+    public double getWheelRotation(final int wheel) {
         return this.wheels.get(wheel).getRotation();
     }
 
-    public double getWheelRotationIncrement(int wheel) {
+    public double getWheelRotationIncrement(final int wheel) {
         return this.wheels.get(wheel).getRotationIncrement();
     }
 
@@ -308,17 +304,17 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
 
     /**
      * Returns true if the passed in entity is allowed to pull this cart.
-     * 
+     *
      * @param entityIn
      */
-    protected boolean canBePulledBy(Entity entityIn) {
+    protected boolean canBePulledBy(final Entity entityIn) {
         if (entityIn == null) {
             return true;
         }
-        return (this.pulling == null || !this.pulling.isAlive()) && !this.isPassenger(entityIn) && isInPullList(entityIn.getType().getRegistryName().toString());
+        return (this.pulling == null || !this.pulling.isAlive()) && !this.isPassenger(entityIn) && this.isInPullList(entityIn.getType().getRegistryName().toString());
     }
 
-    protected boolean isInPullList(String entityId) {
+    protected boolean isInPullList(final String entityId) {
         return this.getAllowedEntityList().contains(entityId);
     }
 
@@ -327,7 +323,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     }
 
     @Override
-    public boolean attackEntityFrom(DamageSource source, float amount) {
+    public boolean attackEntityFrom(final DamageSource source, final float amount) {
         if (this.isInvulnerableTo(source)) {
             return false;
         } else if (!this.world.isRemote && this.isAlive()) {
@@ -336,7 +332,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             } else {
                 this.setTimeSinceHit(10);
                 this.setDamageTaken(this.getDamageTaken() + amount * 10.0F);
-                boolean flag = source.getTrueSource() instanceof PlayerEntity && ((PlayerEntity) source.getTrueSource()).abilities.isCreativeMode;
+                final boolean flag = source.getTrueSource() instanceof PlayerEntity && ((PlayerEntity) source.getTrueSource()).abilities.isCreativeMode;
                 if (flag || this.getDamageTaken() > 40.0F) {
                     this.onDestroyed(source, flag);
                     this.setPulling(null);
@@ -352,36 +348,35 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     /**
      * Called when the cart has been destroyed by a creative player or the carts
      * health hit 0.
-     * 
+     *
      * @param source
      * @param byCreativePlayer
      */
-    public void onDestroyed(DamageSource source, boolean byCreativePlayer) {
+    public void onDestroyed(final DamageSource source, final boolean byCreativePlayer) {
         if (this.world.getGameRules().getBoolean(GameRules.DO_ENTITY_DROPS)) {
             if (!byCreativePlayer) {
                 this.entityDropItem(this.getCartItem());
             }
-            onDestroyedAndDoDrops(source);
+            this.onDestroyedAndDoDrops(source);
         }
     }
 
     /**
      * This method is called from {@link #onDestroyed(DamageSource, boolean)} if the
      * GameRules allow entities to drop items.
-     * 
+     *
      * @param source
-     * @param byCreativePlayer
      */
-    public void onDestroyedAndDoDrops(DamageSource source) {
+    public void onDestroyedAndDoDrops(final DamageSource source) {
 
     }
 
     private void tickLerp() {
         if (this.lerpSteps > 0) {
-            double dx = this.posX + (this.lerpX - this.posX) / this.lerpSteps;
-            double dy = this.posY + (this.lerpY - this.posY) / this.lerpSteps;
-            double dz = this.posZ + (this.lerpZ - this.posZ) / this.lerpSteps;
-            double drot = MathHelper.wrapDegrees(this.lerpYaw - this.rotationYaw);
+            final double dx = this.posX + (this.lerpX - this.posX) / this.lerpSteps;
+            final double dy = this.posY + (this.lerpY - this.posY) / this.lerpSteps;
+            final double dz = this.posZ + (this.lerpZ - this.posZ) / this.lerpSteps;
+            final double drot = MathHelper.wrapDegrees(this.lerpYaw - this.rotationYaw);
             this.rotationYaw = (float) (this.rotationYaw + drot / this.lerpSteps);
             --this.lerpSteps;
             this.setPosition(dx, dy, dz);
@@ -401,7 +396,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void setPositionAndRotationDirect(double x, double y, double z, float yaw, float pitch, int posRotationIncrements, boolean teleport) {
+    public void setPositionAndRotationDirect(final double x, final double y, final double z, final float yaw, final float pitch, final int posRotationIncrements, final boolean teleport) {
         this.lerpX = x;
         this.lerpY = y;
         this.lerpZ = z;
@@ -410,7 +405,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     }
 
     @Override
-    protected void addPassenger(Entity passenger) {
+    protected void addPassenger(final Entity passenger) {
         super.addPassenger(passenger);
         if (this.canPassengerSteer() && this.lerpSteps > 0) {
             this.lerpSteps = 0;
@@ -422,38 +417,38 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     }
 
     @Override
-    protected void removePassenger(Entity passenger) {
+    protected void removePassenger(final Entity passenger) {
         super.removePassenger(passenger);
     }
 
-    public void setDamageTaken(float damageTaken) {
+    public void setDamageTaken(final float damageTaken) {
         this.dataManager.set(DAMAGE_TAKEN, damageTaken);
     }
 
     public float getDamageTaken() {
-        return this.dataManager.get(DAMAGE_TAKEN).floatValue();
+        return this.dataManager.get(DAMAGE_TAKEN);
     }
 
-    public void setTimeSinceHit(int timeSinceHit) {
+    public void setTimeSinceHit(final int timeSinceHit) {
         this.dataManager.set(TIME_SINCE_HIT, timeSinceHit);
     }
 
     public int getTimeSinceHit() {
-        return this.dataManager.get(TIME_SINCE_HIT).intValue();
+        return this.dataManager.get(TIME_SINCE_HIT);
     }
 
     @Override
-    public ItemStack getPickedResult(RayTraceResult target) {
+    public ItemStack getPickedResult(final RayTraceResult target) {
         return new ItemStack(this.getCartItem());
     }
 
     @Override
-    public void writeSpawnData(PacketBuffer buffer) {
+    public void writeSpawnData(final PacketBuffer buffer) {
         buffer.writeInt(this.pulling != null ? this.pulling.getEntityId() : -1);
     }
 
     @Override
-    public void readSpawnData(PacketBuffer additionalData) {
+    public void readSpawnData(final PacketBuffer additionalData) {
         this.pullingId = additionalData.readInt();
     }
 
@@ -464,14 +459,14 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     }
 
     @Override
-    protected void readAdditional(CompoundNBT compound) {
+    protected void readAdditional(final CompoundNBT compound) {
         if (compound.hasUniqueId("PullingUUID")) {
             this.pullingUUID = compound.getUniqueId("PullingUUID");
         }
     }
 
     @Override
-    protected void writeAdditional(CompoundNBT compound) {
+    protected void writeAdditional(final CompoundNBT compound) {
         if (this.pulling != null) {
             compound.putUniqueId("PullingUUID", this.pullingUUID);
         }

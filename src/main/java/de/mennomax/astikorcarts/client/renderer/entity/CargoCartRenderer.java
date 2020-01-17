@@ -9,13 +9,13 @@ import net.minecraft.util.ResourceLocation;
 public class CargoCartRenderer extends DrawnRenderer<CargoCartEntity> {
     private static final ResourceLocation TEXTURE = new ResourceLocation(AstikorCarts.MODID, "textures/entity/cargocart.png");
 
-    public CargoCartRenderer(EntityRendererManager renderManager) {
+    public CargoCartRenderer(final EntityRendererManager renderManager) {
         super(renderManager, new CargoCartModel());
         this.shadowSize = 1.0F;
     }
 
     @Override
-    protected ResourceLocation getEntityTexture(CargoCartEntity entity) {
+    protected ResourceLocation getEntityTexture(final CargoCartEntity entity) {
         return TEXTURE;
     }
 

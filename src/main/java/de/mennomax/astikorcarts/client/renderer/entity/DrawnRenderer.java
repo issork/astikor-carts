@@ -1,7 +1,6 @@
 package de.mennomax.astikorcarts.client.renderer.entity;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-
 import de.mennomax.astikorcarts.entity.AbstractDrawnEntity;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
@@ -11,13 +10,13 @@ public abstract class DrawnRenderer<T extends AbstractDrawnEntity> extends Entit
 
     protected EntityModel<T> model;
 
-    protected DrawnRenderer(EntityRendererManager renderManager, EntityModel<T> modelIn) {
+    protected DrawnRenderer(final EntityRendererManager renderManager, final EntityModel<T> modelIn) {
         super(renderManager);
-        model = modelIn;
+        this.model = modelIn;
     }
 
     @Override
-    public void doRender(T entity, double x, double y, double z, float entityYaw, float partialTicks) {
+    public void doRender(final T entity, final double x, final double y, final double z, final float entityYaw, final float partialTicks) {
         GlStateManager.pushMatrix();
         this.setupTranslation(x, y, z);
         this.setupRotation(entityYaw);
@@ -38,12 +37,12 @@ public abstract class DrawnRenderer<T extends AbstractDrawnEntity> extends Entit
         super.doRender(entity, x, y, z, entityYaw, partialTicks);
     }
 
-    public void setupRotation(float entityYaw) {
+    public void setupRotation(final float entityYaw) {
         GlStateManager.rotatef(180.0F - entityYaw, 0.0F, 1.0F, 0.0F);
         GlStateManager.scalef(-1.0F, -1.0F, 1.0F);
     }
 
-    public void setupTranslation(double x, double y, double z) {
+    public void setupTranslation(final double x, final double y, final double z) {
         GlStateManager.translated(x, y + 1.0F, z);
     }
 

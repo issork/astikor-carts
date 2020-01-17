@@ -1,7 +1,5 @@
 package de.mennomax.astikorcarts.entity;
 
-import java.util.ArrayList;
-
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
 import de.mennomax.astikorcarts.init.Items;
 import de.mennomax.astikorcarts.inventory.container.CargoCartContainer;
@@ -21,11 +19,13 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.items.ItemStackHandler;
 
+import java.util.ArrayList;
+
 public class CargoCartEntity extends AbstractDrawnInventoryEntity {
 
-    private static final DataParameter<Integer> CARGO = EntityDataManager.<Integer>createKey(CargoCartEntity.class, DataSerializers.VARINT);
+    private static final DataParameter<Integer> CARGO = EntityDataManager.createKey(CargoCartEntity.class, DataSerializers.VARINT);
 
-    public CargoCartEntity(EntityType<? extends Entity> entityTypeIn, World worldIn) {
+    public CargoCartEntity(final EntityType<? extends Entity> entityTypeIn, final World worldIn) {
         super(entityTypeIn, worldIn);
     }
 
@@ -38,14 +38,14 @@ public class CargoCartEntity extends AbstractDrawnInventoryEntity {
     protected ItemStackHandler initInventory() {
         return new CartItemStackHandler<CargoCartEntity>(54, this) {
             @Override
-            protected void onContentsChanged(int slot) {
+            protected void onContentsChanged(final int slot) {
                 int tempload = 0;
                 for (int i = 0; i < this.getSlots(); i++) {
                     if (!this.getStackInSlot(i).isEmpty()) {
                         tempload++;
                     }
                 }
-                int newValue;
+                final int newValue;
                 if (tempload > 31)
                     newValue = 4;
                 else if (tempload > 16)
@@ -56,15 +56,15 @@ public class CargoCartEntity extends AbstractDrawnInventoryEntity {
                     newValue = 1;
                 else
                     newValue = 0;
-                if (CART.getDataManager().get(CARGO).intValue() != newValue) {
-                    CART.getDataManager().set(CARGO, newValue);
+                if (this.cart.getDataManager().get(CARGO).intValue() != newValue) {
+                    this.cart.getDataManager().set(CARGO, newValue);
                 }
             }
         };
     }
 
     @Override
-    public boolean processInitialInteract(PlayerEntity player, Hand hand) {
+    public boolean processInitialInteract(final PlayerEntity player, final Hand hand) {
         if (!this.world.isRemote) {
             if (player.isSneaking()) {
                 this.openContainer(player);
@@ -81,13 +81,13 @@ public class CargoCartEntity extends AbstractDrawnInventoryEntity {
     }
 
     @Override
-    public void updatePassenger(Entity passenger) {
+    public void updatePassenger(final Entity passenger) {
         if (this.isPassenger(passenger)) {
-            Vec3d vec3d = (new Vec3d(-0.68D, 0.0D, 0.0D)).rotateYaw(-this.rotationYaw * 0.017453292F - ((float) Math.PI / 2F));
+            final Vec3d vec3d = (new Vec3d(-0.68D, 0.0D, 0.0D)).rotateYaw(-this.rotationYaw * 0.017453292F - ((float) Math.PI / 2F));
             passenger.setPosition(this.posX + vec3d.x, this.posY + this.getMountedYOffset() + passenger.getYOffset(), this.posZ + vec3d.z);
             passenger.setRenderYawOffset(this.rotationYaw + 180.0F);
-            float f2 = MathHelper.wrapDegrees(passenger.rotationYaw - this.rotationYaw + 180.0F);
-            float f1 = MathHelper.clamp(f2, -105.0F, 105.0F);
+            final float f2 = MathHelper.wrapDegrees(passenger.rotationYaw - this.rotationYaw + 180.0F);
+            final float f1 = MathHelper.clamp(f2, -105.0F, 105.0F);
             passenger.prevRotationYaw += f1 - f2;
             passenger.rotationYaw += f1 - f2;
             passenger.setRotationYawHead(passenger.rotationYaw);
@@ -110,18 +110,18 @@ public class CargoCartEntity extends AbstractDrawnInventoryEntity {
     }
 
     @Override
-    protected void readAdditional(CompoundNBT compound) {
+    protected void readAdditional(final CompoundNBT compound) {
         super.readAdditional(compound);
-        dataManager.set(CARGO, compound.getInt("Cargo"));
+        this.dataManager.set(CARGO, compound.getInt("Cargo"));
     }
 
     @Override
-    protected void writeAdditional(CompoundNBT compound) {
+    protected void writeAdditional(final CompoundNBT compound) {
         super.writeAdditional(compound);
-        compound.putInt("Cargo", dataManager.get(CARGO));
+        compound.putInt("Cargo", this.dataManager.get(CARGO));
     }
 
-    public void openContainer(PlayerEntity player) {
+    public void openContainer(final PlayerEntity player) {
         player.openContainer(new SimpleNamedContainerProvider((id, inv, plyr) -> {
             return new CargoCartContainer(id, inv, this);
         }, this.getDisplayName()));

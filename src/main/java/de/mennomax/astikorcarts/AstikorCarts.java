@@ -1,9 +1,5 @@
 package de.mennomax.astikorcarts;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map.Entry;
-
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
 import de.mennomax.astikorcarts.entity.AbstractDrawnEntity;
 import de.mennomax.astikorcarts.entity.CargoCartEntity;
@@ -30,6 +26,10 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 
 @Mod(AstikorCarts.MODID)
 public class AstikorCarts {
@@ -64,7 +64,7 @@ public class AstikorCarts {
         @SubscribeEvent
         public static void openGui(final GuiOpenEvent event) {
             if (event.getGui() instanceof InventoryScreen) {
-                ClientPlayerEntity player = Minecraft.getInstance().player;
+                final ClientPlayerEntity player = Minecraft.getInstance().player;
                 if (player.getRidingEntity() instanceof CargoCartEntity) {
                     event.setCanceled(true);
                     PacketHandler.CHANNEL.sendToServer(new CPacketOpenCargoCartGui(player.getRidingEntity().getEntityId()));
@@ -97,11 +97,11 @@ public class AstikorCarts {
         }
     }
 
-    private static void tickPulled(HashMap<Entity, AbstractDrawnEntity> pullmap) {
-        Iterator<Entry<Entity, AbstractDrawnEntity>> iter = pullmap.entrySet().iterator();
+    private static void tickPulled(final HashMap<Entity, AbstractDrawnEntity> pullmap) {
+        final Iterator<Entry<Entity, AbstractDrawnEntity>> iter = pullmap.entrySet().iterator();
         while (iter.hasNext()) {
-            Entry<Entity, AbstractDrawnEntity> entry = iter.next();
-            AbstractDrawnEntity cart = entry.getValue();
+            final Entry<Entity, AbstractDrawnEntity> entry = iter.next();
+            final AbstractDrawnEntity cart = entry.getValue();
             if (cart.shouldStopPulledTick()) {
                 iter.remove();
                 continue;

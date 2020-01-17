@@ -8,15 +8,15 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class MobCartModel extends EntityModel<MobCartEntity> {
-    private RendererModel axis;
-    private RendererModel cartBase;
-    private RendererModel shaft;
-    private RendererModel boardLeft;
-    private RendererModel boardRight;
-    private RendererModel boardBack;
-    private RendererModel boardFront;
-    private RendererModel leftWheel;
-    private RendererModel rightWheel;
+    private final RendererModel axis;
+    private final RendererModel cartBase;
+    private final RendererModel shaft;
+    private final RendererModel boardLeft;
+    private final RendererModel boardRight;
+    private final RendererModel boardBack;
+    private final RendererModel boardFront;
+    private final RendererModel leftWheel;
+    private final RendererModel rightWheel;
 
     public MobCartModel() {
         this.textureWidth = 64;
@@ -57,12 +57,12 @@ public class MobCartModel extends EntityModel<MobCartEntity> {
         this.leftWheel.setRotationPoint(14.5F, 5.0F, 1.0F);
         this.leftWheel.addBox(-2.0F, -1.0F, -1.0F, 2, 2, 2);
         for (int i = 0; i < 8; i++) {
-            RendererModel rim = new RendererModel(this, 20, 38);
+            final RendererModel rim = new RendererModel(this, 20, 38);
             rim.addBox(-2.0F, -4.5F, 9.86F, 2, 9, 1);
             rim.rotateAngleX = i * (float) Math.PI / 4.0F;
             this.leftWheel.addChild(rim);
 
-            RendererModel spoke = new RendererModel(this, 20, 48);
+            final RendererModel spoke = new RendererModel(this, 20, 48);
             spoke.addBox(-1.5F, 1.0F, -0.5F, 1, 9, 1);
             spoke.rotateAngleX = i * (float) Math.PI / 4.0F;
             this.leftWheel.addChild(spoke);
@@ -74,12 +74,12 @@ public class MobCartModel extends EntityModel<MobCartEntity> {
         this.rightWheel.setRotationPoint(-14.5F, 5.0F, 1.0F);
         this.rightWheel.addBox(0.0F, -1.0F, -1.0F, 2, 2, 2);
         for (int i = 0; i < 8; i++) {
-            RendererModel rim = new RendererModel(this, 20, 38);
+            final RendererModel rim = new RendererModel(this, 20, 38);
             rim.addBox(0.0F, -4.5F, 9.86F, 2, 9, 1);
             rim.rotateAngleX = i * (float) Math.PI / 4.0F;
             this.rightWheel.addChild(rim);
 
-            RendererModel spoke = new RendererModel(this, 20, 48);
+            final RendererModel spoke = new RendererModel(this, 20, 48);
             spoke.addBox(0.5F, 1.0F, -0.5F, 1, 9, 1);
             spoke.rotateAngleX = i * (float) Math.PI / 4.0F;
             this.rightWheel.addChild(spoke);
@@ -88,7 +88,7 @@ public class MobCartModel extends EntityModel<MobCartEntity> {
     }
 
     @Override
-    public void render(MobCartEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+    public void render(final MobCartEntity entityIn, final float limbSwing, final float limbSwingAmount, final float ageInTicks, final float netHeadYaw, final float headPitch, final float scale) {
         this.setRotationAngles(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
         this.leftWheel.render(scale);
         this.rightWheel.render(scale);
@@ -102,7 +102,7 @@ public class MobCartModel extends EntityModel<MobCartEntity> {
     }
 
     @Override
-    public void setRotationAngles(MobCartEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+    public void setRotationAngles(final MobCartEntity entityIn, final float limbSwing, final float limbSwingAmount, final float ageInTicks, final float netHeadYaw, final float headPitch, final float scale) {
         this.rightWheel.rotateAngleX = (float) (entityIn.getWheelRotation(0) + entityIn.getWheelRotationIncrement(0) * limbSwing);
         this.leftWheel.rotateAngleX = (float) (entityIn.getWheelRotation(1) + entityIn.getWheelRotationIncrement(1) * limbSwing);
     }

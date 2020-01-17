@@ -1,32 +1,32 @@
 package de.mennomax.astikorcarts.network.packets;
 
-import java.util.function.Supplier;
-
 import de.mennomax.astikorcarts.entity.CargoCartEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 
+import java.util.function.Supplier;
+
 public class CPacketOpenCargoCartGui {
 
-    private int cartId;
+    private final int cartId;
 
-    public CPacketOpenCargoCartGui(int cartId) {
+    public CPacketOpenCargoCartGui(final int cartId) {
         this.cartId = cartId;
     }
 
-    public static void encode(CPacketOpenCargoCartGui packet, PacketBuffer buffer) {
+    public static void encode(final CPacketOpenCargoCartGui packet, final PacketBuffer buffer) {
         buffer.writeInt(packet.cartId);
     }
 
-    public static CPacketOpenCargoCartGui decode(PacketBuffer buffer) {
+    public static CPacketOpenCargoCartGui decode(final PacketBuffer buffer) {
         return new CPacketOpenCargoCartGui(buffer.readInt());
     }
 
-    public static void handle(CPacketOpenCargoCartGui msg, Supplier<Context> ctx) {
+    public static void handle(final CPacketOpenCargoCartGui msg, final Supplier<Context> ctx) {
         ctx.get().enqueueWork(() -> {
-            ServerPlayerEntity player = ctx.get().getSender();
-            CargoCartEntity cart = (CargoCartEntity) player.world.getEntityByID(msg.cartId);
+            final ServerPlayerEntity player = ctx.get().getSender();
+            final CargoCartEntity cart = (CargoCartEntity) player.world.getEntityByID(msg.cartId);
             cart.openContainer(player);
         });
         ctx.get().setPacketHandled(true);

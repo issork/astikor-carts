@@ -19,10 +19,10 @@ public class PacketHandler {
     private static int id = 0;
     public static final String VERSION = "1";
     public static final SimpleChannel CHANNEL = ChannelBuilder.named(new ResourceLocation(AstikorCarts.MODID, "main"))
-            .networkProtocolVersion(() -> VERSION)
-            .clientAcceptedVersions(VERSION::equals)
-            .serverAcceptedVersions(VERSION::equals)
-            .simpleChannel();
+        .networkProtocolVersion(() -> VERSION)
+        .clientAcceptedVersions(VERSION::equals)
+        .serverAcceptedVersions(VERSION::equals)
+        .simpleChannel();
 
     @SubscribeEvent
     public static void registerPackets(final FMLCommonSetupEvent event) {
