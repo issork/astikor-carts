@@ -1,0 +1,14 @@
+{
+    "cart.attached": {
+        "sounds": [
+            "minecraft:mob/horse/armor"
+        ],
+        "subtitle": "subtitles.astikorcarts.cart.attached"
+    },
+    "cart.detached": {
+        "sounds": [
+            "minecraft:random/break"
+        ],
+        "subtitle": "subtitles.astikorcarts.cart.detached"
+    }
+}

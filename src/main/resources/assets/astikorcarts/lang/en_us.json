@@ -8,5 +8,7 @@
   "entity.astikorcarts.plowcart": "Plow",
   "entity.astikorcarts.mobcart": "Transportation Cart",
   "key.categories.astikorcarts": "AstikorCarts",
-  "key.astikorcarts.desc": "Action Key"
+  "key.astikorcarts.desc": "Action Key",
+  "subtitles.astikorcarts.cart.attached": "Cart attaches",
+  "subtitles.astikorcarts.cart.detached": "Cart detaches"
 }

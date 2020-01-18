@@ -2,10 +2,10 @@ package de.mennomax.astikorcarts.entity;
 
 import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
+import de.mennomax.astikorcarts.init.Sounds;
 import de.mennomax.astikorcarts.network.PacketHandler;
 import de.mennomax.astikorcarts.network.packets.SPacketDrawnUpdate;
 import de.mennomax.astikorcarts.util.CartWheel;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -26,7 +26,6 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityPredicates;
 import net.minecraft.util.IndirectEntityDamageSource;
-import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceContext.BlockMode;
@@ -186,6 +185,9 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
                     }
                     PacketHandler.CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new SPacketDrawnUpdate(-1, this.getEntityId()));
                     this.pullingUUID = null;
+                    if (this.ticksExisted > 20) {
+                        this.playDetachSound();
+                    }
                 } else {
                     if (entityIn instanceof MobEntity) {
                         ((MobEntity) entityIn).getNavigator().clearPath();
@@ -195,6 +197,9 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
                     }
                     PacketHandler.CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new SPacketDrawnUpdate(entityIn.getEntityId(), this.getEntityId()));
                     this.pullingUUID = entityIn.getUniqueID();
+                    if (this.ticksExisted > 20) {
+                        this.playAttachSound();
+                    }
                 }
                 if (entityIn instanceof AbstractDrawnEntity) {
                     ((AbstractDrawnEntity) entityIn).drawn = this;
@@ -211,16 +216,10 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
                 for (final CartWheel wheel : this.wheels) {
                     wheel.clearIncrement();
                 }
-                if (this.ticksExisted > 20) {
-                    this.playDetachSound();
-                }
             } else {
                 this.pullingId = entityIn.getEntityId();
                 if (!(entityIn instanceof AbstractDrawnEntity)) {
                     AstikorCarts.CLIENTPULLMAP.put(entityIn, this);
-                }
-                if (this.ticksExisted > 20) {
-                    this.playAttachSound();
                 }
                 if (entityIn instanceof AbstractDrawnEntity) {
                     ((AbstractDrawnEntity) entityIn).drawn = this;
@@ -230,14 +229,12 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     private void playAttachSound() {
-        this.world.playSound(Minecraft.getInstance().player, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_HORSE_ARMOR, this.getSoundCategory(), 0.5F, 1.0F);
+        this.world.playSound(null, this.posX, this.posY, this.posZ, Sounds.CART_ATTACHED, this.getSoundCategory(), 0.2F, 1.0F);
     }
 
-    @OnlyIn(Dist.CLIENT)
     private void playDetachSound() {
-        this.world.playSound(Minecraft.getInstance().player, this.posX, this.posY, this.posZ, SoundEvents.ENTITY_ITEM_BREAK, this.getSoundCategory(), 0.5F, 0.1F);
+        this.world.playSound(null, this.posX, this.posY, this.posZ, Sounds.CART_DETACHED, this.getSoundCategory(), 0.2F, 0.1F);
     }
 
     /**
