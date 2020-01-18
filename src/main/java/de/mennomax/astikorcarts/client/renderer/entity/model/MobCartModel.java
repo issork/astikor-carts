@@ -18,44 +18,45 @@ public class MobCartModel extends EntityModel<MobCartEntity> {
     private final RendererModel boardFront;
     private final RendererModel leftWheel;
     private final RendererModel rightWheel;
+    private final RendererModel body;
 
     public MobCartModel() {
         this.textureWidth = 64;
         this.textureHeight = 64;
 
         this.axis = new RendererModel(this, 0, 21);
-        this.axis.addBox(-12.5F, 4.0F, 0.0F, 25, 2, 2);
+        this.axis.addBox(-12.5F, -1.0F, -1.0F, 25, 2, 2);
 
         this.cartBase = new RendererModel(this, 0, 0);
-        this.cartBase.addBox(-14.5F, -10.0F, 3.0F, 29, 20, 1);
-        this.cartBase.rotateAngleX = -1.570796F;
-        this.cartBase.rotateAngleY = -1.570796F;
+        this.cartBase.addBox(-15.5F, -10.0F, -2.0F, 29, 20, 1);
+        this.cartBase.rotateAngleX = (float) -Math.PI / 2.0F;
+        this.cartBase.rotateAngleY = (float) -Math.PI / 2.0F;
 
         this.shaft = new RendererModel(this, 0, 25);
-        this.shaft.setRotationPoint(0.0F, 0.0F, -14.0F);
+        this.shaft.setRotationPoint(0.0F, -5.0F, -15.0F);
         this.shaft.rotateAngleY = (float) Math.PI / 2.0F;
         this.shaft.addBox(0.0F, -0.5F, -8.0F, 20, 2, 1);
         this.shaft.addBox(0.0F, -0.5F, 7.0F, 20, 2, 1);
 
         this.boardLeft = new RendererModel(this, 0, 28);
-        this.boardLeft.addBox(-5F, -15.5F, 9F, 8, 31, 2);
-        this.boardLeft.rotateAngleX = -1.570796F;
-        this.boardLeft.rotateAngleZ = 1.570796F;
+        this.boardLeft.addBox(-10.0F, -14.5F, 9F, 8, 31, 2);
+        this.boardLeft.rotateAngleX = (float) -Math.PI / 2.0F;
+        this.boardLeft.rotateAngleZ = (float) Math.PI / 2.0F;
 
         this.boardRight = new RendererModel(this, 0, 28);
-        this.boardRight.addBox(-5F, -15.5F, -11F, 8, 31, 2);
-        this.boardRight.rotateAngleX = -1.570796F;
-        this.boardRight.rotateAngleZ = 1.570796F;
+        this.boardRight.addBox(-10.0F, -14.5F, -11F, 8, 31, 2);
+        this.boardRight.rotateAngleX = (float) -Math.PI / 2.0F;
+        this.boardRight.rotateAngleZ = (float) Math.PI / 2.0F;
 
         this.boardBack = new RendererModel(this, 20, 28);
-        this.boardBack.addBox(-9F, -5F, 13.5F, 18, 8, 2);
+        this.boardBack.addBox(-9F, -10.0F, 12.5F, 18, 8, 2);
 
         this.boardFront = new RendererModel(this, 20, 28);
-        this.boardFront.addBox(-9F, -5F, -15.5F, 18, 8, 2);
+        this.boardFront.addBox(-9F, -10.0F, -16.5F, 18, 8, 2);
 
         // --LEFT-WHEEL----------------------------------
         this.leftWheel = new RendererModel(this, 52, 21);
-        this.leftWheel.setRotationPoint(14.5F, 5.0F, 1.0F);
+        this.leftWheel.setRotationPoint(14.5F, -11.0F, 1.0F);
         this.leftWheel.addBox(-2.0F, -1.0F, -1.0F, 2, 2, 2);
         for (int i = 0; i < 8; i++) {
             final RendererModel rim = new RendererModel(this, 20, 38);
@@ -72,7 +73,7 @@ public class MobCartModel extends EntityModel<MobCartEntity> {
         // --RIGHT-WHEEL---------------------------------
         this.rightWheel = new RendererModel(this, 52, 21);
         this.rightWheel.mirror = true;
-        this.rightWheel.setRotationPoint(-14.5F, 5.0F, 1.0F);
+        this.rightWheel.setRotationPoint(-14.5F, -11.0F, 1.0F);
         this.rightWheel.addBox(0.0F, -1.0F, -1.0F, 2, 2, 2);
         for (int i = 0; i < 8; i++) {
             final RendererModel rim = new RendererModel(this, 20, 38);
@@ -86,24 +87,28 @@ public class MobCartModel extends EntityModel<MobCartEntity> {
             this.rightWheel.addChild(spoke);
         }
 
+        this.body = new RendererModel(this);
+        this.body.addChild(this.axis);
+        this.body.addChild(this.cartBase);
+        this.body.addChild(this.shaft);
+        this.body.addChild(this.boardLeft);
+        this.body.addChild(this.boardRight);
+        this.body.addChild(this.boardBack);
+        this.body.addChild(this.boardFront);
+        this.body.setRotationPoint(0.0F, -11.0F, 1.0F);
     }
 
     @Override
-    public void render(final MobCartEntity entityIn, final float limbSwing, final float limbSwingAmount, final float ageInTicks, final float netHeadYaw, final float headPitch, final float scale) {
-        this.setRotationAngles(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+    public void render(final MobCartEntity entityIn, final float delta, final float limbSwingAmount, final float ageInTicks, final float netHeadYaw, final float pitch, final float scale) {
+        this.setRotationAngles(entityIn, delta, limbSwingAmount, ageInTicks, netHeadYaw, pitch, scale);
         this.rightWheel.render(scale);
         this.leftWheel.render(scale);
-        this.axis.render(scale);
-        this.cartBase.render(scale);
-        this.shaft.render(scale);
-        this.boardLeft.render(scale);
-        this.boardRight.render(scale);
-        this.boardBack.render(scale);
-        this.boardFront.render(scale);
+        this.body.render(scale);
     }
 
     @Override
-    public void setRotationAngles(final MobCartEntity entity, final float delta, final float limbSwingAmount, final float ageInTicks, final float netHeadYaw, final float headPitch, final float scale) {
+    public void setRotationAngles(final MobCartEntity entity, final float delta, final float limbSwingAmount, final float ageInTicks, final float netHeadYaw, final float pitch, final float scale) {
+        this.body.rotateAngleX = (float) Math.toRadians(pitch);
         this.rightWheel.rotateAngleX = (float) (entity.getWheelRotation(0) + entity.getWheelRotationIncrement(0) * delta);
         this.leftWheel.rotateAngleX = (float) (entity.getWheelRotation(1) + entity.getWheelRotationIncrement(1) * delta);
         final float time = entity.getTimeSinceHit() - delta;

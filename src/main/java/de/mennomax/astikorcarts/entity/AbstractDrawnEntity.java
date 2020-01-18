@@ -59,6 +59,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     private double lerpY;
     private double lerpZ;
     private double lerpYaw;
+    private double lerpPitch;
     protected boolean pullingOnGroundLastTick;
     protected List<CartWheel> wheels;
     private int pullingId = -1;
@@ -88,6 +89,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         super.tick();
         this.tickLerp();
         if (this.pulling == null) {
+            this.rotationPitch = 25.0F;
             this.move(MoverType.SELF, this.getMotion());
             this.attemptReattach();
         }
@@ -103,8 +105,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
      * when being pulled. (unless this cart is being pulled by another cart)
      */
     public void pulledTick() {
-        this.rotationPitch = 0.0F;
-        Vec3d targetVec = this.getRelativeTargetVec();
+        Vec3d targetVec = this.getRelativeTargetVec(1.0F);
         this.handleRotation(targetVec);
         final double dRotation = this.prevRotationYaw - this.rotationYaw;
         if (dRotation < -180.0D) {
@@ -129,7 +130,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
                 wheel.tick(lookX, lookZ);
             }
         } else {
-            targetVec = this.getRelativeTargetVec();
+            targetVec = this.getRelativeTargetVec(1.0F);
             if (Math.sqrt(targetVec.x * targetVec.x + targetVec.z * targetVec.z) > this.spacing + 0.5) {
                 this.setPulling(null);
             }
@@ -276,18 +277,37 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     /**
      * @return The position this cart should always face and travel towards.
      * Relative to the cart position.
+     * @param delta
      */
-    public Vec3d getRelativeTargetVec() {
-        return new Vec3d(this.pulling.posX - this.posX, this.pulling.posY - this.posY, this.pulling.posZ - this.posZ);
+    public Vec3d getRelativeTargetVec(final float delta) {
+        if (delta == 1.0F) {
+            return new Vec3d(this.pulling.posX - this.posX, this.pulling.posY - this.posY, this.pulling.posZ - this.posZ);
+        }
+        final double px = MathHelper.lerp(delta, this.pulling.lastTickPosX, this.pulling.posX);
+        final double py = MathHelper.lerp(delta, this.pulling.lastTickPosY, this.pulling.posY);
+        final double pz = MathHelper.lerp(delta, this.pulling.lastTickPosZ, this.pulling.posZ);
+        final double x = MathHelper.lerp(delta, this.lastTickPosX, this.posX);
+        final double y = MathHelper.lerp(delta, this.lastTickPosY, this.posY);
+        final double z = MathHelper.lerp(delta, this.lastTickPosZ, this.posZ);
+        return new Vec3d(px - x, py - y, pz - z);
     }
 
     /**
      * Handles the rotation of this cart and its components.
      *
-     * @param targetVecIn
+     * @param target
      */
-    public void handleRotation(final Vec3d targetVecIn) {
-        this.rotationYaw = (float) Math.toDegrees(-Math.atan2(targetVecIn.x, targetVecIn.z));
+    public void handleRotation(final Vec3d target) {
+        this.rotationYaw = getYaw(target);
+        this.rotationPitch = getPitch(target);
+    }
+
+    public static float getYaw(final Vec3d vec) {
+        return MathHelper.wrapDegrees((float) Math.toDegrees(-MathHelper.atan2(vec.x, vec.z)));
+    }
+
+    public static float getPitch(final Vec3d vec) {
+        return MathHelper.wrapDegrees((float) Math.toDegrees(-MathHelper.atan2(vec.y, MathHelper.sqrt(vec.x * vec.x + vec.z * vec.z))));
     }
 
     public double getWheelRotation(final int wheel) {
@@ -372,13 +392,13 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
 
     private void tickLerp() {
         if (this.lerpSteps > 0) {
-            final double dx = this.posX + (this.lerpX - this.posX) / this.lerpSteps;
-            final double dy = this.posY + (this.lerpY - this.posY) / this.lerpSteps;
-            final double dz = this.posZ + (this.lerpZ - this.posZ) / this.lerpSteps;
-            final double drot = MathHelper.wrapDegrees(this.lerpYaw - this.rotationYaw);
-            this.rotationYaw = (float) (this.rotationYaw + drot / this.lerpSteps);
-            --this.lerpSteps;
-            this.setPosition(dx, dy, dz);
+            final double dx = (this.lerpX - this.posX) / this.lerpSteps;
+            final double dy = (this.lerpY - this.posY) / this.lerpSteps;
+            final double dz = (this.lerpZ - this.posZ) / this.lerpSteps;
+            this.rotationYaw = (float) (this.rotationYaw + MathHelper.wrapDegrees(this.lerpYaw - this.rotationYaw) / this.lerpSteps);
+            this.rotationPitch = (float) (this.rotationPitch + (this.lerpPitch - this.rotationPitch) / this.lerpSteps);
+            this.lerpSteps--;
+            this.move(MoverType.SELF, new Vec3d(dx, dy, dz));
             this.setRotation(this.rotationYaw, this.rotationPitch);
         }
     }
@@ -400,7 +420,8 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         this.lerpY = y;
         this.lerpZ = z;
         this.lerpYaw = yaw;
-        this.lerpSteps = posRotationIncrements;
+        this.lerpPitch = pitch;
+        this.lerpSteps = teleport ? 1 : this.pulling == null ? 3 : 20;
     }
 
     @Override
@@ -412,6 +433,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             this.posY = this.lerpY;
             this.posZ = this.lerpZ;
             this.rotationYaw = (float) this.lerpYaw;
+            this.rotationPitch = (float) this.lerpPitch;
         }
     }
 
@@ -483,6 +505,54 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     @Override
     public IPacket<?> createSpawnPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);
+    }
+
+    public RenderInfo getInfo(final float delta) {
+        return new RenderInfo(delta);
+    }
+
+    public class RenderInfo {
+        final float delta;
+        Vec3d target;
+        float yaw = Float.NaN;
+        float pitch = Float.NaN;
+
+        public RenderInfo(final float delta) {
+            this.delta = delta;
+        }
+
+        public Vec3d getTarget() {
+            if (this.target == null) {
+                if (AbstractDrawnEntity.this.pulling == null) {
+                    this.target = AbstractDrawnEntity.this.getLook(this.delta);
+                } else {
+                    this.target = AbstractDrawnEntity.this.getRelativeTargetVec(this.delta);
+                }
+            }
+            return this.target;
+        }
+
+        public float getYaw() {
+            if (Float.isNaN(this.yaw)) {
+                if (AbstractDrawnEntity.this.pulling == null) {
+                    this.yaw = MathHelper.lerp(this.delta, AbstractDrawnEntity.this.prevRotationYaw, AbstractDrawnEntity.this.rotationYaw);
+                } else {
+                    this.yaw = AbstractDrawnEntity.getYaw(this.getTarget());
+                }
+            }
+            return this.yaw;
+        }
+
+        public float getPitch() {
+            if (Float.isNaN(this.pitch)) {
+                if (AbstractDrawnEntity.this.pulling == null) {
+                    this.pitch = MathHelper.lerp(this.delta, AbstractDrawnEntity.this.prevRotationPitch, AbstractDrawnEntity.this.rotationPitch);
+                } else {
+                    this.pitch = AbstractDrawnEntity.getPitch(this.target);
+                }
+            }
+            return this.pitch;
+        }
     }
 
 }
