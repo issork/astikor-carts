@@ -3,6 +3,7 @@ package de.mennomax.astikorcarts.client.renderer.entity.model;
 import de.mennomax.astikorcarts.entity.MobCartEntity;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.entity.model.RendererModel;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -90,8 +91,8 @@ public class MobCartModel extends EntityModel<MobCartEntity> {
     @Override
     public void render(final MobCartEntity entityIn, final float limbSwing, final float limbSwingAmount, final float ageInTicks, final float netHeadYaw, final float headPitch, final float scale) {
         this.setRotationAngles(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
-        this.leftWheel.render(scale);
         this.rightWheel.render(scale);
+        this.leftWheel.render(scale);
         this.axis.render(scale);
         this.cartBase.render(scale);
         this.shaft.render(scale);
@@ -102,8 +103,18 @@ public class MobCartModel extends EntityModel<MobCartEntity> {
     }
 
     @Override
-    public void setRotationAngles(final MobCartEntity entityIn, final float limbSwing, final float limbSwingAmount, final float ageInTicks, final float netHeadYaw, final float headPitch, final float scale) {
-        this.rightWheel.rotateAngleX = (float) (entityIn.getWheelRotation(0) + entityIn.getWheelRotationIncrement(0) * limbSwing);
-        this.leftWheel.rotateAngleX = (float) (entityIn.getWheelRotation(1) + entityIn.getWheelRotationIncrement(1) * limbSwing);
+    public void setRotationAngles(final MobCartEntity entity, final float delta, final float limbSwingAmount, final float ageInTicks, final float netHeadYaw, final float headPitch, final float scale) {
+        this.rightWheel.rotateAngleX = (float) (entity.getWheelRotation(0) + entity.getWheelRotationIncrement(0) * delta);
+        this.leftWheel.rotateAngleX = (float) (entity.getWheelRotation(1) + entity.getWheelRotationIncrement(1) * delta);
+        final float time = entity.getTimeSinceHit() - delta;
+        final float rot;
+        if (time > 0.0F) {
+            final float damage = Math.max(entity.getDamageTaken() - delta, 0.0F);
+            rot = (float) Math.toRadians(MathHelper.sin(time) * time * damage / 40.0F * -entity.getForwardDirection());
+        } else {
+            rot = 0.0F;
+        }
+        this.rightWheel.rotateAngleZ = rot;
+        this.leftWheel.rotateAngleZ = rot;
     }
 }

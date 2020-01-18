@@ -51,9 +51,10 @@ import java.util.UUID;
 public abstract class AbstractDrawnEntity extends Entity implements IEntityAdditionalSpawnData {
 
     private static final DataParameter<Integer> TIME_SINCE_HIT = EntityDataManager.createKey(AbstractDrawnEntity.class, DataSerializers.VARINT);
+    private static final DataParameter<Integer> FORWARD_DIRECTION = EntityDataManager.createKey(AbstractDrawnEntity.class, DataSerializers.VARINT);
     private static final DataParameter<Float> DAMAGE_TAKEN = EntityDataManager.createKey(AbstractDrawnEntity.class, DataSerializers.FLOAT);
     public static final UUID PULL_SLOWLY_MODIFIER_UUID = UUID.fromString("49B0E52E-48F2-4D89-BED7-4F5DF26F1263");
-    public static final AttributeModifier PULL_SLOWLY_MODIFIER = (new AttributeModifier(PULL_SLOWLY_MODIFIER_UUID, "Pull slowly modifier", AstikorCartsConfig.COMMON.speedModifier.get().doubleValue(), Operation.MULTIPLY_TOTAL)).setSaved(false);
+    public static final AttributeModifier PULL_SLOWLY_MODIFIER = (new AttributeModifier(PULL_SLOWLY_MODIFIER_UUID, "Pull slowly modifier", AstikorCartsConfig.COMMON.speedModifier.get(), Operation.MULTIPLY_TOTAL)).setSaved(false);
     private int lerpSteps;
     private double lerpX;
     private double lerpY;
@@ -330,6 +331,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             if (source instanceof IndirectEntityDamageSource && source.getTrueSource() != null && this.isPassenger(source.getTrueSource())) {
                 return false;
             } else {
+                this.setForwardDirection(-this.getForwardDirection());
                 this.setTimeSinceHit(10);
                 this.setDamageTaken(this.getDamageTaken() + amount * 10.0F);
                 final boolean flag = source.getTrueSource() instanceof PlayerEntity && ((PlayerEntity) source.getTrueSource()).abilities.isCreativeMode;
@@ -437,6 +439,14 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         return this.dataManager.get(TIME_SINCE_HIT);
     }
 
+    public void setForwardDirection(final int forwardDirection) {
+        this.dataManager.set(FORWARD_DIRECTION, forwardDirection);
+    }
+
+    public int getForwardDirection() {
+        return this.dataManager.get(FORWARD_DIRECTION);
+    }
+
     @Override
     public ItemStack getPickedResult(final RayTraceResult target) {
         return new ItemStack(this.getCartItem());
@@ -455,6 +465,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     @Override
     protected void registerData() {
         this.dataManager.register(TIME_SINCE_HIT, 0);
+        this.dataManager.register(FORWARD_DIRECTION, 1);
         this.dataManager.register(DAMAGE_TAKEN, 0.0F);
     }
 
