@@ -360,21 +360,19 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             }
             if (source instanceof IndirectEntityDamageSource && source.getTrueSource() != null && this.isPassenger(source.getTrueSource())) {
                 return false;
-            } else {
-                this.setForwardDirection(-this.getForwardDirection());
-                this.setTimeSinceHit(10);
-                this.setDamageTaken(this.getDamageTaken() + amount * 10.0F);
-                final boolean flag = source.getTrueSource() instanceof PlayerEntity && ((PlayerEntity) source.getTrueSource()).abilities.isCreativeMode;
-                if (flag || this.getDamageTaken() > 40.0F) {
-                    this.onDestroyed(source, flag);
-                    this.setPulling(null);
-                    this.remove();
-                }
-
-                return true;
             }
+            this.setForwardDirection(-this.getForwardDirection());
+            this.setTimeSinceHit(10);
+            this.setDamageTaken(this.getDamageTaken() + amount * 10.0F);
+            final boolean flag = source.getTrueSource() instanceof PlayerEntity && ((PlayerEntity) source.getTrueSource()).abilities.isCreativeMode;
+            if (flag || this.getDamageTaken() > 40.0F) {
+                this.onDestroyed(source, flag);
+                this.setPulling(null);
+                this.remove();
+            }
+            return true;
         }
-        return true;
+        return false;
     }
 
     /**
