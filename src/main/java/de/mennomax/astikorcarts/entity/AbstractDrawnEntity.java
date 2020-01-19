@@ -355,6 +355,9 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         if (this.isInvulnerableTo(source)) {
             return false;
         } else if (!this.world.isRemote && this.isAlive()) {
+            if (source == DamageSource.CACTUS) {
+                return false;
+            }
             if (source instanceof IndirectEntityDamageSource && source.getTrueSource() != null && this.isPassenger(source.getTrueSource())) {
                 return false;
             } else {
