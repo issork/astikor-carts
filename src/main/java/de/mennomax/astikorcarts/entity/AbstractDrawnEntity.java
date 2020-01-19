@@ -165,9 +165,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             final Vec3d start = new Vec3d(this.posX, this.posY + this.getHeight(), this.posZ);
             final Vec3d end = new Vec3d(this.pulling.posX, this.pulling.posY + this.getHeight() / 2, this.pulling.posZ);
             final RayTraceResult result = this.world.rayTraceBlocks(new RayTraceContext(start, end, BlockMode.COLLIDER, FluidMode.NONE, this));
-            if (result != null) {
-                return result.getType() == Type.BLOCK;
-            }
+            return result.getType() == Type.BLOCK;
         }
         return false;
     }
