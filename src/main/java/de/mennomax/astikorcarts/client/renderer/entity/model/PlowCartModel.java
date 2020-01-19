@@ -1,10 +1,9 @@
 package de.mennomax.astikorcarts.client.renderer.entity.model;
 
 import de.mennomax.astikorcarts.entity.PlowCartEntity;
-import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.entity.model.RendererModel;
 
-public class PlowCartModel extends EntityModel<PlowCartEntity> {
+public class PlowCartModel extends CartModel<PlowCartEntity> {
     private final RendererModel axis;
     private final RendererModel[] triangle = new RendererModel[3];
     private final RendererModel shaft;
@@ -13,18 +12,15 @@ public class PlowCartModel extends EntityModel<PlowCartEntity> {
     private final RendererModel[] plowShaftLower = new RendererModel[3];
     private final RendererModel plowHandle;
     private final RendererModel plowHandleGrip;
-    private final RendererModel leftWheel;
-    private final RendererModel rightWheel;
-    private final RendererModel body;
     private final RendererModel parts;
     private final RendererModel shafts;
 
     public PlowCartModel() {
-        // --AXIS--------------------------------------
+        super(64, 64);
+
         this.axis = new RendererModel(this, 0, 0);
         this.axis.addBox(-12.5F, -1.0F, -1.0F, 25, 2, 2);
 
-        // --BOTTOM-BOARD--------------------------------------
         this.triangle[0] = new RendererModel(this, 0, 4);
         this.triangle[0].addBox(-7.5F, -9.0F, 0.0F, 15, 2, 2);
 
@@ -37,7 +33,6 @@ public class PlowCartModel extends EntityModel<PlowCartEntity> {
         this.triangle[2].rotateAngleZ = 0.175F;
         this.triangle[2].mirror = true;
 
-        // --Horse shafts--------------------------------------
         this.shaft = new RendererModel(this, 0, 8);
         this.shaft.rotateAngleZ = -0.07F;
         this.shaft.addBox(0.0F, 0.0F, -8.0F, 20, 2, 1);
@@ -54,7 +49,6 @@ public class PlowCartModel extends EntityModel<PlowCartEntity> {
         this.shafts.addChild(this.shaft);
         this.shafts.addChild(this.shaftConnector);
 
-        // --PLOW-SHAFT---------------------------------
         for (int i = 0; i < this.plowShaftUpper.length; i++) {
             this.plowShaftUpper[i] = new RendererModel(this, 56, 0);
             this.plowShaftUpper[i].addBox(-1.0F, -2.0F, -2.0F, 2, 30, 2);
@@ -80,39 +74,6 @@ public class PlowCartModel extends EntityModel<PlowCartEntity> {
         this.plowHandleGrip.rotateAngleX = (float) Math.PI / 4.0F;
         this.plowShaftUpper[1].addChild(this.plowHandleGrip);
 
-        // --LEFT-WHEEL----------------------------------
-        this.leftWheel = new RendererModel(this, 34, 4);
-        this.leftWheel.setRotationPoint(14.5F, -11.0F, 1.0F);
-        this.leftWheel.addBox(-2.0F, -1.0F, -1.0F, 2, 2, 2);
-        for (int i = 0; i < 8; i++) {
-            final RendererModel rim = new RendererModel(this, 8, 11);
-            rim.addBox(-2.0F, -4.5F, 9.86F, 2, 9, 1);
-            rim.rotateAngleX = i * (float) Math.PI / 4.0F;
-            this.leftWheel.addChild(rim);
-
-            final RendererModel spoke = new RendererModel(this, 14, 11);
-            spoke.addBox(-1.5F, 1.0F, -0.5F, 1, 9, 1);
-            spoke.rotateAngleX = i * (float) Math.PI / 4.0F;
-            this.leftWheel.addChild(spoke);
-        }
-
-        // --RIGHT-WHEEL---------------------------------
-        this.rightWheel = new RendererModel(this, 34, 4);
-        this.rightWheel.mirror = true;
-        this.rightWheel.setRotationPoint(-14.5F, -11.0F, 1.0F);
-        this.rightWheel.addBox(0.0F, -1.0F, -1.0F, 2, 2, 2);
-        for (int i = 0; i < 8; i++) {
-            final RendererModel rim = new RendererModel(this, 8, 11);
-            rim.addBox(0.0F, -4.5F, 9.86F, 2, 9, 1);
-            rim.rotateAngleX = i * (float) Math.PI / 4.0F;
-            this.rightWheel.addChild(rim);
-
-            final RendererModel spoke = new RendererModel(this, 14, 11);
-            spoke.addBox(0.5F, 1.0F, -0.5F, 1, 9, 1);
-            spoke.rotateAngleX = i * (float) Math.PI / 4.0F;
-            this.rightWheel.addChild(spoke);
-        }
-
         this.parts = new RendererModel(this);
         this.parts.setRotationPoint(0.0F, -5.0F, -1.0F);
         this.parts.addChild(this.shafts);
@@ -122,8 +83,6 @@ public class PlowCartModel extends EntityModel<PlowCartEntity> {
         this.parts.addChild(this.plowShaftUpper[0]);
         this.parts.addChild(this.plowShaftUpper[1]);
         this.parts.addChild(this.plowShaftUpper[2]);
-        this.body = new RendererModel(this);
-        this.body.setRotationPoint(0.0F, -11.0F, 1.0F);
         this.body.addChild(this.axis);
         this.body.addChild(this.parts);
     }
@@ -137,26 +96,10 @@ public class PlowCartModel extends EntityModel<PlowCartEntity> {
     }
 
     @Override
-    public void render(final PlowCartEntity entityIn, final float delta, final float limbSwingAmount, final float ageInTicks, final float netHeadYaw, final float headPitch, final float scale) {
-        this.setRotationAngles(entityIn, delta, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
-        if (entityIn.getPlowing()) {
-            for (final RendererModel renderer : this.plowShaftUpper) {
-                renderer.rotateAngleX = (float) Math.PI / 4.0F;
-            }
-        } else {
-            for (final RendererModel renderer : this.plowShaftUpper) {
-                renderer.rotateAngleX = (float) Math.PI / 2.5F;
-            }
+    public void render(final PlowCartEntity entity, final float delta, final float limbSwingAmount, final float ageInTicks, final float netHeadYaw, final float pitch, final float scale) {
+        for (final RendererModel renderer : this.plowShaftUpper) {
+            renderer.rotateAngleX = entity.getPlowing() ? (float) Math.PI / 4.0F : (float) Math.PI / 2.5F;
         }
-        this.leftWheel.render(scale);
-        this.rightWheel.render(scale);
-        this.body.render(scale);
-    }
-
-    @Override
-    public void setRotationAngles(final PlowCartEntity entityIn, final float delta, final float limbSwingAmount, final float ageInTicks, final float netHeadYaw, final float pitch, final float scale) {
-        this.body.rotateAngleX = (float) Math.toRadians(pitch);
-        this.rightWheel.rotateAngleX = (float) (entityIn.getWheelRotation(0) + entityIn.getWheelRotationIncrement(0) * delta);
-        this.leftWheel.rotateAngleX = (float) (entityIn.getWheelRotation(1) + entityIn.getWheelRotationIncrement(1) * delta);
+        super.render(entity, delta, limbSwingAmount, ageInTicks, netHeadYaw, pitch, scale);
     }
 }

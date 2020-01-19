@@ -53,7 +53,7 @@ public abstract class DrawnRenderer<T extends AbstractDrawnEntity, M extends Ent
             final float angle = MathHelper.sin(time) * time * damage / 60.0F;
             GlStateManager.rotatef(angle * entity.getForwardDirection(), 0.0F, 0.0F, 1.0F);
             GlStateManager.translated(0.0D, -center, 0.0D);
-            GlStateManager.translated(0.0D, angle / 16.0F, 0.0D);
+            GlStateManager.translated(0.0D, angle / 32.0F, 0.0D);
         }
         GlStateManager.scalef(-1.0F, -1.0F, 1.0F);
     }
