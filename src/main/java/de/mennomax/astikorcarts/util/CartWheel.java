@@ -34,18 +34,21 @@ public class CartWheel {
         this(cartIn, offsetX, 0.0F, (float) (10 * Math.PI * 2 / 16));
     }
 
-    public void tick(final double lookX, final double lookZ) {
+    public void tick() {
         this.rotation += this.rotationIncrement;
         this.prevPosX = this.posX;
         this.prevPosZ = this.posZ;
-        this.posX = this.cart.posX + lookX * this.offsetZ + MathHelper.sin((float) Math.toRadians(this.cart.rotationYaw - 90)) * this.offsetX;
-        this.posZ = this.cart.posZ + lookZ * this.offsetZ - MathHelper.cos((float) Math.toRadians(this.cart.rotationYaw - 90)) * this.offsetX;
+        final float yaw = (float) Math.toRadians(this.cart.rotationYaw);
+        final float nx = -MathHelper.sin(yaw);
+        final float nz = MathHelper.cos(yaw);
+        this.posX = this.cart.posX + nx * this.offsetZ - nz * this.offsetX;
+        this.posZ = this.cart.posZ + nz * this.offsetZ + nx * this.offsetX;
         final double dx = this.posX - this.prevPosX;
         final double dz = this.posZ - this.prevPosZ;
         final float distanceTravelled = (float) Math.sqrt(dx * dx + dz * dz);
         final double dxNormalized = dx / distanceTravelled;
         final double dzNormalized = dz / distanceTravelled;
-        final boolean travelledForward = Math.sqrt((dxNormalized - lookX) * (dxNormalized - lookX) + (dzNormalized - lookZ) * (dzNormalized - lookZ)) < 1;
+        final float travelledForward = MathHelper.signum(dxNormalized * nx + dzNormalized * nz);
         if (distanceTravelled > 0.2) {
             final BlockPos blockpos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.cart.posY - 0.2F), MathHelper.floor(this.posZ));
             final BlockState blockstate = this.cart.world.getBlockState(blockpos);
@@ -55,7 +58,7 @@ public class CartWheel {
                 }
             }
         }
-        this.rotationIncrement = (travelledForward ? distanceTravelled : -distanceTravelled) * this.circumference * 0.2F;
+        this.rotationIncrement = travelledForward * distanceTravelled * this.circumference * 0.2F;
     }
 
     public void clearIncrement() {

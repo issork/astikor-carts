@@ -120,25 +120,30 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         } else if (dRotation >= 180.0D) {
             this.prevRotationYaw -= 360.0F;
         }
-        final double targetVecLength = Math.sqrt(targetVec.x * targetVec.x + targetVec.z * targetVec.z);
-        final double lookX = targetVec.x / targetVecLength;
-        final double lookZ = targetVec.z / targetVecLength;
-        final double moveX = targetVec.x - lookX * this.spacing;
-        final double moveZ = targetVec.z - lookZ * this.spacing;
-        this.fallDistance = this.pulling.fallDistance;
-        if ((!this.pulling.onGround && this.fallDistance == 0.0F && !this.pullingOnGroundLastTick)) {
-            this.setMotion(moveX, targetVec.y, moveZ);
+        if (this.pulling.onGround) {
+            targetVec = new Vec3d(targetVec.x, 0.0D, targetVec.z);
         }
-        this.pullingOnGroundLastTick = this.pulling.onGround;
-        this.setMotion(moveX, this.getMotion().y, moveZ);
-        this.move(MoverType.SELF, this.getMotion());
+        final double targetVecLength = targetVec.length();
+        final double r = 0.2D;
+        final double diff = targetVecLength - this.spacing;
+        final Vec3d move;
+        if (Math.abs(diff) < r) {
+            move = this.getMotion();
+        } else {
+            move = this.getMotion().add(targetVec.subtract(targetVec.normalize().scale(this.spacing + r * Math.signum(diff))));
+        }
+        this.onGround = true;
+        this.move(MoverType.SELF, move);
+        if (!this.isAlive()) {
+            return;
+        }
         if (this.world.isRemote) {
             for (final CartWheel wheel : this.wheels) {
-                wheel.tick(lookX, lookZ);
+                wheel.tick();
             }
         } else {
             targetVec = this.getRelativeTargetVec(1.0F);
-            if (Math.sqrt(targetVec.x * targetVec.x + targetVec.z * targetVec.z) > this.spacing + 0.5) {
+            if (targetVec.length() > this.spacing + 1.0D) {
                 this.setPulling(null);
             }
         }
@@ -405,6 +410,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             this.rotationYaw = (float) (this.rotationYaw + MathHelper.wrapDegrees(this.lerpYaw - this.rotationYaw) / this.lerpSteps);
             this.rotationPitch = (float) (this.rotationPitch + (this.lerpPitch - this.rotationPitch) / this.lerpSteps);
             this.lerpSteps--;
+            this.onGround = true;
             this.move(MoverType.SELF, new Vec3d(dx, dy, dz));
             this.setRotation(this.rotationYaw, this.rotationPitch);
         }
@@ -428,7 +434,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         this.lerpZ = z;
         this.lerpYaw = yaw;
         this.lerpPitch = pitch;
-        this.lerpSteps = teleport ? 1 : this.pulling == null ? 3 : 20;
+        this.lerpSteps = teleport ? 1 : this.pulling == null ? 3 : 10;
     }
 
     @Override
