@@ -56,9 +56,7 @@ public class CargoCartEntity extends AbstractDrawnInventoryEntity {
                     newValue = 1;
                 else
                     newValue = 0;
-                if (this.cart.getDataManager().get(CARGO) != newValue) {
-                    this.cart.getDataManager().set(CARGO, newValue);
-                }
+                this.cart.getDataManager().set(CARGO, newValue);
             }
         };
     }
