@@ -6,14 +6,14 @@ import de.mennomax.astikorcarts.client.renderer.entity.model.PlowCartModel;
 import de.mennomax.astikorcarts.entity.PlowCartEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.model.RendererModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
 
 @SuppressWarnings("deprecation")
-public class PlowCartRenderer extends DrawnRenderer<PlowCartEntity> {
+public class PlowCartRenderer extends DrawnRenderer<PlowCartEntity, PlowCartModel> {
     private static final ResourceLocation TEXTURE = new ResourceLocation(AstikorCarts.MODID, "textures/entity/plowcart.png");
 
     public PlowCartRenderer(final EntityRendererManager renderManager) {
@@ -27,29 +27,36 @@ public class PlowCartRenderer extends DrawnRenderer<PlowCartEntity> {
     }
 
     @Override
-    public void doRender(final PlowCartEntity entity, final double x, final double y, final double z, final float yaw, final float delta) {
-        super.doRender(entity, x, y, z, yaw, delta);
-        // Render the items on the plow
+    protected void renderContents(final PlowCartEntity entity, final float delta) {
+        super.renderContents(entity, delta);
         for (int i = 0; i < entity.inventory.getSlots(); i++) {
-            GlStateManager.pushMatrix();
-            final double offsetSides = 0.1D * ((i + 1) & 1);
-            if (entity.getPlowing()) {
-                GlStateManager.translated(x + (1.45D + offsetSides) * MathHelper.sin((-36.0F + yaw + i * 36.0F) * 0.017453292F), y + 0.10D, z - (1.45D + offsetSides) * MathHelper.cos((-36.0F + yaw + i * 36.0F) * 0.017453292F));
-                GlStateManager.rotatef(120.0F - yaw - 30.0F * i, 0.0F, 1.0F, 0.0F);
-                GlStateManager.rotatef(181.0F, 0.0F, 0.0F, 1.0F);
-            } else {
-                GlStateManager.translated(x + (1.9D + offsetSides) * MathHelper.sin((-34.7F + yaw + i * 34.7F) * 0.017453292F), y + 0.90D, z - (1.9D + offsetSides) * MathHelper.cos((-34.7F + yaw + i * 34.7F) * 0.017453292F));
-                GlStateManager.rotatef(120.0F - yaw - 30.0F * i, 0.0F, 1.0F, 0.0F);
-                GlStateManager.rotatef(207.0F, 0.0F, 0.0F, 1.0F);
-            }
             final ItemStack stack = entity.getStackInSlot(i);
-            if (stack.getItem() instanceof BlockItem) {
-                GlStateManager.translated(0.0D, -0.1D, 0.0D);
-                GlStateManager.rotatef(180.0F, 0.0F, 0.0F, 1.0F);
+            if (stack.isEmpty()) {
+                continue;
             }
-            Minecraft.getInstance().getItemRenderer().renderItem(stack, ItemCameraTransforms.TransformType.FIXED);
-            GlStateManager.popMatrix();
+            this.attach(this.model.getBody(), this.model.getShaft(i), () -> {
+                GlStateManager.rotatef(-90.0F, 1.0F, 0.0F, 0.0F);
+                GlStateManager.rotatef(90.0F, 0.0F, 1.0F, 0.0F);
+                GlStateManager.translated(-4.0D / 16.0D, 1.0D / 16.0D, 0.0D);
+                if (stack.getItem() instanceof BlockItem) {
+                    GlStateManager.translated(0.0D, -0.1D, 0.0D);
+                    GlStateManager.rotatef(180.0F, 0.0F, 0.0F, 1.0F);
+                }
+                Minecraft.getInstance().getItemRenderer().renderItem(stack, ItemCameraTransforms.TransformType.FIXED);
+            }, 0.0625F);
         }
     }
 
+    private void attach(final RendererModel bone, final RendererModel attachment, final Runnable function, final float scale) {
+        GlStateManager.pushMatrix();
+        bone.postRender(scale);
+        if (bone == attachment) {
+            function.run();
+        } else if (bone.childModels != null) {
+            for (final RendererModel child : bone.childModels) {
+                this.attach(child, attachment, function, scale);
+            }
+        }
+        GlStateManager.popMatrix();
+    }
 }

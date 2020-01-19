@@ -6,7 +6,7 @@ import de.mennomax.astikorcarts.entity.MobCartEntity;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.util.ResourceLocation;
 
-public class MobCartRenderer extends DrawnRenderer<MobCartEntity> {
+public class MobCartRenderer extends DrawnRenderer<MobCartEntity, MobCartModel> {
     private static final ResourceLocation TEXTURE = new ResourceLocation(AstikorCarts.MODID, "textures/entity/mobcart.png");
 
     public MobCartRenderer(final EntityRendererManager renderManager) {

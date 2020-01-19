@@ -7,13 +7,13 @@ import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.util.math.MathHelper;
 
-public abstract class DrawnRenderer<T extends AbstractDrawnEntity> extends EntityRenderer<T> {
+public abstract class DrawnRenderer<T extends AbstractDrawnEntity, M extends EntityModel<T>> extends EntityRenderer<T> {
 
-    protected EntityModel<T> model;
+    protected M model;
 
-    protected DrawnRenderer(final EntityRendererManager renderManager, final EntityModel<T> modelIn) {
+    protected DrawnRenderer(final EntityRendererManager renderManager, final M model) {
         super(renderManager);
-        this.model = modelIn;
+        this.model = model;
     }
 
     @Override
@@ -30,6 +30,7 @@ public abstract class DrawnRenderer<T extends AbstractDrawnEntity> extends Entit
         }
 
         this.model.render(entity, delta, 0.0F, 0.0F, 0.0F, info.getPitch(), 0.0625F);
+        this.renderContents(entity, delta);
 
         if (this.renderOutlines) {
             GlStateManager.tearDownSolidRenderingTextureCombine();
@@ -37,6 +38,9 @@ public abstract class DrawnRenderer<T extends AbstractDrawnEntity> extends Entit
         }
         GlStateManager.popMatrix();
         super.doRender(entity, x, y, z, info.getYaw(), delta);
+    }
+
+    protected void renderContents(final T entity, final float delta) {
     }
 
     public void setupRotation(final T entity, final float entityYaw, final float delta) {
