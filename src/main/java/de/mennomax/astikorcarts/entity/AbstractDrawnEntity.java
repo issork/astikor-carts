@@ -26,6 +26,7 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityPredicates;
 import net.minecraft.util.IndirectEntityDamageSource;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceContext.BlockMode;
@@ -73,6 +74,12 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         this.stepHeight = 1.2F;
         this.preventEntitySpawning = true;
         this.initWheels();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @Override
+    public AxisAlignedBB getRenderBoundingBox() {
+        return this.getBoundingBox().grow(3.0D, 3.0D, 3.0D);
     }
 
     @Override
