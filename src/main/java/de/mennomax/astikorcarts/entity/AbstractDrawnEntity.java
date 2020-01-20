@@ -290,16 +290,23 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
      * @param delta
      */
     public Vec3d getRelativeTargetVec(final float delta) {
+        final double x;
+        final double y;
+        final double z;
         if (delta == 1.0F) {
-            return new Vec3d(this.pulling.posX - this.posX, this.pulling.posY - this.posY, this.pulling.posZ - this.posZ);
+            x = this.pulling.posX - this.posX;
+            y = this.pulling.posY - this.posY;
+            z = this.pulling.posZ - this.posZ;
+        } else {
+            x = MathHelper.lerp(delta, this.pulling.lastTickPosX, this.pulling.posX) - MathHelper.lerp(delta, this.lastTickPosX, this.posX);
+            y = MathHelper.lerp(delta, this.pulling.lastTickPosY, this.pulling.posY) - MathHelper.lerp(delta, this.lastTickPosY, this.posY);
+            z = MathHelper.lerp(delta, this.pulling.lastTickPosZ, this.pulling.posZ) - MathHelper.lerp(delta, this.lastTickPosZ, this.posZ);
         }
-        final double px = MathHelper.lerp(delta, this.pulling.lastTickPosX, this.pulling.posX);
-        final double py = MathHelper.lerp(delta, this.pulling.lastTickPosY, this.pulling.posY);
-        final double pz = MathHelper.lerp(delta, this.pulling.lastTickPosZ, this.pulling.posZ);
-        final double x = MathHelper.lerp(delta, this.lastTickPosX, this.posX);
-        final double y = MathHelper.lerp(delta, this.lastTickPosY, this.posY);
-        final double z = MathHelper.lerp(delta, this.lastTickPosZ, this.posZ);
-        return new Vec3d(px - x, py - y, pz - z);
+        final float yaw = (float) Math.toRadians(this.pulling.rotationYaw);
+        final float nx = -MathHelper.sin(yaw);
+        final float nz = MathHelper.cos(yaw);
+        final double r = 0.2D;
+        return new Vec3d(x + nx * r, y, z + nz * r);
     }
 
     /**
@@ -346,9 +353,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         return this.getAllowedEntityList().contains(entityId);
     }
 
-    protected ArrayList<String> getAllowedEntityList() {
-        return new ArrayList<String>();
-    }
+    protected abstract ArrayList<String> getAllowedEntityList();
 
     @Override
     public boolean attackEntityFrom(final DamageSource source, final float amount) {
