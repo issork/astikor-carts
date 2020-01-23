@@ -9,38 +9,45 @@ public abstract class BasicProgram implements Runnable {
 
     private final StringBuilder line;
 
-    protected BasicProgram(final IO io) {
+    protected BasicProgram(final IO io, final Random rng) {
         this.io = io;
-        this.rng = new Random();
+        this.rng = rng;
         this.line = new StringBuilder();
     }
 
-    protected final int round(final float x) {
-        final int i = (int) x;
-        return x < i ? i - 1 : i;
+    @Override
+    public final void run() {
+        this.main();
     }
 
-    protected final float inputNumeric() {
-        while (true) {
-            final String s = this.inputString();
-            try {
-                return Float.parseFloat(s);
-            } catch (final NumberFormatException e) {
-                this.io.print("INVALID INPUT");
-            }
-        }
+    public abstract int main();
+
+    protected final int prompt(final int lower, final int upper) {
+        return this.io.prompt(lower, upper);
     }
 
-    protected final String inputString() {
-        return this.io.input();
+    protected final String prompt(final String... options) {
+        return this.io.prompt(options);
     }
 
     protected final float rnd() {
         return this.rng.nextFloat();
     }
 
-    protected final float pow(final float a, final float b) {
-        return (float) Math.pow(a, b);
+    protected final int rnd(final int n) {
+        return this.rng.nextInt(n);
+    }
+
+    protected final float pow(final float a, int b) {
+        if (b < 0) {
+            throw new IllegalArgumentException();
+        }
+        if (b == 0) {
+            return 1;
+        }
+        float q = a;
+        while (--b > 0) q *= a;
+        return q;
     }
 
     protected final long clk() {
@@ -57,15 +64,17 @@ public abstract class BasicProgram implements Runnable {
     }
 
     protected final void print(final Object... arr) {
-        final StringBuilder bob = new StringBuilder();
         for (final Object o : arr) {
-            bob.append(String.format("%1$-15s", o));
+            this.line.append(String.format("%1$-15s", o));
         }
-        this.io.print(bob.toString());
+        this.io.print(this.line.toString());
+        this.line.setLength(0);
     }
 
     public interface IO {
-        String input();
+        int prompt(final int lower, final int upper);
+
+        String prompt(final String... options);
 
         void print(final String s);
     }

@@ -1,30 +1,31 @@
 package de.mennomax.astikorcarts.oregon;
 
+import java.util.Random;
 import java.util.Scanner;
 
 // https://archive.org/download/creativecomputing-1978-05/Creative_Computing_v04_n03_1978_May-June.pdf
 // pg. 132-139 (140-147)
 public class Oregon extends BasicProgram {
     // TOTAL MILEAGE WHOLE TRIP
-    private float m = 0;
+    private int m = 0;
     // TURN NUMBER FOR SETTING DATE
     private int d3 = 0;
     // CHOICE OF SHOOTING EXPERTISE LEVEL
-    private float d9;
+    private int d9;
     // AMOUNT SPENT ON ANIMALS
-    private float a;
+    private int a;
     // AMOUNT SPENT ON FOOD
-    private float f;
+    private int f;
     // AMOUNT SPENT ON AMMUNITION
-    private float b;
+    private int b;
     // AMOUNT SPENT ON CLOTHING
-    private float c;
+    private int c;
     // AMOUNT SPENT ON MISCELLANEOUS SUPPLIES
-    private float m1;
+    private int m1;
     // CASH LEFT OVER AFTER INITIAL PURCHASES
-    private float t;
+    private int t;
     // TOTAL MILEAGE UP THROUGH PREVIOUS TURN
-    private float m2;
+    private int m2;
     // CHOICE OF EATING
     private int e;
     // FLAG FOR FORT OPTION
@@ -40,14 +41,14 @@ public class Oregon extends BasicProgram {
     // FLAG FOR CLEARING SOUTH PASS IN SETTING MILEAGE
     private boolean m9 = false;
 
-    public Oregon(final IO io) {
-        super(io);
+    public Oregon(final IO io, final Random rng) {
+        super(io, rng);
     }
 
     @Override
-    public void run() {
+    public int main() {
         this.print("DO YOU NEED INSTRUCTIONS  (YES/NO)?");
-        final String cs = this.inputString();
+        final String cs = this.prompt("YES", "NO");
         if (!"NO".equals(cs)) {
             this.print("THIS PROGRAM SIMULATES A TRIP OVER THE OREGON TRAIL FROM");
             this.print("INDEPENDENCE, MISSOURI TO OREGON CITY, OREGON IN 1847.");
@@ -102,7 +103,7 @@ public class Oregon extends BasicProgram {
         this.print("         (4) NEED MORE PRACTICE,  (5) SHAKY KNEES");
         this.print("ENTER ONE OF THE ABOVE -- THE BETTER YOU CLAIM YOU ARE, THE");
         this.print("FASTER YOU'LL HAVE TO BE WITH YOUR GUN TO BE SUCCESSFUL.");
-        this.d9 = this.inputNumeric();
+        this.d9 = this.prompt(1, 5);
         if (this.d9 > 5) {
             this.d9 = 0;
         }
@@ -112,7 +113,7 @@ public class Oregon extends BasicProgram {
             this.print("");
             this.print("HOW MUCH DO YOU WANT TO SPEND ON YOUR OXEN TEAM?");
             while (true) {
-                this.a = this.inputNumeric();
+                this.a = this.prompt(200, 300);
                 if (this.a < 200) {
                     this.print("NOT ENOUGH");
                 } else if (this.a > 300) {
@@ -123,7 +124,7 @@ public class Oregon extends BasicProgram {
             }
             this.print("HOW MUCH DO YOU WANT TO SPEND ON FOOD?");
             while (true) {
-                this.f = this.inputNumeric();
+                this.f = this.prompt(0, 700 - this.a);
                 if (this.f < 0) {
                     this.print("IMPOSSIBLE");
                 } else {
@@ -132,7 +133,7 @@ public class Oregon extends BasicProgram {
             }
             this.print("HOW MUCH DO YOU WANT TO SPEND ON AMMUNITION?");
             while (true) {
-                this.b = this.inputNumeric();
+                this.b = this.prompt(0, 700 - this.f - this.a);
                 if (this.b < 0) {
                     this.print("IMPOSSIBLE");
                 } else {
@@ -141,7 +142,7 @@ public class Oregon extends BasicProgram {
             }
             this.print("HOW MUCH DO YOU WANT TO SPEND ON CLOTHING?");
             while (true) {
-                this.c = this.inputNumeric();
+                this.c = this.prompt(0, 700 - this.b - this.f - this.a);
                 if (this.c < 0) {
                     this.print("IMPOSSIBLE");
                 } else {
@@ -150,7 +151,7 @@ public class Oregon extends BasicProgram {
             }
             this.print("HOW MUCH DO YOU WANT TO SPEND ON MISCELLANEOUS SUPPLIES?");
             while (true) {
-                this.m1 = this.inputNumeric();
+                this.m1 = this.prompt(0, 700 - this.c - this.b - this.f - this.a);
                 if (this.m1 < 0) {
                     this.print("IMPOSSIBLE");
                 } else {
@@ -238,15 +239,16 @@ public class Oregon extends BasicProgram {
                     this.print("YOU HAVE BEEN ON THE TRAIL TOO LONG ------");
                     this.print("YOUR FAMILY DIES IN THE FIRST BLIZZARD OF WINTER");
                     this.formalities();
-                    return;
+                    return 1;
             }
             this.print("1847");
             this.print("");
             if (this.turn()) {
-                return;
+                return 1;
             }
         }
         this.finalTurn();
+        return 0;
     }
 
     // BEGINNING EACH TURN
@@ -266,12 +268,6 @@ public class Oregon extends BasicProgram {
         if (this.f < 13) {
             this.print("YOU'D BETTER DO SOME HUNTING OR BUY FOOD AND SOON!!!!");
         }
-        this.f = this.round(this.f);
-        this.b = this.round(this.b);
-        this.c = this.round(this.c);
-        this.m1 = this.round(this.m1);
-        this.t = this.round(this.t);
-        this.m = this.round(this.m);
         this.m2 = this.m;
         if (this.s4 || this.k8) {
             this.t = this.t - 20;
@@ -296,7 +292,7 @@ public class Oregon extends BasicProgram {
             return true;
         }
         this.eat();
-        this.m = this.m + 200 + (this.a - 220) / 5.0F + 10 * this.rnd();
+        this.m = this.m + 200 + (this.a - 220) / 5 + this.rnd(10);
         if (this.ridersAttack()) {
             return true;
         }
@@ -309,23 +305,22 @@ public class Oregon extends BasicProgram {
     private void wants() {
         this.x1 = !this.x1;
         while (true) {
-            float x;
+            int x;
             if (this.x1) {
                 this.print("DO YOU WANT TO (1) HUNT, OR (2) CONTINUE?");
-                x = this.inputNumeric();
+                x = this.prompt(1, 2);
                 if (x != 1) {
                     x = 2;
                 }
                 x = x + 1;
             } else {
-                this.print("DO YOU WANT TO (1) STOP AT THE NEXT FORT, (2) HUNT, ");
-                this.print("OR (3) CONTINUE?");
-                x = this.inputNumeric();
+                this.print("DO YOU WANT TO (1) STOP AT THE NEXT FORT, (2) HUNT, OR (3) CONTINUE?");
+                x = this.prompt(1, 3);
                 if (x > 2 || x < 1) {
                     x = 3;
                 }
             }
-            switch (this.round(x)) {
+            switch (x) {
                 default:
                 case 1:
                     this.stopAtFort();
@@ -346,22 +341,22 @@ public class Oregon extends BasicProgram {
     private void stopAtFort() {
         this.print("ENTER WHAT YOU WISH TO SPEND ON THE FOLLOWING");
         this.print("FOOD?");
-        float p = this.spend();
-        this.f = this.f + 2.0F / 3.0F * p;
+        int p = this.spend();
+        this.f = this.f + p * 2 / 3;
         this.print("AMMUNITION?");
         p = this.spend();
-        this.b = this.round(this.b + 2.0F / 3.0F * p * 50);
+        this.b = this.b + p * 2 / 3 * 50;
         this.print("CLOTHING?");
         p = this.spend();
-        this.c = this.c + 2.0F / 3.0F * p;
+        this.c = this.c + p * 2 / 3;
         this.print("MISCELLANEOUS SUPPLIES?");
         p = this.spend();
-        this.m1 = this.m1 + 2.0F / 3.0F * p;
+        this.m1 = this.m1 + p * 2 / 3;
         this.m = this.m - 45;
     }
 
-    private float spend() {
-        final float p = this.inputNumeric();
+    private int spend() {
+        final int p = this.prompt(0, this.t);
         if (p < 0) {
             return p;
         }
@@ -370,7 +365,7 @@ public class Oregon extends BasicProgram {
             this.print("YOU DON'T HAVE THAT MUCH--KEEP YOUR SPENDING DOWN");
             this.print("YOU MISS YOUR CHANCE TO SPEND ON THAT ITEM");
             this.t = this.t + p;
-            return 0.0F;
+            return 0;
         }
         return p;
     }
@@ -387,8 +382,8 @@ public class Oregon extends BasicProgram {
                 // BELLS IN LINE
                 this.print("RIGHT BETWEEN THE EYES---YOU GOT A BIG ONE!!!!");
                 this.print("FULL BELLIES TONIGHT!");
-                this.f = this.f + 52 + this.rnd() * 6;
-                this.b = this.b - 10 - this.rnd() * 4;
+                this.f = this.f + 52 + this.rnd(6);
+                this.b = this.b - 10 - this.rnd(4);
             } else if (100 * this.rnd() < 13 * b1) {
                 this.print("YOU MISSED---AND YOUR DINNER GOT AWAY.....");
             } else {
@@ -403,9 +398,8 @@ public class Oregon extends BasicProgram {
     // EATING
     private void eat() {
         while (true) {
-            this.print("DO YOU WANT TO EAT (1) POORLY, (2) MODERATELY, ");
-            this.print("OR (3) WELL?");
-            this.e = this.round(this.inputNumeric());
+            this.print("DO YOU WANT TO EAT (1) POORLY, (2) MODERATELY, OR (3) WELL?");
+            this.e = this.prompt(1, 3);
             if (this.e < 1 || this.e > 3) {
                 continue;
             }
@@ -430,19 +424,18 @@ public class Oregon extends BasicProgram {
             }
             this.print("LOOK HOSTILE");
             this.print("TACTICS");
-            float t1;
+            int t1;
             while (true) {
                 this.print("(1) RUN  (2) ATTACK  (3) CONTINUE  (4) CIRCLE WAGONS");
                 if (this.rnd() <= 0.2F) {
                     s5 = !s5;
                 }
-                t1 = this.inputNumeric();
+                t1 = this.prompt(1, 4);
                 if (t1 < 1 || t1 > 4) {
                     continue;
                 }
                 break;
             }
-            t1 = this.round(t1);
             if (s5) {
                 if (t1 <= 1) {
                     this.m = this.m + 15;
@@ -509,7 +502,7 @@ public class Oregon extends BasicProgram {
         switch (d1) {
             case 0:
                 this.print("WAGON BREAKS DOWN--LOSE TIME AND SUPPLIES FIXING IT");
-                this.m = this.m - 15 - 5 * this.rnd();
+                this.m = this.m - 15 - this.rnd(5);
                 this.m1 = this.m1 - 8;
                 break;
             case 1:
@@ -520,8 +513,8 @@ public class Oregon extends BasicProgram {
             case 2:
                 this.print("BAD LUCK---YOUR DAUGHTER BROKE HER ARM");
                 this.print("YOU HAD TO STOP AND USE SUPPLIES TO MAKE A SLING");
-                this.m = this.m - 5 - 4 * this.rnd();
-                this.m1 = this.m1 - 2 - 3 * this.rnd();
+                this.m = this.m - 5 - this.rnd(4);
+                this.m1 = this.m1 - 2 - this.rnd(3);
                 break;
             case 3:
                 this.print("OX WANDERS OFF---SPEND TIME LOOKING FOR IT");
@@ -533,7 +526,7 @@ public class Oregon extends BasicProgram {
                 break;
             case 5:
                 this.print("UNSAFE WATER--LOSE TIME LOOKING FOR CLEAN SPRING");
-                this.m = this.m - 10 * this.rnd() - 2;
+                this.m = this.m - this.rnd(10) - 2;
                 break;
             case 6:
                 if (this.m <= 950) {
@@ -541,7 +534,7 @@ public class Oregon extends BasicProgram {
                     this.f = this.f - 10;
                     this.b = this.b - 500;
                     this.m1 = this.m1 - 15;
-                    this.m = this.m - 10 * this.rnd() - 5;
+                    this.m = this.m - this.rnd(10) - 5;
                 } else {
                     this.print("COLD WEATHER---BRRRRRRR!---YOU ");
                     boolean c1 = false;
@@ -563,7 +556,7 @@ public class Oregon extends BasicProgram {
                 this.b = this.b - 20 * b1;
                 if (this.b < 0) {
                     this.print("YOU RAN OUT OF BULLETS---THEY GET LOTS OF CASH");
-                    this.t = this.t / 3.0F;
+                    this.t = this.t / 3;
                 } else {
                     if (b1 > 1) {
                         this.print("YOU GOT SHOT IN THE LEG AND THEY TOOK ONE OF YOUR OXEN");
@@ -581,12 +574,12 @@ public class Oregon extends BasicProgram {
                 this.print("THERE WAS A FIRE IN YOUR WAGON--FOOD AND SUPPLIES DAMAGE!");
                 this.f = this.f - 40;
                 this.b = this.b - 400;
-                this.m1 = this.m1 - this.rnd() * 8 - 3;
+                this.m1 = this.m1 - this.rnd(8) - 3;
                 this.m = this.m - 15;
                 break;
             case 9:
                 this.print("LOSE YOUR WAY IN HEAVY FOG---TIME IS LOST");
-                this.m = this.m - 10 - 5 * this.rnd();
+                this.m = this.m - 10 - this.rnd(5);
                 break;
             case 10:
                 this.print("YOU KILLED A POISONOUS SNAKE AFTER IT BIT YOU");
@@ -602,7 +595,7 @@ public class Oregon extends BasicProgram {
                 this.print("WAGON GETS SWAMPED FORDING RIVER--LOSE FOOD AND CLOTHES");
                 this.f = this.f - 30;
                 this.c = this.c - 20;
-                this.m = this.m - 20 - 20 * this.rnd();
+                this.m = this.m - 20 - this.rnd(20);
                 break;
             case 12:
                 this.print("WILD ANIMALS ATTACK!");
@@ -625,9 +618,9 @@ public class Oregon extends BasicProgram {
                 break;
             case 13:
                 this.print("HAIL STORM---SUPPLIES DAMAGED");
-                this.m = this.m - 5 - this.rnd() * 10;
+                this.m = this.m - 5 - this.rnd(10);
                 this.b = this.b - 200;
-                this.m1 = this.m1 - 4 - this.rnd() * 3;
+                this.m1 = this.m1 - 4 - this.rnd(3);
                 break;
             case 14:
                 if (this.e == 1) {
@@ -670,10 +663,10 @@ public class Oregon extends BasicProgram {
                     this.print("WAGON DAMAGED!---LOSE TIME AND SUPPLIES");
                     this.m1 = this.m1 - 5;
                     this.b = this.b - 200;
-                    this.m = this.m - 20 - 30 * this.rnd();
+                    this.m = this.m - 20 - this.rnd(30);
                 } else {
                     this.print("THE GOING GETS SLOW");
-                    this.m = this.m - 45 - this.rnd() / 0.02F;
+                    this.m = this.m - 45 - this.rnd(50);
                 }
             }
         }
@@ -711,7 +704,7 @@ public class Oregon extends BasicProgram {
         this.f = this.f - 25;
         this.m1 = this.m1 - 10;
         this.b = this.b - 300;
-        this.m = this.m - 30 - 40 * this.rnd();
+        this.m = this.m - 30 - this.rnd(40);
         if (this.c < 18 + 2 * this.rnd()) {
             return this.illness();
         }
@@ -747,8 +740,10 @@ public class Oregon extends BasicProgram {
 
     private void finalTurn() {
         // FINAL TURN
-        float f9 = (2040 - this.m2) / (this.m - this.m2);
-        this.f = this.f + (1 - f9) * (8 * 5 * this.e);
+        final int f9n = 2040 - this.m2;
+        final int f9d = this.m - this.m2;
+        final int foodConsumption = 8 + 5 * this.e;
+        this.f = this.f + foodConsumption - foodConsumption * f9n / f9d;
         this.print("");
 
         // BELLS IN LINES
@@ -756,13 +751,13 @@ public class Oregon extends BasicProgram {
         this.print("AFTER 2040 LONG MILES---HOORAY!!!!!");
         this.print("A REAL PIONEER!");
         this.print("");
-        f9 = this.round(f9 * 14);
-        this.d3 = this.d3 * 14 + (int) f9;
-        f9 = f9 + 1;
-        if (f9 >= 8) {
-            f9 = f9 - 7;
+        int day = 14 * f9n / f9d;
+        this.d3 = this.d3 * 14 + day;
+        day = day + 1;
+        if (day >= 8) {
+            day = day - 7;
         }
-        switch ((int) f9) {
+        switch (day) {
             default:
             case 1:
                 this.print("MONDAY ");
@@ -822,7 +817,7 @@ public class Oregon extends BasicProgram {
         if (this.f < 0) {
             this.f = 0;
         }
-        this.print(this.round(this.f), this.round(this.b), this.round(this.c), this.round(this.m1), this.round(this.t));
+        this.print(this.f, this.b, this.c, this.m1, this.t);
         this.print("");
         this.print("           PRESIDENT JAMES K. POLK SENDS YOU HIS");
         this.print("                 HEARTIEST CONGRATULATIONS");
@@ -838,11 +833,11 @@ public class Oregon extends BasicProgram {
         this.print("FORMALITIES WE MUST GO THROUGH");
         this.print("");
         this.print("WOULD YOU LIKE A MINISTER?");
-        this.inputString();
+        this.prompt("YES", "NO");
         this.print("WOULD YOU LIKE A FANCY FUNERAL?");
-        this.inputString();
+        this.prompt("YES", "NO");
         this.print("WOULD YOU LIKE US TO INFORM YOUR NEXT OF KIN?");
-        final String cs = this.inputString();
+        final String cs = this.prompt("YES", "NO");
         if ("YES".equals(cs)) {
             this.print("THAT WILL BE $4.50 FOR THE TELEGRAPH CHARGE.");
         } else {
@@ -862,10 +857,10 @@ public class Oregon extends BasicProgram {
     // SHOOTING SUB-ROUTINE
     private int shoot() {
         final String[] ss = { "BANG", "BLAM", "POW", "WHAM" };
-        final int s6 = this.round(this.rnd() * 4);
+        final int s6 = this.rnd(4);
         this.print("TYPE " + ss[s6]);
         final long b3 = this.clk();
-        final String cs = this.inputString();
+        final String cs = this.prompt(ss[s6]);
         final long b1 = this.clk();
         // TODO: tune this to be playable
         int b = (int) (((b1 - b3) * 3600) - (this.d9 - 1));
@@ -890,7 +885,7 @@ public class Oregon extends BasicProgram {
             this.m = this.m - 5;
             this.m1 = this.m1 - 5;
         } else {
-            this.print("SERIOUS ILLNESS");
+            this.print("SERIOUS ILLNESS---");
             this.print("YOU MUST STOP FOR MEDICAL ATTENTION");
             this.m1 = this.m1 - 10;
             this.s4 = true;
@@ -903,19 +898,112 @@ public class Oregon extends BasicProgram {
     }
 
     public static void main(final String[] args) {
-        final Oregon oregon = new Oregon(new IO() {
-            final Scanner kb = new Scanner(System.in);
-
-            @Override
-            public String input() {
-                return this.kb.nextLine();
+        /*final Random seeder = new Random();
+        int cash = 0;
+        for (long attempt = 1; ; attempt++) {
+            final long seed = seeder.nextLong();
+            final long gameseed = seeder.nextLong();
+            final Logger logger = new Logger(new Monkey(new Random(seed)));
+            final Oregon oregon = new Oregon(logger, new Random(gameseed));
+            if (oregon.main() == 0 && oregon.c > cash) {
+                System.out.printf("Attempt %d, Monkey Seed: %d, Game Seed: %d Clothing: %d%n", attempt, seed, gameseed, cash);
+                //System.out.print(logger.getLines());
+                cash = oregon.c;
             }
-
-            @Override
-            public void print(final String s) {
-                System.out.println(s);
+        }*/
+        // Attempt 5024910, Monkey Seed: 4531754554786746443, Game Seed: 1654304166763708234 Cash: 343
+        /*int win = 0;
+        final int total = 5_000_000;
+        for (int i = 0; i < total; i++) {
+            final long seed = seeder.nextLong();
+            final long gameseed = seeder.nextLong();
+            final Logger logger = new Logger(new Monkey(new Random(seed)));
+            final Oregon oregon = new Oregon(logger, new Random(gameseed));
+            if (oregon.main() == 0) {
+                win++;
             }
-        });
-        oregon.run();
+        }
+        System.out.printf("%d / %d, %d%%%n", win, total, win * 100 / total);*/
+    }
+
+
+    static final class Monkey implements IO {
+        final Random rng;
+
+        Monkey(final Random rng) {
+            this.rng = rng;
+        }
+
+        @Override
+        public int prompt(final int lower, final int upper) {
+            return this.rng.nextInt(upper - lower + 1) + lower;
+        }
+
+        @Override
+        public String prompt(final String... options) {
+            return options[this.rng.nextInt(options.length)];
+        }
+
+        @Override
+        public void print(final String s) {
+        }
+    }
+
+    static final class Logger implements IO {
+        final IO input;
+
+        final StringBuilder lines;
+
+        Logger(final IO input) {
+            this.input = input;
+            this.lines = new StringBuilder();
+        }
+
+        @Override
+        public int prompt(final int lower, final int upper) {
+            return this.input(this.input.prompt(lower, upper));
+        }
+
+        @Override
+        public String prompt(final String... options) {
+            return this.input(this.input.prompt(options));
+        }
+
+        private <T> T input(final T o) {
+            this.lines.append("> ").append(o).append(System.lineSeparator());
+            return o;
+        }
+
+        @Override
+        public void print(final String s) {
+            this.lines.append(s).append(System.lineSeparator());
+        }
+
+        public String getLines() {
+            return this.lines.toString();
+        }
+    }
+
+    static final class SystemIO implements IO {
+        final Scanner kb = new Scanner(System.in);
+
+        @Override
+        public int prompt(final int lower, final int upper) {
+            try {
+                return Integer.parseInt(this.kb.nextLine());
+            } catch (final NumberFormatException e) {
+                return 0;
+            }
+        }
+
+        @Override
+        public String prompt(final String... options) {
+            return this.kb.nextLine();
+        }
+
+        @Override
+        public void print(final String s) {
+            System.out.println(s);
+        }
     }
 }
