@@ -15,13 +15,6 @@ public abstract class BasicProgram implements Runnable {
         this.line = new StringBuilder();
     }
 
-    @Override
-    public final void run() {
-        this.main();
-    }
-
-    public abstract int main();
-
     protected final int prompt(final int lower, final int upper) {
         return this.io.prompt(lower, upper);
     }

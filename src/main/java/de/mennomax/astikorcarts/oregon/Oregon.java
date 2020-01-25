@@ -46,7 +46,7 @@ public class Oregon extends BasicProgram {
     }
 
     @Override
-    public int main() {
+    public void run() {
         this.print("DO YOU NEED INSTRUCTIONS  (YES/NO)?");
         final String cs = this.prompt("YES", "NO");
         if (!"NO".equals(cs)) {
@@ -170,7 +170,9 @@ public class Oregon extends BasicProgram {
         this.print("");
         this.print("MONDAY MARCH 29 1847");
         this.print("");
-        this.turn();
+        if (this.turn()) {
+            return;
+        }
         while (this.m < 2040) {
             // SETTING DATE
             this.d3 = this.d3 + 1;
@@ -239,16 +241,15 @@ public class Oregon extends BasicProgram {
                     this.print("YOU HAVE BEEN ON THE TRAIL TOO LONG ------");
                     this.print("YOUR FAMILY DIES IN THE FIRST BLIZZARD OF WINTER");
                     this.formalities();
-                    return 1;
+                    return;
             }
             this.print("1847");
             this.print("");
             if (this.turn()) {
-                return 1;
+                return;
             }
         }
         this.finalTurn();
-        return 0;
     }
 
     // BEGINNING EACH TURN
@@ -862,16 +863,17 @@ public class Oregon extends BasicProgram {
         final long b3 = this.clk();
         final String cs = this.prompt(ss[s6]);
         final long b1 = this.clk();
-        // TODO: tune this to be playable
-        int b = (int) (((b1 - b3) * 3600) - (this.d9 - 1));
+        final int cpm = cs.length() * (60 * 1000) / (int) (b1 - b3);
+        final int expertise = 300 - 50 * (this.d9 - 1);
         this.print("");
-        if (b <= 0) {
-            b = 0;
-        }
+        final int range = 9;
         if (!cs.equals(ss[s6])) {
-            b = 9;
+            return range;
         }
-        return b;
+        if (cpm > expertise) {
+            return 0;
+        }
+        return Math.min(4 * range * (cpm - expertise) * (cpm - expertise) / (expertise * expertise), range);
     }
 
     // ILLNESS SUB-ROUTINE
@@ -898,34 +900,8 @@ public class Oregon extends BasicProgram {
     }
 
     public static void main(final String[] args) {
-        /*final Random seeder = new Random();
-        int cash = 0;
-        for (long attempt = 1; ; attempt++) {
-            final long seed = seeder.nextLong();
-            final long gameseed = seeder.nextLong();
-            final Logger logger = new Logger(new Monkey(new Random(seed)));
-            final Oregon oregon = new Oregon(logger, new Random(gameseed));
-            if (oregon.main() == 0 && oregon.c > cash) {
-                System.out.printf("Attempt %d, Monkey Seed: %d, Game Seed: %d Clothing: %d%n", attempt, seed, gameseed, cash);
-                //System.out.print(logger.getLines());
-                cash = oregon.c;
-            }
-        }*/
-        // Attempt 5024910, Monkey Seed: 4531754554786746443, Game Seed: 1654304166763708234 Cash: 343
-        /*int win = 0;
-        final int total = 5_000_000;
-        for (int i = 0; i < total; i++) {
-            final long seed = seeder.nextLong();
-            final long gameseed = seeder.nextLong();
-            final Logger logger = new Logger(new Monkey(new Random(seed)));
-            final Oregon oregon = new Oregon(logger, new Random(gameseed));
-            if (oregon.main() == 0) {
-                win++;
-            }
-        }
-        System.out.printf("%d / %d, %d%%%n", win, total, win * 100 / total);*/
+        new Oregon(new SystemIO(), new Random()).run();
     }
-
 
     static final class Monkey implements IO {
         final Random rng;
