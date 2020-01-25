@@ -38,6 +38,13 @@ public class MobCartEntity extends AbstractDrawnEntity {
                 }
             } else if (this.getPulling() != player) {
                 player.startRiding(this);
+                final Entity pulling = this.getPulling();
+                if (pulling != null) {
+                    final PostilionEntity postilion = new PostilionEntity(this.world);
+                    postilion.setPositionAndRotation(pulling.posX, pulling.posY, pulling.posZ, pulling.rotationYaw, pulling.rotationPitch);
+                    postilion.startRiding(pulling);
+                    this.world.addEntity(postilion);
+                }
             }
         }
         return true;

@@ -7,6 +7,7 @@ import de.mennomax.astikorcarts.client.renderer.entity.PlowCartRenderer;
 import de.mennomax.astikorcarts.entity.CargoCartEntity;
 import de.mennomax.astikorcarts.entity.MobCartEntity;
 import de.mennomax.astikorcarts.entity.PlowCartEntity;
+import de.mennomax.astikorcarts.entity.PostilionEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
@@ -28,12 +29,19 @@ public class Entities {
     public static final EntityType<?> CARGOCART = null;
     public static final EntityType<?> PLOWCART = null;
     public static final EntityType<?> MOBCART = null;
+    public static final EntityType<PostilionEntity> POSTILION = null;
 
     @SubscribeEvent
     public static void registerEntities(final RegistryEvent.Register<EntityType<?>> event) {
         event.getRegistry().registerAll(buildType(CargoCartEntity::new, "cargocart", 1.5F, 1.4F),
             buildType(PlowCartEntity::new, "plowcart", 1.3F, 1.4F),
-            buildType(MobCartEntity::new, "mobcart", 1.3F, 1.4F));
+            buildType(MobCartEntity::new, "mobcart", 1.3F, 1.4F),
+            EntityType.Builder.<PostilionEntity>create(PostilionEntity::new, EntityClassification.MISC)
+                .size(0.1F, 0.1F)
+                .setCustomClientFactory((pkt, world) -> new PostilionEntity(world))
+                .build(AstikorCarts.MODID + ":postilion")
+                .setRegistryName("postilion")
+        );
     }
 
     public static EntityType<?> buildType(final IFactory<Entity> factoryIn, final String name, final float widthIn, final float heightIn) {
