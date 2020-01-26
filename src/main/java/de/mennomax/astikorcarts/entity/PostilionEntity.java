@@ -177,6 +177,11 @@ public class PostilionEntity extends LivingEntity {
     }
 
     @Override
+    public boolean addPotionEffect(final EffectInstance effect) {
+        return false;
+    }
+
+    @Override
     protected void updatePotionMetadata() {
         this.setInvisible(true);
     }
