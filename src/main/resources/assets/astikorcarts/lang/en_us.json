@@ -7,8 +7,10 @@
   "entity.astikorcarts.cargocart": "Cart",
   "entity.astikorcarts.plowcart": "Plow",
   "entity.astikorcarts.mobcart": "Transportation Cart",
+  "entity.astikorcarts.postilion": "Postilion",
   "key.categories.astikorcarts": "AstikorCarts",
   "key.astikorcarts.desc": "Action Key",
   "subtitles.astikorcarts.cart.attached": "Cart attaches",
-  "subtitles.astikorcarts.cart.detached": "Cart detaches"
+  "subtitles.astikorcarts.cart.detached": "Cart detaches",
+  "stat.astikorcarts.cart_one_cm": "Distance by Cart"
 }

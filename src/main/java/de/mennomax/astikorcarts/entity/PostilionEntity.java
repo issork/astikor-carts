@@ -10,10 +10,12 @@ import net.minecraft.entity.effect.LightningBoltEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.IPacket;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.HandSide;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 
 public class PostilionEntity extends LivingEntity {
@@ -34,29 +36,6 @@ public class PostilionEntity extends LivingEntity {
     }
 
     @Override
-    public void tick() {
-        super.tick();
-        final Entity mount = this.getRidingEntity();
-        if (mount == null) {
-            this.remove();
-            return;
-        }
-        final AbstractDrawnEntity drawn = (this.world.isRemote ? AstikorCarts.CLIENTPULLMAP : AstikorCarts.SERVERPULLMAP).get(mount);
-        if (drawn == null) {
-            this.remove();
-            return;
-        }
-        final Entity coachman = drawn.getControllingPassenger();
-        if (coachman instanceof LivingEntity) {
-            this.rotationYaw = coachman.rotationYaw;
-            this.prevRotationYaw = this.rotationYaw;
-            this.rotationPitch = coachman.rotationPitch * 0.5F;
-            this.moveForward = ((LivingEntity) coachman).moveForward;
-            this.moveStrafing = 0.0F;
-        }
-    }
-
-    @Override
     public Iterable<ItemStack> getArmorInventoryList() {
         return Collections.emptyList();
     }
@@ -74,12 +53,6 @@ public class PostilionEntity extends LivingEntity {
     public HandSide getPrimaryHand() {
         return HandSide.RIGHT;
     }
-
-    @Override
-    public void onKillCommand() {
-        this.remove();
-    }
-
     @Override
     public boolean isImmuneToExplosions() {
         return true;
@@ -93,6 +66,11 @@ public class PostilionEntity extends LivingEntity {
     @Override
     public boolean canBreatheUnderwater() {
         return true;
+    }
+
+    @Override
+    public boolean isServerWorld() {
+        return false;
     }
 
     @Override
@@ -126,6 +104,63 @@ public class PostilionEntity extends LivingEntity {
     }
 
     @Override
+    public boolean isNonBoss() {
+        return false;
+    }
+
+    @Override
+    public boolean canAttack(final EntityType<?> type) {
+        return false;
+    }
+
+    @Override
+    public boolean canAttack(final LivingEntity living) {
+        return false;
+    }
+
+    @Override
+    public boolean isPotionApplicable(final EffectInstance effect) {
+        return false;
+    }
+
+    @Override
+    public double getYOffset() {
+        return 0.125D;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        final LivingEntity coachman = this.getCoachman();
+        if (coachman != null) {
+            this.rotationYaw = coachman.rotationYaw;
+            this.prevRotationYaw = this.rotationYaw;
+            this.rotationPitch = coachman.rotationPitch * 0.5F;
+            this.moveForward = coachman.moveForward;
+            this.moveStrafing = 0.0F;
+        } else {
+            this.remove();
+        }
+    }
+
+    @Nullable
+    private LivingEntity getCoachman() {
+        final Entity mount = this.getRidingEntity();
+        if (mount != null) {
+            final AbstractDrawnEntity drawn = (this.world.isRemote ? AstikorCarts.CLIENTPULLMAP : AstikorCarts.SERVERPULLMAP).get(mount);
+            if (drawn != null) {
+                return drawn.getControllingPassenger();
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void onKillCommand() {
+        this.remove();
+    }
+
+    @Override
     public void onStruckByLightning(final LightningBoltEntity bolt) {
     }
 
@@ -139,6 +174,11 @@ public class PostilionEntity extends LivingEntity {
 
     @Override
     protected void doWaterSplashEffect() {
+    }
+
+    @Override
+    protected void updatePotionMetadata() {
+        this.setInvisible(true);
     }
 
     @Override

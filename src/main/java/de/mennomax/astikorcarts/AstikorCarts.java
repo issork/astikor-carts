@@ -3,6 +3,7 @@ package de.mennomax.astikorcarts;
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
 import de.mennomax.astikorcarts.entity.AbstractDrawnEntity;
 import de.mennomax.astikorcarts.entity.CargoCartEntity;
+import de.mennomax.astikorcarts.entity.PostilionEntity;
 import de.mennomax.astikorcarts.entity.ai.goal.PullCartGoal;
 import de.mennomax.astikorcarts.init.KeyBindings;
 import de.mennomax.astikorcarts.network.PacketHandler;
@@ -22,6 +23,7 @@ import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.WorldTickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -92,6 +94,14 @@ public class AstikorCarts {
         public static void joinWorld(final EntityJoinWorldEvent event) {
             if (!event.getWorld().isRemote && event.getEntity() instanceof MobEntity) {
                 ((MobEntity) event.getEntity()).goalSelector.addGoal(1, new PullCartGoal(event.getEntity()));
+            }
+        }
+
+        @SubscribeEvent
+        public static void onInteract(final PlayerInteractEvent.EntityInteract event) {
+            final Entity rider = event.getTarget().getControllingPassenger();
+            if (rider instanceof PostilionEntity) {
+                rider.stopRiding();
             }
         }
 

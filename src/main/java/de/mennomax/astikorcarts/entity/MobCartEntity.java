@@ -28,6 +28,22 @@ public class MobCartEntity extends AbstractDrawnEntity {
     }
 
     @Override
+    public void tick() {
+        super.tick();
+        final Entity coachman = this.getControllingPassenger();
+        final Entity pulling = this.getPulling();
+        if (pulling != null && coachman != null && pulling.getControllingPassenger() == null) {
+            final PostilionEntity postilion = new PostilionEntity(this.world);
+            postilion.setPositionAndRotation(pulling.posX, pulling.posY, pulling.posZ, coachman.rotationYaw, coachman.rotationPitch);
+            if (postilion.startRiding(pulling)) {
+                this.world.addEntity(postilion);
+            } else {
+                postilion.remove();
+            }
+        }
+    }
+
+    @Override
     public boolean processInitialInteract(final PlayerEntity player, final Hand hand) {
         if (!this.world.isRemote) {
             if (player.isSneaking()) {
@@ -38,13 +54,6 @@ public class MobCartEntity extends AbstractDrawnEntity {
                 }
             } else if (this.getPulling() != player) {
                 player.startRiding(this);
-                final Entity pulling = this.getPulling();
-                if (pulling != null) {
-                    final PostilionEntity postilion = new PostilionEntity(this.world);
-                    postilion.setPositionAndRotation(pulling.posX, pulling.posY, pulling.posZ, pulling.rotationYaw, pulling.rotationPitch);
-                    postilion.startRiding(pulling);
-                    this.world.addEntity(postilion);
-                }
             }
         }
         return true;

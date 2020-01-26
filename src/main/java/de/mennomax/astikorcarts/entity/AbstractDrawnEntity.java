@@ -14,6 +14,7 @@ import net.minecraft.entity.MoverType;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.AttributeModifier.Operation;
+import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -62,7 +63,6 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     private double lerpZ;
     private double lerpYaw;
     private double lerpPitch;
-    protected boolean pullingOnGroundLastTick;
     protected List<CartWheel> wheels;
     private int pullingId = -1;
     private UUID pullingUUID = null;
@@ -115,11 +115,11 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     public void pulledTick() {
         Vec3d targetVec = this.getRelativeTargetVec(1.0F);
         this.handleRotation(targetVec);
-        final double dRotation = this.prevRotationYaw - this.rotationYaw;
-        if (dRotation < -180.0D) {
-            this.prevRotationYaw += 360.0F;
-        } else if (dRotation >= 180.0D) {
+        while (this.rotationYaw - this.prevRotationYaw < -180.0F) {
             this.prevRotationYaw -= 360.0F;
+        }
+        while (this.rotationYaw - this.prevRotationYaw >= 180.0F) {
+            this.prevRotationYaw += 360.0F;
         }
         if (this.pulling.onGround) {
             targetVec = new Vec3d(targetVec.x, 0.0D, targetVec.z);
@@ -457,8 +457,21 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
 
     @Override
     @Nullable
-    public Entity getControllingPassenger() {
-        return this.getPassengers().isEmpty() ? null : this.getPassengers().get(0);
+    public LivingEntity getControllingPassenger() {
+        final List<Entity> passengers = this.getPassengers();
+        if (passengers.isEmpty()) {
+            return null;
+        }
+        final Entity first = passengers.get(0);
+        if (first instanceof AnimalEntity || !(first instanceof LivingEntity)) {
+            return null;
+        }
+        return (LivingEntity) first;
+    }
+
+    @Override
+    public boolean canPassengerSteer() {
+        return false;
     }
 
     public void setDamageTaken(final float damageTaken) {

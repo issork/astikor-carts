@@ -4,6 +4,7 @@ import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.client.renderer.entity.CargoCartRenderer;
 import de.mennomax.astikorcarts.client.renderer.entity.MobCartRenderer;
 import de.mennomax.astikorcarts.client.renderer.entity.PlowCartRenderer;
+import de.mennomax.astikorcarts.client.renderer.entity.PostilionRenderer;
 import de.mennomax.astikorcarts.entity.CargoCartEntity;
 import de.mennomax.astikorcarts.entity.MobCartEntity;
 import de.mennomax.astikorcarts.entity.PlowCartEntity;
@@ -37,7 +38,9 @@ public class Entities {
             buildType(PlowCartEntity::new, "plowcart", 1.3F, 1.4F),
             buildType(MobCartEntity::new, "mobcart", 1.3F, 1.4F),
             EntityType.Builder.<PostilionEntity>create(PostilionEntity::new, EntityClassification.MISC)
-                .size(0.1F, 0.1F)
+                .size(0.25F, 0.25F)
+                .disableSummoning()
+                .disableSerialization()
                 .setCustomClientFactory((pkt, world) -> new PostilionEntity(world))
                 .build(AstikorCarts.MODID + ":postilion")
                 .setRegistryName("postilion")
@@ -59,5 +62,6 @@ public class Entities {
         RenderingRegistry.registerEntityRenderingHandler(CargoCartEntity.class, CargoCartRenderer::new);
         RenderingRegistry.registerEntityRenderingHandler(PlowCartEntity.class, PlowCartRenderer::new);
         RenderingRegistry.registerEntityRenderingHandler(MobCartEntity.class, MobCartRenderer::new);
+        RenderingRegistry.registerEntityRenderingHandler(PostilionEntity.class, PostilionRenderer::new);
     }
 }
