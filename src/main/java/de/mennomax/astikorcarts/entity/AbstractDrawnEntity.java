@@ -2,6 +2,7 @@ package de.mennomax.astikorcarts.entity;
 
 import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
+import de.mennomax.astikorcarts.init.AstikorStats;
 import de.mennomax.astikorcarts.init.Sounds;
 import de.mennomax.astikorcarts.network.PacketHandler;
 import de.mennomax.astikorcarts.network.packets.SPacketDrawnUpdate;
@@ -134,10 +135,14 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             move = this.getMotion().add(targetVec.subtract(targetVec.normalize().scale(this.spacing + r * Math.signum(diff))));
         }
         this.onGround = true;
+        final double startX = this.posX;
+        final double startY = this.posY;
+        final double startZ = this.posZ;
         this.move(MoverType.SELF, move);
         if (!this.isAlive()) {
             return;
         }
+        this.addStats(this.posX - startX, this.posY - startY, this.posZ - startZ);
         if (this.world.isRemote) {
             for (final CartWheel wheel : this.wheels) {
                 wheel.tick();
@@ -151,6 +156,19 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         this.updatePassengers();
         if (this.drawn != null) {
             this.drawn.pulledTick();
+        }
+    }
+
+    private void addStats(final double x, final double y, final double z) {
+        if (!this.world.isRemote) {
+            final int cm = Math.round(MathHelper.sqrt(x * x + y * y + z * z) * 100.0F);
+            if (cm > 0) {
+                for (final Entity passenger : this.getPassengers()) {
+                    if (passenger instanceof PlayerEntity) {
+                        ((PlayerEntity) passenger).addStat(AstikorStats.CART_ONE_CM, cm);
+                    }
+                }
+            }
         }
     }
 

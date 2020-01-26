@@ -14,11 +14,11 @@ import net.minecraftforge.fml.common.Mod;
 public final class AstikorStats {
     private AstikorStats() {}
 
-    public static final ResourceLocation CART_ON_CM = new ResourceLocation(AstikorCarts.MODID, "cart_on_cm");
+    public static final ResourceLocation CART_ONE_CM = new ResourceLocation(AstikorCarts.MODID, "cart_one_cm");
 
     @SubscribeEvent
     public static void onRegister(final RegistryEvent.Register<StatType<?>> event) {
-        registerCustom(CART_ON_CM, IStatFormatter.DISTANCE);
+        registerCustom(CART_ONE_CM, IStatFormatter.DISTANCE);
     }
 
     private static void registerCustom(final ResourceLocation key, final IStatFormatter formatter) {
