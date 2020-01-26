@@ -19,7 +19,7 @@ public abstract class DrawnRenderer<T extends AbstractDrawnEntity, M extends Ent
     @Override
     public void doRender(final T entity, final double x, final double y, final double z, final float yaw, final float delta) {
         GlStateManager.pushMatrix();
-        GlStateManager.translated(x, y, z);
+        GlStateManager.translatef((float) x, (float) y, (float) z);
         final AbstractDrawnEntity.RenderInfo info = entity.getInfo(delta);
         this.setupRotation(entity, info.getYaw(), delta);
         this.bindEntityTexture(entity);
@@ -57,5 +57,4 @@ public abstract class DrawnRenderer<T extends AbstractDrawnEntity, M extends Ent
         }
         GlStateManager.scalef(-1.0F, -1.0F, 1.0F);
     }
-
 }
