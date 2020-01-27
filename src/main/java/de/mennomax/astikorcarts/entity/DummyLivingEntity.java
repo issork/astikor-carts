@@ -5,9 +5,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.LightningBoltEntity;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.HandSide;
 import net.minecraft.world.World;
+
+import java.util.Collections;
 
 public abstract class DummyLivingEntity extends LivingEntity {
     protected DummyLivingEntity(final EntityType<? extends LivingEntity> type, final World world) {
@@ -20,6 +24,20 @@ public abstract class DummyLivingEntity extends LivingEntity {
         this.setSilent(true);
         this.setNoGravity(true);
         this.setInvulnerable(true);
+    }
+
+    @Override
+    public Iterable<ItemStack> getArmorInventoryList() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public ItemStack getItemStackFromSlot(final EquipmentSlotType slotIn) {
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public void setItemStackToSlot(final EquipmentSlotType slotIn, final ItemStack stack) {
     }
 
     @Override
