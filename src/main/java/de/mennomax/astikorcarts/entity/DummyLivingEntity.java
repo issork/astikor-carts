@@ -24,6 +24,7 @@ public abstract class DummyLivingEntity extends LivingEntity {
         this.setSilent(true);
         this.setNoGravity(true);
         this.setInvulnerable(true);
+        this.setInvisible(true);
     }
 
     @Override
