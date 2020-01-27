@@ -49,7 +49,7 @@ public final class MatrixStack implements AutoCloseable {
 	public void rotate(final float angle, final float x, final float y, final float z) {
 		final Mat4f mat = this.matrix();
 		final Mat4f rotation = this.newMatrix();
-		rotation.makeRotation(x, y, z, angle);
+		rotation.makeRotation(angle, x, y, z);
 		mat.mul(rotation);
 	}
 

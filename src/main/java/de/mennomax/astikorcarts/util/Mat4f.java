@@ -29,33 +29,30 @@ public final class Mat4f {
 		this.m33 = matrix.m33;
 	}
 
-	public void makeIdentity() {
+	public Mat4f makeIdentity() {
 		this.m00 = this.m11 = this.m22 = this.m33 = 1.0F;
 		this.m01 = this.m02 = this.m03 = this.m10 = this.m12 = this.m13 = this.m20 = this.m21 = this.m23 = this.m30 = this.m31 = this.m32 = 0.0F;
+		return this;
 	}
 
-	public void makeTranslation(final float x, final float y, final float z) {
+	public Mat4f makeTranslation(final float x, final float y, final float z) {
 		this.makeIdentity();
 		this.m03 = x;
 		this.m13 = y;
 		this.m23 = z;
+		return this;
 	}
 
-	public void setTranslation(final float x, final float y, final float z) {
-		this.m03 = x;
-		this.m13 = y;
-		this.m23 = z;
-	}
-
-	public void makeScale(final float x, final float y, final float z) {
+	public Mat4f makeScale(final float x, final float y, final float z) {
 		this.makeIdentity();
 		this.m00 = x;
 		this.m11 = y;
 		this.m22 = z;
 		this.m33 = 1.0F;
+		return this;
 	}
 
-	public void makeRotation(final float x, final float y, final float z, final float angle) {
+	public Mat4f makeRotation(final float angle, final float x, final float y, final float z) {
 		this.makeIdentity();
 		final float c = MathHelper.cos(angle);
 		final float s = MathHelper.sin(angle);
@@ -75,6 +72,7 @@ public final class Mat4f {
 		b = x * s;
 		this.m21 = a + b;
 		this.m12 = a - b;
+		return this;
 	}
 
 	public void makeQuaternion(final Quat4f quat) {

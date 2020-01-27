@@ -9,6 +9,9 @@ import de.mennomax.astikorcarts.util.Vec4f;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.HorseRenderer;
+import net.minecraft.client.renderer.entity.model.HorseModel;
+import net.minecraft.client.renderer.entity.model.RendererModel;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
@@ -17,6 +20,7 @@ import net.minecraft.entity.passive.horse.HorseEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import org.lwjgl.opengl.GL11;
 
 public class MobCartRenderer extends DrawnRenderer<MobCartEntity, MobCartModel> {
@@ -33,16 +37,57 @@ public class MobCartRenderer extends DrawnRenderer<MobCartEntity, MobCartModel> 
         final LivingEntity coachman = entity.getControllingPassenger();
         final Entity pulling = entity.getPulling();
         if (pulling instanceof HorseEntity && coachman instanceof PlayerEntity) {
+            final HorseEntity horse = (HorseEntity) pulling;
             GlStateManager.pushMatrix();
             GlStateManager.translatef((float) -TileEntityRendererDispatcher.staticPlayerX, (float) -TileEntityRendererDispatcher.staticPlayerY, (float) -TileEntityRendererDispatcher.staticPlayerZ);
             final Mat4f cmv = this.modelView(coachman, delta);
             final Mat4f pmv = this.modelView(pulling, delta);
+            this.horseTransform(pmv, horse, delta);
+            final float strength = Math.min(MathHelper.lerp(delta, horse.prevLimbSwingAmount, horse.limbSwingAmount), 1.0F);
+            final float swing = horse.limbSwing - horse.limbSwingAmount * (1.0F - delta);
             for (int side = -1; side <= 1; side += 2) {
-                final Vec4f start = new Vec4f(side * 0.4F, coachman.getHeight() * 0.65F, -0.3F, 1.0F).transform(cmv);
-                final Vec4f end = new Vec4f(side * 0.25F, pulling.getHeight() * 1.05F, -1.25F, 1.0F).transform(pmv);
+                final Vec4f start = new Vec4f(side * 0.4F, 1.17F + MathHelper.cos(swing * 0.667F) * 0.05F * strength, -0.3F, 1.0F).transform(cmv);
+                final Vec4f end = new Vec4f(-side * 0.175F, -0.5F, -0.3F, 1.0F).transform(pmv);
                 this.renderCurve(start.x(), start.y(), start.z(), end.x(), end.y(), end.z());
             }
             GlStateManager.popMatrix();
+        }
+    }
+
+    private void horseTransform(final Mat4f m, final HorseEntity entity, final float delta) {
+        final HorseModel<HorseEntity> horseModel = this.renderManager.<HorseEntity, HorseRenderer>getRenderer(entity).getEntityModel();
+        float strength = 0.0F;
+        float swing = 0.0F;
+        if (!entity.isPassenger() && entity.isAlive()) {
+            strength = MathHelper.lerp(delta, entity.prevLimbSwingAmount, entity.limbSwingAmount);
+            swing = entity.limbSwing - entity.limbSwingAmount * (1.0F - delta);
+            if (entity.isChild()) {
+                swing *= 3.0F;
+            }
+            if (strength > 1.0F) {
+                strength = 1.0F;
+            }
+        }
+        horseModel.setLivingAnimations(entity, swing, strength, delta);
+        final RendererModel head = ObfuscationReflectionHelper.getPrivateValue(HorseModel.class, horseModel, "field_217128_b");
+        final Mat4f tmp = new Mat4f();
+        m.mul(tmp.makeScale(-1.0F, -1.0F, 1.0F));
+        m.mul(tmp.makeScale(1.1F, 1.1F, 1.1F));
+        m.mul(tmp.makeTranslation(0.0F, -1.501F, 0.0F));
+        this.transform(m, head);
+    }
+
+    private void transform(final Mat4f m, final RendererModel bone) {
+        final Mat4f tmp = new Mat4f();
+        m.mul(tmp.makeTranslation(bone.rotationPointX / 16.0F, bone.rotationPointY / 16.0F, bone.rotationPointZ / 16.0F));
+        if (bone.rotateAngleZ != 0.0F) {
+            m.mul(tmp.makeRotation(bone.rotateAngleZ, 0.0F, 0.0F, 1.0F));
+        }
+        if (bone.rotateAngleY != 0.0F) {
+            m.mul(tmp.makeRotation(bone.rotateAngleY, 0.0F, 1.0F, 0.0F));
+        }
+        if (bone.rotateAngleX != 0.0F) {
+            m.mul(tmp.makeRotation(bone.rotateAngleX, 1.0F, 0.0F, 0.0F));
         }
     }
 
@@ -61,7 +106,7 @@ public class MobCartRenderer extends DrawnRenderer<MobCartEntity, MobCartModel> 
             prevYaw = entity.prevRotationYaw;
             yaw = entity.rotationYaw;
         }
-        r.makeRotation(0.0F, 1.0F, 0.0F, (float) Math.toRadians(180.0F - MathHelper.func_219805_h(delta, prevYaw, yaw)));
+        r.makeRotation((float) Math.toRadians(180.0F - MathHelper.func_219805_h(delta, prevYaw, yaw)), 0.0F, 1.0F, 0.0F);
         m.mul(r);
         return m;
     }
@@ -85,11 +130,14 @@ public class MobCartRenderer extends DrawnRenderer<MobCartEntity, MobCartModel> 
         final double m = Math.sqrt(dx * dx + dz * dz);
         final double nx = dx / m;
         final double nz = dz / m;
+        final float r0 = 97.0F / 255.0F;
+        final float g0 = 58.0F / 255.0F;
+        final float b0 = 29.0F / 255.0F;
         buf.begin(GL11.GL_TRIANGLE_STRIP, DefaultVertexFormats.POSITION_COLOR);
         for (int i = 0; i <= n; i++) {
-            float r = 0.5F;
-            float g = 0.4F;
-            float b = 0.3F;
+            float r = r0;
+            float g = g0;
+            float b = b0;
             if ((i + offset) % 2 == 0) {
                 r *= 0.7F;
                 g *= 0.7F;
@@ -102,9 +150,9 @@ public class MobCartRenderer extends DrawnRenderer<MobCartEntity, MobCartModel> 
         tes.draw();
         buf.begin(GL11.GL_TRIANGLE_STRIP, DefaultVertexFormats.POSITION_COLOR);
         for (int i = 0; i <= n; i++) {
-            float r = 0.5F;
-            float g = 0.4F;
-            float b = 0.3F;
+            float r = r0;
+            float g = g0;
+            float b = b0;
             if ((i + offset) % 2 == 0) {
                 r *= 0.7F;
                 g *= 0.7F;
