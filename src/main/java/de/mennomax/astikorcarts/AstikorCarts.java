@@ -1,10 +1,12 @@
 package de.mennomax.astikorcarts;
 
+import cpw.mods.modlauncher.api.INameMappingService;
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
 import de.mennomax.astikorcarts.entity.AbstractDrawnEntity;
 import de.mennomax.astikorcarts.entity.CargoCartEntity;
 import de.mennomax.astikorcarts.entity.PostilionEntity;
 import de.mennomax.astikorcarts.entity.ai.goal.PullCartGoal;
+import de.mennomax.astikorcarts.init.AstikorStats;
 import de.mennomax.astikorcarts.init.KeyBindings;
 import de.mennomax.astikorcarts.network.PacketHandler;
 import de.mennomax.astikorcarts.network.packets.CPacketActionKey;
@@ -12,12 +14,17 @@ import de.mennomax.astikorcarts.network.packets.CPacketOpenCargoCartGui;
 import de.mennomax.astikorcarts.network.packets.CPacketToggleSlow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.StatsScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
+import net.minecraft.client.gui.widget.list.AbstractList;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MobEntity;
+import net.minecraft.stats.Stat;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.event.InputUpdateEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
@@ -28,8 +35,12 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.logging.log4j.LogManager;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -86,6 +97,35 @@ public class AstikorCarts {
             }
         }
 
+        @SubscribeEvent
+        public static void onScreenKeyPressed(final GuiScreenEvent.KeyboardKeyPressedEvent.Pre event) {
+            final Minecraft mc = Minecraft.getInstance();
+            final Screen screen = event.getGui();
+            if (screen instanceof StatsScreen && (event.getKeyCode() == GLFW.GLFW_KEY_ENTER || event.getKeyCode() == GLFW.GLFW_KEY_KP_ENTER) && mc.player != null) {
+                final AbstractList<?> list = ObfuscationReflectionHelper.getPrivateValue(StatsScreen.class, (StatsScreen) screen, "field_146550_h");
+                if (list != null) {
+                    final Class<?> classCustomStatsList$Entry;
+                    try {
+                        classCustomStatsList$Entry = Class.forName("net.minecraft.client.gui.screen.StatsScreen$CustomStatsList$Entry");
+                    } catch (final ClassNotFoundException e) {
+                        return;
+                    }
+                    final AbstractList.AbstractListEntry<?> entry = list.getSelected();
+                    if (classCustomStatsList$Entry.isInstance(entry)) {
+                        final String statFieldName = ObfuscationReflectionHelper.remapName(INameMappingService.Domain.FIELD, "field_214405_b");
+                        final Stat<?> stat;
+                        try {
+                            stat = (Stat<?>) FieldUtils.readDeclaredField(classCustomStatsList$Entry, statFieldName, true);
+                        } catch (final IllegalAccessException e) {
+                            return;
+                        }
+                        if (AstikorStats.CART_ONE_CM.equals(stat.getValue()) && mc.player.getStats().getValue(stat) > 2040 * 100) {
+                            LogManager.getLogger().info("Hello, World!");
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @EventBusSubscriber
