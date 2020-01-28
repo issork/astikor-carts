@@ -47,6 +47,13 @@ public class Oregon extends BasicProgram {
 
     @Override
     public void run() {
+        try {
+            this.run0();
+        } catch (final InterruptedException ignored) {
+        }
+    }
+
+    public void run0() throws InterruptedException {
         this.print("DO YOU NEED INSTRUCTIONS  (YES/NO)?");
         final String cs = this.prompt("YES", "NO");
         if (!"NO".equals(cs)) {
@@ -253,7 +260,7 @@ public class Oregon extends BasicProgram {
     }
 
     // BEGINNING EACH TURN
-    private boolean turn() {
+    private boolean turn() throws InterruptedException {
         if (this.f < 0) {
             this.f = 0;
         }
@@ -303,7 +310,7 @@ public class Oregon extends BasicProgram {
         return this.mountains();
     }
 
-    private void wants() {
+    private void wants() throws InterruptedException {
         this.x1 = !this.x1;
         while (true) {
             int x;
@@ -339,7 +346,7 @@ public class Oregon extends BasicProgram {
     }
 
     // STOPPING AT FORT
-    private void stopAtFort() {
+    private void stopAtFort() throws InterruptedException {
         this.print("ENTER WHAT YOU WISH TO SPEND ON THE FOLLOWING");
         this.print("FOOD?");
         int p = this.spend();
@@ -356,7 +363,7 @@ public class Oregon extends BasicProgram {
         this.m = this.m - 45;
     }
 
-    private int spend() {
+    private int spend() throws InterruptedException {
         final int p = this.prompt(0, this.t);
         if (p < 0) {
             return p;
@@ -372,7 +379,7 @@ public class Oregon extends BasicProgram {
     }
 
     // HUNTING
-    private boolean hunting() {
+    private boolean hunting() throws InterruptedException {
         if (this.b <= 39) {
             this.print("TOUGH---YOU NEED MORE BULLETS TO GO HUNTING");
             return true;
@@ -397,7 +404,7 @@ public class Oregon extends BasicProgram {
     }
 
     // EATING
-    private void eat() {
+    private void eat() throws InterruptedException {
         while (true) {
             this.print("DO YOU WANT TO EAT (1) POORLY, (2) MODERATELY, OR (3) WELL?");
             this.e = this.prompt(1, 3);
@@ -415,7 +422,7 @@ public class Oregon extends BasicProgram {
     }
 
     // RIDERS ATTACK
-    private boolean ridersAttack() {
+    private boolean ridersAttack() throws InterruptedException {
         if (this.rnd() * 10 <= (this.pow(this.m / 100.0F - 4, 2) + 72) / (this.pow(this.m / 100.0F - 4, 2) + 12) - 1) {
             this.print("RIDERS AHEAD.  THEY ");
             boolean s5 = false;
@@ -495,7 +502,7 @@ public class Oregon extends BasicProgram {
     }
 
     // SELECTION OF EVENTS
-    private boolean events() {
+    private boolean events() throws InterruptedException {
         int d1;
         final int[] d = { 6, 11, 13, 15, 17, 22, 32, 35, 37, 42, 44, 54, 64, 69, 95 };
         final float r1 = 100 * this.rnd();
@@ -650,7 +657,7 @@ public class Oregon extends BasicProgram {
     }
 
     // MOUNTAINS
-    private boolean mountains() {
+    private boolean mountains() throws InterruptedException {
         if (this.m <= 950) {
             return false;
         }
@@ -680,7 +687,7 @@ public class Oregon extends BasicProgram {
         return false;
     }
 
-    private boolean mountainPass() {
+    private boolean mountainPass() throws InterruptedException {
         if (!this.f1) {
             this.f1 = true;
             if (this.rnd() < 0.8F) {
@@ -700,7 +707,7 @@ public class Oregon extends BasicProgram {
         return false;
     }
 
-    private boolean blizzard() {
+    private boolean blizzard() throws InterruptedException {
         this.print("BLIZZARD IN MOUNTAIN PASS--TIME AND SUPPLIES LOST");
         this.f = this.f - 25;
         this.m1 = this.m1 - 10;
@@ -713,23 +720,23 @@ public class Oregon extends BasicProgram {
     }
 
     // DYING
-    private void noFood() {
+    private void noFood() throws InterruptedException {
         this.print("YOU RAN OUT OF FOOD AND STARVED TO DEATH");
         this.formalities();
     }
 
-    private void noDoctor() {
+    private void noDoctor() throws InterruptedException {
         this.t = 0;
         this.print("YOU CAN'T AFFORD A DOCTOR");
         this.die();
     }
 
-    private void noMedicalSupplies() {
+    private void noMedicalSupplies() throws InterruptedException {
         this.print("YOU RAN OUT OF MEDICAL SUPPLIES");
         this.die();
     }
 
-    private void die() {
+    private void die() throws InterruptedException {
         this.print("YOU DIED OF ");
         if (this.k8) {
             this.print("INJURIES");
@@ -828,7 +835,7 @@ public class Oregon extends BasicProgram {
         this.print("                      AT YOUR NEW HOME");
     }
 
-    private void formalities() {
+    private void formalities() throws InterruptedException {
         this.print("");
         this.print("DUE TO YOUR UNFORTUNATE SITUATION, THERE ARE A FEW");
         this.print("FORMALITIES WE MUST GO THROUGH");
@@ -856,7 +863,7 @@ public class Oregon extends BasicProgram {
     }
 
     // SHOOTING SUB-ROUTINE
-    private int shoot() {
+    private int shoot() throws InterruptedException {
         final String[] ss = { "BANG", "BLAM", "POW", "WHAM" };
         final int s6 = this.rnd(4);
         this.print("TYPE " + ss[s6]);
@@ -877,7 +884,7 @@ public class Oregon extends BasicProgram {
     }
 
     // ILLNESS SUB-ROUTINE
-    private boolean illness() {
+    private boolean illness() throws InterruptedException {
         if (100 * this.rnd() < 10 + 35 * (this.e - 1)) {
             this.print("MILD ILLNESS---MEDICINE USED");
             this.m = this.m - 5;
@@ -936,12 +943,12 @@ public class Oregon extends BasicProgram {
         }
 
         @Override
-        public int prompt(final int lower, final int upper) {
+        public int prompt(final int lower, final int upper) throws InterruptedException {
             return this.input(this.input.prompt(lower, upper));
         }
 
         @Override
-        public String prompt(final String... options) {
+        public String prompt(final String... options) throws InterruptedException {
             return this.input(this.input.prompt(options));
         }
 

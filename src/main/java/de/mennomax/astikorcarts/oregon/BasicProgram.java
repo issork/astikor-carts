@@ -15,11 +15,11 @@ public abstract class BasicProgram implements Runnable {
         this.line = new StringBuilder();
     }
 
-    protected final int prompt(final int lower, final int upper) {
+    protected final int prompt(final int lower, final int upper) throws InterruptedException {
         return this.io.prompt(lower, upper);
     }
 
-    protected final String prompt(final String... options) {
+    protected final String prompt(final String... options) throws InterruptedException {
         return this.io.prompt(options);
     }
 
@@ -65,9 +65,9 @@ public abstract class BasicProgram implements Runnable {
     }
 
     public interface IO {
-        int prompt(final int lower, final int upper);
+        int prompt(final int lower, final int upper) throws InterruptedException;
 
-        String prompt(final String... options);
+        String prompt(final String... options) throws InterruptedException;
 
         void print(final String s);
     }
