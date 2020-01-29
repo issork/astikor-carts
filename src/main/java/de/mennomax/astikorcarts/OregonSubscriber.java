@@ -9,13 +9,12 @@ import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.StatsScreen;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.list.AbstractList;
 import net.minecraft.stats.Stat;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.client.event.ClientChatEvent;
-import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
@@ -54,7 +53,6 @@ public final class OregonSubscriber {
                         return;
                     }
                     if (AstikorStats.CART_ONE_CM.equals(stat.getValue()) && mc.player.getStats().getValue(stat) > 2040 * 100) {
-                        mc.displayGuiScreen(null);
                         final PlayerIO io = new PlayerIO();
                         final Oregon oregon = new Oregon(io, new Random());
                         this.setState(new ActiveState(new Thread(() -> {
@@ -68,27 +66,22 @@ public final class OregonSubscriber {
                 }
             }
         }
-    }
-
-    @SubscribeEvent
-    public void onChat(final ClientChatEvent event) {
-        if (this.state.onChat(event.getMessage())) {
-            event.setCanceled(true);
-        }
-    }
-
-    @SubscribeEvent
-    public void onScreenOpen(final GuiOpenEvent event) {
-        if (this.state.onScreenOpen(event.getGui())) {
-            event.setGui(new ChatScreen("? "));
+        if (screen instanceof ChatScreen && (event.getKeyCode() == GLFW.GLFW_KEY_ENTER || event.getKeyCode() == GLFW.GLFW_KEY_KP_ENTER)) {
+            screen.children().stream()
+                .filter(TextFieldWidget.class::isInstance)
+                .map(TextFieldWidget.class::cast)
+                .findFirst().ifPresent(field -> {
+                    if (this.state.onChat(field)) {
+                        event.setCanceled(true);
+                    }
+                });
         }
     }
 
     private void setState(final State newState) {
-        final State oldState = this.state;
+        this.state.stop();
         this.state = newState;
-        oldState.stop();
-        newState.start();
+        this.state.start();
     }
 
     abstract static class State {
@@ -96,9 +89,7 @@ public final class OregonSubscriber {
 
         abstract void stop();
 
-        abstract boolean onChat(final String message);
-
-        public abstract boolean onScreenOpen(final Screen screen);
+        abstract boolean onChat(final TextFieldWidget field);
     }
 
     static class IdleState extends State {
@@ -111,12 +102,7 @@ public final class OregonSubscriber {
         }
 
         @Override
-        public boolean onChat(final String message) {
-            return false;
-        }
-
-        @Override
-        public boolean onScreenOpen(final Screen screen) {
+        public boolean onChat(final TextFieldWidget field) {
             return false;
         }
     }
@@ -134,6 +120,7 @@ public final class OregonSubscriber {
         void start() {
             this.thread.setDaemon(true);
             this.thread.start();
+            Minecraft.getInstance().displayGuiScreen(new ChatScreen("? "));
         }
 
         @Override
@@ -150,17 +137,14 @@ public final class OregonSubscriber {
         }
 
         @Override
-        public boolean onChat(final String message) {
-            if (message.startsWith("?")) {
-                this.io.add(message.substring(1).trim());
+        public boolean onChat(final TextFieldWidget field) {
+            final String text = field.getText();
+            if (text.startsWith("?")) {
+                this.io.add(text.substring(1).trim());
+                field.setText("? ");
                 return true;
             }
             return false;
-        }
-
-        @Override
-        public boolean onScreenOpen(final Screen screen) {
-            return screen == null && Minecraft.getInstance().currentScreen instanceof ChatScreen;
         }
     }
 
@@ -192,7 +176,7 @@ public final class OregonSubscriber {
         @Override
         public void print(final String s) {
             final Minecraft mc = Minecraft.getInstance();
-            mc.enqueue(() -> {
+            mc.runImmediately(() -> {
                 final ClientPlayerEntity player = mc.player;
                 if (player != null) {
                     player.sendMessage(new StringTextComponent(s).setStyle(new Style().setItalic(true).setColor(TextFormatting.GRAY)));
