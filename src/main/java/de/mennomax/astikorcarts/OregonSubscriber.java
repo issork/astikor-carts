@@ -23,6 +23,7 @@ import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.BlockingDeque;
@@ -87,7 +88,7 @@ public final class OregonSubscriber {
             fieldStat.setAccessible(true);
             stat = (Stat<?>) fieldStat.get(entry);
         } catch (final NoSuchFieldException | IllegalAccessException e) {
-            LOGGER.error("Unable to retrieve stat from entry {}", entry.getClass(), e);
+            LOGGER.error("Unable to retrieve stat from entry; fields: {}", Arrays.asList(StatsScreen.class.getDeclaredFields()), e);
             return Optional.empty();
         }
         return Optional.of(stat);
