@@ -57,8 +57,11 @@ public abstract class BasicProgram implements Runnable {
     }
 
     protected final void print(final Object... arr) {
-        for (final Object o : arr) {
-            this.line.append(String.format("%1$-15s", o));
+        if (arr.length > 0) {
+            for (int i = 0; i < arr.length - 1; i++) {
+                this.line.append(String.format("%1$-15s", arr[i]));
+            }
+            this.line.append(arr[arr.length - 1]);
         }
         this.io.print(this.line.toString());
         this.line.setLength(0);
