@@ -28,15 +28,17 @@ public class PostilionEntity extends DummyLivingEntity {
     @Override
     public void tick() {
         super.tick();
-        final LivingEntity coachman = this.getCoachman();
-        if (coachman != null) {
-            this.rotationYaw = coachman.rotationYaw;
-            this.prevRotationYaw = this.rotationYaw;
-            this.rotationPitch = coachman.rotationPitch * 0.5F;
-            this.moveForward = coachman.moveForward;
-            this.moveStrafing = 0.0F;
-        } else {
-            this.remove();
+        if (!this.world.isRemote) {
+            final LivingEntity coachman = this.getCoachman();
+            if (coachman != null) {
+                this.rotationYaw = coachman.rotationYaw;
+                this.prevRotationYaw = this.rotationYaw;
+                this.rotationPitch = coachman.rotationPitch * 0.5F;
+                this.moveForward = coachman.moveForward;
+                this.moveStrafing = 0.0F;
+            } else {
+                this.remove();
+            }
         }
     }
 

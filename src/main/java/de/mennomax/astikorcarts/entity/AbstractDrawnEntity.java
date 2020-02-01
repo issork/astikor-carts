@@ -457,7 +457,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         this.lerpZ = z;
         this.lerpYaw = yaw;
         this.lerpPitch = pitch;
-        this.lerpSteps = teleport ? 1 : this.pulling == null ? 3 : 10;
+        this.lerpSteps = posRotationIncrements;
     }
 
     @Override
