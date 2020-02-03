@@ -46,7 +46,7 @@ public class MobCartRenderer extends DrawnRenderer<MobCartEntity, MobCartModel> 
             final float strength = Math.min(MathHelper.lerp(delta, horse.prevLimbSwingAmount, horse.limbSwingAmount), 1.0F);
             final float swing = horse.limbSwing - horse.limbSwingAmount * (1.0F - delta);
             for (int side = -1; side <= 1; side += 2) {
-                final Vec4f start = new Vec4f(side * 0.4F, 1.17F + MathHelper.cos(swing * 0.667F) * 0.05F * strength, -0.3F, 1.0F).transform(cmv);
+                final Vec4f start = new Vec4f(side * 0.4F, 1.17F + MathHelper.cos((swing - 1.02F) * 0.4F * 2) * 0.05F * strength, -0.3F, 1.0F).transform(cmv);
                 final Vec4f end = new Vec4f(-side * 0.175F, -0.5F, -0.3F, 1.0F).transform(pmv);
                 this.renderCurve(start.x(), start.y(), start.z(), end.x(), end.y(), end.z());
             }
