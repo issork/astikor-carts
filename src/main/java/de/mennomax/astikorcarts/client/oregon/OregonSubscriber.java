@@ -1,4 +1,4 @@
-package de.mennomax.astikorcarts;
+package de.mennomax.astikorcarts.client.oregon;
 
 import cpw.mods.modlauncher.api.INameMappingService;
 import de.mennomax.astikorcarts.init.AstikorStats;

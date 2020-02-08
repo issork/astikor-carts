@@ -1,7 +1,7 @@
 package de.mennomax.astikorcarts.entity;
 
-import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.init.Entities;
+import de.mennomax.astikorcarts.world.AstikorWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -10,6 +10,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 public class PostilionEntity extends DummyLivingEntity {
     public PostilionEntity(final EntityType<? extends PostilionEntity> type, final World world) {
@@ -46,10 +47,8 @@ public class PostilionEntity extends DummyLivingEntity {
     private LivingEntity getCoachman() {
         final Entity mount = this.getRidingEntity();
         if (mount != null) {
-            final AbstractDrawnEntity drawn = (this.world.isRemote ? AstikorCarts.CLIENTPULLMAP : AstikorCarts.SERVERPULLMAP).get(mount);
-            if (drawn != null) {
-                return drawn.getControllingPassenger();
-            }
+            return AstikorWorld.get(this.world).map(m -> m.getDrawn(mount)).orElse(Optional.empty())
+                .map(AbstractDrawnEntity::getControllingPassenger).orElse(null);
         }
         return null;
     }

@@ -1,6 +1,6 @@
 package de.mennomax.astikorcarts.entity.ai.goal;
 
-import de.mennomax.astikorcarts.AstikorCarts;
+import de.mennomax.astikorcarts.world.AstikorWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ai.goal.Goal;
 
@@ -16,7 +16,7 @@ public class PullCartGoal extends Goal {
 
     @Override
     public boolean shouldExecute() {
-        return AstikorCarts.SERVERPULLMAP.containsKey(this.mob);
+        return AstikorWorld.get(this.mob.world).map(w -> w.isPulling(this.mob)).orElse(false);
     }
 
 }

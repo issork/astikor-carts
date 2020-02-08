@@ -1,13 +1,17 @@
 package de.mennomax.astikorcarts.network.packets;
 
-import de.mennomax.astikorcarts.AstikorCarts;
+import com.mojang.datafixers.util.Pair;
 import de.mennomax.astikorcarts.entity.AbstractDrawnEntity;
+import de.mennomax.astikorcarts.world.AstikorWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 
-import java.util.List;
+import java.util.Comparator;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class CPacketActionKey {
@@ -23,24 +27,14 @@ public class CPacketActionKey {
     public static void handle(final CPacketActionKey msg, final Supplier<Context> ctx) {
         ctx.get().enqueueWork(() -> {
             final ServerPlayerEntity player = ctx.get().getSender();
-            Entity pulling = player.isPassenger() ? player.getRidingEntity() : player;
-            AbstractDrawnEntity closest = AstikorCarts.SERVERPULLMAP.get(pulling);
-            if (closest == null) {
-                final List<AbstractDrawnEntity> result = player.world.getEntitiesWithinAABB(AbstractDrawnEntity.class, player.getBoundingBox().grow(3), entity -> entity != player.getRidingEntity());
-                if (result.isEmpty()) {
-                    return;
-                }
-                closest = result.get(0);
-                for (int i = 1; i < result.size(); i++) {
-                    final AbstractDrawnEntity cart = result.get(i);
-                    if (cart.getDistance(pulling) < closest.getDistance(pulling)) {
-                        closest = cart;
-                    }
-                }
-            } else {
-                pulling = null;
-            }
-            closest.setPulling(pulling);
+            final Entity pulling = player.isPassenger() ? Objects.requireNonNull(player.getRidingEntity()) : player;
+            final World world = player.world;
+            AstikorWorld.get(world).map(w -> w.getDrawn(pulling)).orElse(Optional.empty())
+                .map(c -> Optional.of(Pair.of(c, (Entity) null)))
+                .orElseGet(() -> world.getEntitiesWithinAABB(AbstractDrawnEntity.class, player.getBoundingBox().grow(3), entity -> entity != pulling).stream()
+                    .min(Comparator.comparing(pulling::getDistance))
+                    .map(c -> Pair.of(c, pulling))
+                ).ifPresent(p -> p.getFirst().setPulling(p.getSecond()));
         });
         ctx.get().setPacketHandled(true);
     }

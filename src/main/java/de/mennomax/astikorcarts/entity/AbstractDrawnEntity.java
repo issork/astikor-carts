@@ -1,20 +1,18 @@
 package de.mennomax.astikorcarts.entity;
 
-import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
 import de.mennomax.astikorcarts.init.AstikorStats;
 import de.mennomax.astikorcarts.init.Sounds;
 import de.mennomax.astikorcarts.network.PacketHandler;
 import de.mennomax.astikorcarts.network.packets.SPacketDrawnUpdate;
 import de.mennomax.astikorcarts.util.CartWheel;
+import de.mennomax.astikorcarts.world.AstikorWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.MoverType;
-import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.AttributeModifier.Operation;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -57,7 +55,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     private static final DataParameter<Integer> FORWARD_DIRECTION = EntityDataManager.createKey(AbstractDrawnEntity.class, DataSerializers.VARINT);
     private static final DataParameter<Float> DAMAGE_TAKEN = EntityDataManager.createKey(AbstractDrawnEntity.class, DataSerializers.FLOAT);
     public static final UUID PULL_SLOWLY_MODIFIER_UUID = UUID.fromString("49B0E52E-48F2-4D89-BED7-4F5DF26F1263");
-    public static final AttributeModifier PULL_SLOWLY_MODIFIER = (new AttributeModifier(PULL_SLOWLY_MODIFIER_UUID, "Pull slowly modifier", AstikorCartsConfig.COMMON.speedModifier.get(), Operation.MULTIPLY_TOTAL)).setSaved(false);
+    public static final AttributeModifier PULL_SLOWLY_MODIFIER = (new AttributeModifier(PULL_SLOWLY_MODIFIER_UUID, "Pull slowly modifier", AstikorCartsConfig.COMMON.speedModifier.get(), AttributeModifier.Operation.MULTIPLY_TOTAL)).setSaved(false);
     private int lerpSteps;
     private double lerpX;
     private double lerpY;
@@ -195,6 +193,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         }
     }
 
+    @Nullable
     public Entity getPulling() {
         return this.pulling;
     }
@@ -205,12 +204,13 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
      * @param entityIn new pulling entity
      */
     public void setPulling(final Entity entityIn) {
+        if (this.pulling instanceof AbstractDrawnEntity) {
+            ((AbstractDrawnEntity) this.pulling).drawn = null;
+        }
         if (!this.world.isRemote) {
             if (this.canBePulledBy(entityIn)) {
                 if (entityIn == null) {
-                    if (this.pulling instanceof LivingEntity) {
-                        ((LivingEntity) this.pulling).getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(PULL_SLOWLY_MODIFIER);
-                    } else if (this.pulling instanceof AbstractDrawnEntity) {
+                    if (this.pulling instanceof AbstractDrawnEntity) {
                         ((AbstractDrawnEntity) this.pulling).drawn = null;
                     }
                     PacketHandler.CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new SPacketDrawnUpdate(-1, this.getEntityId()));
@@ -223,7 +223,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
                         ((MobEntity) entityIn).getNavigator().clearPath();
                     }
                     if (!(entityIn instanceof AbstractDrawnEntity)) {
-                        AstikorCarts.SERVERPULLMAP.put(entityIn, this);
+                        AstikorWorld.get(this.world).ifPresent(w -> w.addPulling(this));
                     }
                     PacketHandler.CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new SPacketDrawnUpdate(entityIn.getEntityId(), this.getEntityId()));
                     this.pullingUUID = entityIn.getUniqueID();
@@ -239,23 +239,18 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             }
         } else {
             if (entityIn == null) {
-                if (this.pulling instanceof AbstractDrawnEntity) {
-                    ((AbstractDrawnEntity) this.pulling).drawn = null;
-                }
                 this.pullingId = -1;
                 for (final CartWheel wheel : this.wheels) {
                     wheel.clearIncrement();
                 }
             } else {
                 this.pullingId = entityIn.getEntityId();
-                if (!(entityIn instanceof AbstractDrawnEntity)) {
-                    AstikorCarts.CLIENTPULLMAP.put(entityIn, this);
-                }
-                if (entityIn instanceof AbstractDrawnEntity) {
-                    ((AbstractDrawnEntity) entityIn).drawn = this;
-                }
             }
             this.pulling = entityIn;
+        }
+        AstikorWorld.get(this.world).ifPresent(w -> w.addPulling(this));
+        if (this.pulling instanceof AbstractDrawnEntity) {
+            ((AbstractDrawnEntity) this.pulling).drawn = this;
         }
     }
 
@@ -362,6 +357,9 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
      * @param entityIn
      */
     protected boolean canBePulledBy(final Entity entityIn) {
+        if (this.world.isRemote) {
+            return true;
+        }
         if (entityIn == null) {
             return true;
         }

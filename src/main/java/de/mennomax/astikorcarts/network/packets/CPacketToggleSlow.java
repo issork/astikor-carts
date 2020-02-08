@@ -1,7 +1,7 @@
 package de.mennomax.astikorcarts.network.packets;
 
-import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.entity.AbstractDrawnEntity;
+import de.mennomax.astikorcarts.world.AstikorWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -25,13 +25,11 @@ public class CPacketToggleSlow {
         final ServerPlayerEntity sender = ctx.get().getSender();
         ctx.get().enqueueWork(() -> {
             final Entity ridden = sender.getRidingEntity();
-            if (AstikorCarts.SERVERPULLMAP.containsKey(ridden)) {
-                if (ridden instanceof MobEntity) {
-                    if (((MobEntity) ridden).getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).hasModifier(AbstractDrawnEntity.PULL_SLOWLY_MODIFIER)) {
-                        ((MobEntity) ridden).getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(AbstractDrawnEntity.PULL_SLOWLY_MODIFIER);
-                    } else {
-                        ((MobEntity) ridden).getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(AbstractDrawnEntity.PULL_SLOWLY_MODIFIER);
-                    }
+            if (ridden instanceof MobEntity && AstikorWorld.get(ridden.world).map(w -> w.isPulling(ridden)).orElse(false)) {
+                if (((MobEntity) ridden).getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).hasModifier(AbstractDrawnEntity.PULL_SLOWLY_MODIFIER)) {
+                    ((MobEntity) ridden).getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(AbstractDrawnEntity.PULL_SLOWLY_MODIFIER);
+                } else {
+                    ((MobEntity) ridden).getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(AbstractDrawnEntity.PULL_SLOWLY_MODIFIER);
                 }
             }
         });

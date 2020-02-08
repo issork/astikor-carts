@@ -11,17 +11,11 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.lwjgl.glfw.GLFW;
 
 @EventBusSubscriber(modid = AstikorCarts.MODID, bus = Bus.MOD, value = Dist.CLIENT)
-public class KeyBindings {
-
-    public static final KeyBinding[] KEYBINDINGS = {
-        new KeyBinding("key.astikorcarts.desc", GLFW.GLFW_KEY_R, "key.categories.astikorcarts")
-    };
+public final class KeyBindings {
+    public static final KeyBinding ACTION = new KeyBinding("key.astikorcarts.desc", GLFW.GLFW_KEY_R, "key.categories.astikorcarts");
 
     @SubscribeEvent
     public static void registerKeyBindings(final FMLClientSetupEvent event) {
-        for (final KeyBinding bind : KEYBINDINGS) {
-            ClientRegistry.registerKeyBinding(bind);
-        }
+        ClientRegistry.registerKeyBinding(ACTION);
     }
-
 }
