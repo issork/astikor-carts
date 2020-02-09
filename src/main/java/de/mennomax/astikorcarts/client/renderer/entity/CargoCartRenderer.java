@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.util.ResourceLocation;
 
 public class CargoCartRenderer extends DrawnRenderer<CargoCartEntity, CargoCartModel> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(AstikorCarts.MODID, "textures/entity/cargocart.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation(AstikorCarts.ID, "textures/entity/cargocart.png");
 
     public CargoCartRenderer(final EntityRendererManager renderManager) {
         super(renderManager, new CargoCartModel());

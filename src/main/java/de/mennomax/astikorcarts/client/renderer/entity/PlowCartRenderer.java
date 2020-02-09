@@ -14,7 +14,7 @@ import net.minecraft.util.ResourceLocation;
 
 @SuppressWarnings("deprecation")
 public class PlowCartRenderer extends DrawnRenderer<PlowCartEntity, PlowCartModel> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(AstikorCarts.MODID, "textures/entity/plowcart.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation(AstikorCarts.ID, "textures/entity/plowcart.png");
 
     public PlowCartRenderer(final EntityRendererManager renderManager) {
         super(renderManager, new PlowCartModel());

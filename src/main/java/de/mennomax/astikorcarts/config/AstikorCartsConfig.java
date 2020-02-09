@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-@EventBusSubscriber(modid = AstikorCarts.MODID, bus = Bus.MOD)
+@EventBusSubscriber(modid = AstikorCarts.ID, bus = Bus.MOD)
 public class AstikorCartsConfig {
 
     public static final Common COMMON;

@@ -13,12 +13,12 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.network.NetworkRegistry.ChannelBuilder;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
-@EventBusSubscriber(modid = AstikorCarts.MODID, bus = Bus.MOD)
+@EventBusSubscriber(modid = AstikorCarts.ID, bus = Bus.MOD)
 public class PacketHandler {
 
     private static int id = 0;
     public static final String VERSION = "1";
-    public static final SimpleChannel CHANNEL = ChannelBuilder.named(new ResourceLocation(AstikorCarts.MODID, "main"))
+    public static final SimpleChannel CHANNEL = ChannelBuilder.named(new ResourceLocation(AstikorCarts.ID, "main"))
         .networkProtocolVersion(() -> VERSION)
         .clientAcceptedVersions(VERSION::equals)
         .serverAcceptedVersions(VERSION::equals)

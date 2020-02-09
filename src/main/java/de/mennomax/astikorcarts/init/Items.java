@@ -2,19 +2,17 @@ package de.mennomax.astikorcarts.init;
 
 import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.item.CartItem;
-import de.mennomax.astikorcarts.item.ModItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.Properties;
 import net.minecraft.item.ItemGroup;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.registries.ObjectHolder;
 
-@ObjectHolder(AstikorCarts.MODID)
-@EventBusSubscriber(bus = Bus.MOD, modid = AstikorCarts.MODID)
+@ObjectHolder(AstikorCarts.ID)
+@EventBusSubscriber(bus = Bus.MOD, modid = AstikorCarts.ID)
 public class Items {
 
     public static final Item CARGOCART = null;
@@ -24,10 +22,14 @@ public class Items {
     @SubscribeEvent
     public static void registerItems(final RegistryEvent.Register<Item> event) {
         event.getRegistry().registerAll(
-            new ModItem(new Properties().group(ItemGroup.MATERIALS), new ResourceLocation(AstikorCarts.MODID, "wheel")),
-            new CartItem(AstikorCarts.MODID, "cargocart"),
-            new CartItem(AstikorCarts.MODID, "plowcart"),
-            new CartItem(AstikorCarts.MODID, "mobcart"));
+            new Item(new Properties().group(ItemGroup.MATERIALS)).setRegistryName("wheel"),
+            createCart("cargocart"),
+            createCart("plowcart"),
+            createCart("mobcart")
+        );
     }
 
+    private static Item createCart(final String name) {
+        return new CartItem(new Properties().maxStackSize(1).group(ItemGroup.TRANSPORTATION)).setRegistryName(name);
+    }
 }

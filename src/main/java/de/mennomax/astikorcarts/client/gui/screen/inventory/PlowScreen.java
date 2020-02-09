@@ -10,7 +10,7 @@ import net.minecraft.util.text.ITextComponent;
 
 public class PlowScreen extends ContainerScreen<CartContainer> {
 
-    private static final ResourceLocation PLOW_GUI_TEXTURES = new ResourceLocation(AstikorCarts.MODID, "textures/gui/container/plow.png");
+    private static final ResourceLocation PLOW_GUI_TEXTURES = new ResourceLocation(AstikorCarts.ID, "textures/gui/container/plow.png");
 
     public PlowScreen(final CartContainer screenContainer, final PlayerInventory inv, final ITextComponent titleIn) {
         super(screenContainer, inv, titleIn);

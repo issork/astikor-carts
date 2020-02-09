@@ -23,8 +23,8 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ObjectHolder;
 
-@ObjectHolder(AstikorCarts.MODID)
-@EventBusSubscriber(bus = Bus.MOD, modid = AstikorCarts.MODID)
+@ObjectHolder(AstikorCarts.ID)
+@EventBusSubscriber(bus = Bus.MOD, modid = AstikorCarts.ID)
 public class Entities {
 
     public static final EntityType<?> CARGOCART = null;
@@ -42,13 +42,13 @@ public class Entities {
                 .disableSummoning()
                 .disableSerialization()
                 .setCustomClientFactory((pkt, world) -> new PostilionEntity(world))
-                .build(AstikorCarts.MODID + ":postilion")
+                .build(AstikorCarts.ID + ":postilion")
                 .setRegistryName("postilion")
         );
     }
 
     public static EntityType<?> buildType(final IFactory<Entity> factoryIn, final String name, final float widthIn, final float heightIn) {
-        final ResourceLocation resourceLocation = new ResourceLocation(AstikorCarts.MODID, name);
+        final ResourceLocation resourceLocation = new ResourceLocation(AstikorCarts.ID, name);
         final EntityType<?> entityType = EntityType.Builder.create(factoryIn, EntityClassification.MISC)
             .size(widthIn, heightIn)
             .setCustomClientFactory((pkg, world) -> ForgeRegistries.ENTITIES.getValue(resourceLocation).create(world))

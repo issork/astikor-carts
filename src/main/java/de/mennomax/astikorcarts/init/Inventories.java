@@ -15,8 +15,8 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.network.IContainerFactory;
 import net.minecraftforge.registries.ObjectHolder;
 
-@ObjectHolder(AstikorCarts.MODID)
-@EventBusSubscriber(modid = AstikorCarts.MODID, bus = Bus.MOD)
+@ObjectHolder(AstikorCarts.ID)
+@EventBusSubscriber(modid = AstikorCarts.ID, bus = Bus.MOD)
 public class Inventories {
 
     public static final ContainerType<PlowCartContainer> PLOWCARTCONTAINER = null;
@@ -33,7 +33,7 @@ public class Inventories {
     }
 
     private static ContainerType<?> createType(final IContainerFactory<? extends CartContainer> container, final String name) {
-        return IForgeContainerType.create(container).setRegistryName(AstikorCarts.MODID, name);
+        return IForgeContainerType.create(container).setRegistryName(AstikorCarts.ID, name);
     }
 
 }

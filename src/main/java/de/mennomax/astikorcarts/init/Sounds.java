@@ -7,7 +7,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, modid = AstikorCarts.MODID)
+@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, modid = AstikorCarts.ID)
 public final class Sounds {
     private Sounds() {}
 
@@ -21,6 +21,6 @@ public final class Sounds {
     }
 
     private static SoundEvent create(final String name) {
-        return new SoundEvent(new ResourceLocation(AstikorCarts.MODID, name)).setRegistryName(new ResourceLocation(AstikorCarts.MODID, name));
+        return new SoundEvent(new ResourceLocation(AstikorCarts.ID, name)).setRegistryName(new ResourceLocation(AstikorCarts.ID, name));
     }
 }

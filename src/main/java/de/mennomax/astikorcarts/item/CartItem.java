@@ -2,14 +2,14 @@ package de.mennomax.astikorcarts.item;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemGroup;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.EntityPredicates;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.RayTraceContext.FluidMode;
 import net.minecraft.util.math.RayTraceResult;
@@ -20,51 +20,50 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 
-public class CartItem extends ModItem {
-
-    public CartItem(final String modid, final String name) {
-        super(new Properties().maxStackSize(1).group(ItemGroup.TRANSPORTATION), new ResourceLocation(modid, name));
+public class CartItem extends Item {
+    public CartItem(final Properties properties) {
+        super(properties);
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(final World worldIn, final PlayerEntity playerIn, final Hand handIn) {
-        final ItemStack itemstack = playerIn.getHeldItem(handIn);
-        final RayTraceResult result = rayTrace(worldIn, playerIn, FluidMode.ANY);
+    public ActionResult<ItemStack> onItemRightClick(final World world, final PlayerEntity player, final Hand hand) {
+        ItemStack stack = player.getHeldItem(hand);
+        CompoundNBT tag = stack.getOrCreateTag();
+        final RayTraceResult result = rayTrace(world, player, FluidMode.ANY);
         if (result.getType() == Type.MISS) {
-            return new ActionResult<>(ActionResultType.PASS, itemstack);
+            return new ActionResult<>(ActionResultType.PASS, stack);
         } else {
-            final Vec3d lookVec = playerIn.getLook(1.0F);
-            final List<Entity> list = worldIn.getEntitiesInAABBexcluding(playerIn, playerIn.getBoundingBox().expand(lookVec.scale(5.0D)).grow(5.0D), EntityPredicates.NOT_SPECTATING.and(Entity::canBeCollidedWith));
+            final Vec3d lookVec = player.getLook(1.0F);
+            final List<Entity> list = world.getEntitiesInAABBexcluding(player, player.getBoundingBox().expand(lookVec.scale(5.0D)).grow(5.0D), EntityPredicates.NOT_SPECTATING.and(Entity::canBeCollidedWith));
             if (!list.isEmpty()) {
-                final Vec3d eyePos = playerIn.getEyePosition(1.0F);
+                final Vec3d eyePos = player.getEyePosition(1.0F);
                 for (final Entity entity : list) {
                     final AxisAlignedBB axisalignedbb = entity.getBoundingBox().grow(entity.getCollisionBorderSize());
                     if (axisalignedbb.contains(eyePos)) {
-                        return new ActionResult<>(ActionResultType.PASS, itemstack);
+                        return new ActionResult<>(ActionResultType.PASS, stack);
                     }
                 }
             }
 
             if (result.getType() == Type.BLOCK) {
-                final Entity cart = ForgeRegistries.ENTITIES.getValue(this.getRegistryName()).create(worldIn);
+                final Entity cart = ForgeRegistries.ENTITIES.getValue(this.getRegistryName()).create(world);
                 cart.setPosition(result.getHitVec().x, result.getHitVec().y, result.getHitVec().z);
-                cart.rotationYaw = (playerIn.rotationYaw + 180) % 360;
-                if (!worldIn.isCollisionBoxesEmpty(cart, cart.getBoundingBox().grow(0.1F, -0.1F, 0.1F))) {
-                    return new ActionResult<>(ActionResultType.FAIL, itemstack);
+                cart.rotationYaw = (player.rotationYaw + 180) % 360;
+                if (!world.isCollisionBoxesEmpty(cart, cart.getBoundingBox().grow(0.1F, -0.1F, 0.1F))) {
+                    return new ActionResult<>(ActionResultType.FAIL, stack);
                 } else {
-                    if (!worldIn.isRemote()) {
-                        worldIn.addEntity(cart);
+                    if (!world.isRemote()) {
+                        world.addEntity(cart);
                     }
-                    if (!playerIn.abilities.isCreativeMode) {
-                        itemstack.shrink(1);
+                    if (!player.abilities.isCreativeMode) {
+                        stack.shrink(1);
                     }
-                    playerIn.addStat(Stats.ITEM_USED.get(this));
-                    return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
+                    player.addStat(Stats.ITEM_USED.get(this));
+                    return new ActionResult<>(ActionResultType.SUCCESS, stack);
                 }
             } else {
-                return new ActionResult<>(ActionResultType.PASS, itemstack);
+                return new ActionResult<>(ActionResultType.PASS, stack);
             }
         }
     }
-
 }

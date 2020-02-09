@@ -10,11 +10,11 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, modid = AstikorCarts.MODID)
+@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, modid = AstikorCarts.ID)
 public final class AstikorStats {
     private AstikorStats() {}
 
-    public static final ResourceLocation CART_ONE_CM = new ResourceLocation(AstikorCarts.MODID, "cart_one_cm");
+    public static final ResourceLocation CART_ONE_CM = new ResourceLocation(AstikorCarts.ID, "cart_one_cm");
 
     @SubscribeEvent
     public static void onRegister(final RegistryEvent.Register<StatType<?>> event) {
