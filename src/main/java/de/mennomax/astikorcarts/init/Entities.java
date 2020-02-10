@@ -1,10 +1,6 @@
 package de.mennomax.astikorcarts.init;
 
 import de.mennomax.astikorcarts.AstikorCarts;
-import de.mennomax.astikorcarts.client.renderer.entity.CargoCartRenderer;
-import de.mennomax.astikorcarts.client.renderer.entity.MobCartRenderer;
-import de.mennomax.astikorcarts.client.renderer.entity.PlowCartRenderer;
-import de.mennomax.astikorcarts.client.renderer.entity.PostilionRenderer;
 import de.mennomax.astikorcarts.entity.CargoCartEntity;
 import de.mennomax.astikorcarts.entity.MobCartEntity;
 import de.mennomax.astikorcarts.entity.PlowCartEntity;
@@ -16,10 +12,8 @@ import net.minecraft.entity.EntityType.IFactory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ObjectHolder;
 
@@ -55,13 +49,5 @@ public class Entities {
             .build(resourceLocation.toString());
         entityType.setRegistryName(name);
         return entityType;
-    }
-
-    @SubscribeEvent
-    public static void registerRenders(final FMLClientSetupEvent event) {
-        RenderingRegistry.registerEntityRenderingHandler(CargoCartEntity.class, CargoCartRenderer::new);
-        RenderingRegistry.registerEntityRenderingHandler(PlowCartEntity.class, PlowCartRenderer::new);
-        RenderingRegistry.registerEntityRenderingHandler(MobCartEntity.class, MobCartRenderer::new);
-        RenderingRegistry.registerEntityRenderingHandler(PostilionEntity.class, PostilionRenderer::new);
     }
 }

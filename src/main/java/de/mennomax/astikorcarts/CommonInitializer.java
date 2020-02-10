@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
 
 public class CommonInitializer implements Initializer {
     @Override
-    public void init(final Mod mod) {
+    public void init(final Context mod) {
         mod.context().registerConfig(ModConfig.Type.COMMON, AstikorCartsConfig.COMMONSPEC);
         mod.modBus().<FMLCommonSetupEvent>addListener(e -> {
             CapabilityManager.INSTANCE.register(AstikorWorld.class, new Capability.IStorage<AstikorWorld>() {
