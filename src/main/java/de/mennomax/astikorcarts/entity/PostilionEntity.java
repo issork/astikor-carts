@@ -1,6 +1,5 @@
 package de.mennomax.astikorcarts.entity;
 
-import de.mennomax.astikorcarts.init.Entities;
 import de.mennomax.astikorcarts.world.AstikorWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -15,10 +14,6 @@ import java.util.Optional;
 public class PostilionEntity extends DummyLivingEntity {
     public PostilionEntity(final EntityType<? extends PostilionEntity> type, final World world) {
         super(type, world);
-    }
-
-    public PostilionEntity(final World world) {
-        super(Entities.POSTILION, world);
     }
 
     @Override

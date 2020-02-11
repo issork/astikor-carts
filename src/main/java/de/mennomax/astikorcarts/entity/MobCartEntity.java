@@ -1,7 +1,7 @@
 package de.mennomax.astikorcarts.entity;
 
+import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
-import de.mennomax.astikorcarts.init.Items;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -33,12 +33,14 @@ public class MobCartEntity extends AbstractDrawnEntity {
         final Entity coachman = this.getControllingPassenger();
         final Entity pulling = this.getPulling();
         if (pulling != null && coachman != null && pulling.getControllingPassenger() == null) {
-            final PostilionEntity postilion = new PostilionEntity(this.world);
-            postilion.setPositionAndRotation(pulling.posX, pulling.posY, pulling.posZ, coachman.rotationYaw, coachman.rotationPitch);
-            if (postilion.startRiding(pulling)) {
-                this.world.addEntity(postilion);
-            } else {
-                postilion.remove();
+            final PostilionEntity postilion = AstikorCarts.EntityTypes.POSTILION.get().create(this.world);
+            if (postilion != null) {
+                postilion.setPositionAndRotation(pulling.posX, pulling.posY, pulling.posZ, coachman.rotationYaw, coachman.rotationPitch);
+                if (postilion.startRiding(pulling)) {
+                    this.world.addEntity(postilion);
+                } else {
+                    postilion.remove();
+                }
             }
         }
     }
@@ -112,7 +114,7 @@ public class MobCartEntity extends AbstractDrawnEntity {
 
     @Override
     public Item getCartItem() {
-        return Items.MOBCART;
+        return AstikorCarts.Items.MOB_CART.get();
     }
 
 }

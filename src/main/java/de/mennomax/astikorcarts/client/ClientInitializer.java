@@ -21,6 +21,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.event.TickEvent;
@@ -48,12 +49,15 @@ public class ClientInitializer extends CommonInitializer {
         });
         mod.bus().<InputEvent.KeyInputEvent>addListener(e -> {
             final Minecraft mc = Minecraft.getInstance();
-            final Entity ridden = mc.player.getRidingEntity();
-            if (ridden != null && AstikorWorld.get(ridden.world).map(w -> w.isPulling(ridden)).orElse(false)) {
-                final KeyBinding binding = mc.gameSettings.keyBindSprint;
-                while (binding.isPressed()) {
-                    PacketHandler.CHANNEL.sendToServer(new CPacketToggleSlow());
-                    KeyBinding.setKeyBindState(binding.getKey(), false);
+            final PlayerEntity player = mc.player;
+            if (player != null) {
+                final Entity ridden = player.getRidingEntity();
+                if (ridden != null && AstikorWorld.get(ridden.world).map(w -> w.isPulling(ridden)).orElse(false)) {
+                    final KeyBinding binding = mc.gameSettings.keyBindSprint;
+                    while (binding.isPressed()) {
+                        PacketHandler.CHANNEL.sendToServer(new CPacketToggleSlow());
+                        KeyBinding.setKeyBindState(binding.getKey(), false);
+                    }
                 }
             }
         });

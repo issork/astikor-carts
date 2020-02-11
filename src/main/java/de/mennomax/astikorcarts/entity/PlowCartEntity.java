@@ -1,8 +1,8 @@
 package de.mennomax.astikorcarts.entity;
 
 import com.google.common.collect.ImmutableList;
+import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
-import de.mennomax.astikorcarts.init.Items;
 import de.mennomax.astikorcarts.inventory.container.PlowCartContainer;
 import de.mennomax.astikorcarts.util.CartItemStackHandler;
 import de.mennomax.astikorcarts.util.PlowBlockHandler;
@@ -129,7 +129,7 @@ public class PlowCartEntity extends AbstractDrawnInventoryEntity {
 
     @Override
     public Item getCartItem() {
-        return Items.PLOWCART;
+        return AstikorCarts.Items.PLOW_CART.get();
     }
 
     @Override

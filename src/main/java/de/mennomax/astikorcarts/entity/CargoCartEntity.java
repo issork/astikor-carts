@@ -1,7 +1,7 @@
 package de.mennomax.astikorcarts.entity;
 
+import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
-import de.mennomax.astikorcarts.init.Items;
 import de.mennomax.astikorcarts.inventory.container.CargoCartContainer;
 import de.mennomax.astikorcarts.util.CartItemStackHandler;
 import net.minecraft.entity.Entity;
@@ -22,11 +22,10 @@ import net.minecraftforge.items.ItemStackHandler;
 import java.util.ArrayList;
 
 public class CargoCartEntity extends AbstractDrawnInventoryEntity {
-
     private static final DataParameter<Integer> CARGO = EntityDataManager.createKey(CargoCartEntity.class, DataSerializers.VARINT);
 
-    public CargoCartEntity(final EntityType<? extends Entity> entityTypeIn, final World worldIn) {
-        super(entityTypeIn, worldIn);
+    public CargoCartEntity(final EntityType<? extends Entity> type, final World world) {
+        super(type, world);
     }
 
     @Override
@@ -98,7 +97,7 @@ public class CargoCartEntity extends AbstractDrawnInventoryEntity {
 
     @Override
     public Item getCartItem() {
-        return Items.CARGOCART;
+        return AstikorCarts.Items.CARGO_CART.get();
     }
 
     @Override
@@ -124,5 +123,4 @@ public class CargoCartEntity extends AbstractDrawnInventoryEntity {
             return new CargoCartContainer(id, inv, this);
         }, this.getDisplayName()));
     }
-
 }
