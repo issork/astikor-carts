@@ -1,7 +1,7 @@
 package de.mennomax.astikorcarts.client.oregon;
 
 import cpw.mods.modlauncher.api.INameMappingService;
-import de.mennomax.astikorcarts.init.AstikorStats;
+import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.oregon.BasicProgram;
 import de.mennomax.astikorcarts.oregon.Oregon;
 import net.minecraft.client.Minecraft;
@@ -40,7 +40,7 @@ public final class OregonSubscriber {
         final Screen screen = event.getGui();
         if (screen instanceof StatsScreen && (event.getKeyCode() == GLFW.GLFW_KEY_ENTER || event.getKeyCode() == GLFW.GLFW_KEY_KP_ENTER) && mc.player != null) {
             this.getSelectedStat((StatsScreen) screen).ifPresent(stat -> {
-                if (AstikorStats.CART_ONE_CM.equals(stat.getValue()) && mc.player.getStats().getValue(stat) > 2040 * 100) {
+                if (AstikorCarts.Stats.CART_ONE_CM.equals(stat.getValue()) && mc.player.getStats().getValue(stat) > 2040 * 100) {
                     final PlayerIO io = new PlayerIO();
                     final Oregon oregon = new Oregon(io, new Random());
                     this.setState(new ActiveState(new Thread(() -> {

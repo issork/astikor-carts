@@ -1,7 +1,7 @@
 package de.mennomax.astikorcarts.inventory.container;
 
+import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.entity.AbstractDrawnInventoryEntity;
-import de.mennomax.astikorcarts.init.Inventories;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
@@ -16,7 +16,7 @@ public class PlowCartContainer extends CartContainer {
     }
 
     public PlowCartContainer(final int id, final PlayerInventory playerInv, final AbstractDrawnInventoryEntity cart) {
-        super(Inventories.PLOWCARTCONTAINER, id, cart);
+        super(AstikorCarts.ContainerTypes.PLOWCARTCONTAINER.get(), id, cart);
         this.addSlot(new PlowSlot(this.cartInv, 0, 57, 24));
         this.addSlot(new PlowSlot(this.cartInv, 1, 80, 17));
         this.addSlot(new PlowSlot(this.cartInv, 2, 103, 24));

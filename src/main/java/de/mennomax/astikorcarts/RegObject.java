@@ -28,7 +28,7 @@ public final class RegObject<T extends IForgeRegistryEntry<? super T>> {
     public static <T extends IForgeRegistryEntry<T>, U extends T> RegObject<U> of(final ResourceLocation name, final IForgeRegistry<T> registry) {
         final RegObject<U> obj = new RegObject<>(name);
         ObjectHolderRegistry.addHandler(n -> {
-            if (n.test(name)) {
+            if (n.test(registry.getRegistryName())) {
                 //noinspection unchecked
                 obj.value = registry.containsKey(name) ? (U) registry.getValue(name) : null;
             }

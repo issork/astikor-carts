@@ -1,4 +1,4 @@
-package de.mennomax.astikorcarts.init;
+package de.mennomax.astikorcarts.util;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;

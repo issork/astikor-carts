@@ -1,8 +1,7 @@
 package de.mennomax.astikorcarts.entity;
 
+import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
-import de.mennomax.astikorcarts.init.AstikorStats;
-import de.mennomax.astikorcarts.init.Sounds;
 import de.mennomax.astikorcarts.network.PacketHandler;
 import de.mennomax.astikorcarts.network.packets.SPacketDrawnUpdate;
 import de.mennomax.astikorcarts.util.CartWheel;
@@ -163,7 +162,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             if (cm > 0) {
                 for (final Entity passenger : this.getPassengers()) {
                     if (passenger instanceof PlayerEntity) {
-                        ((PlayerEntity) passenger).addStat(AstikorStats.CART_ONE_CM, cm);
+                        ((PlayerEntity) passenger).addStat(AstikorCarts.Stats.CART_ONE_CM, cm);
                     }
                 }
             }
@@ -255,11 +254,11 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     }
 
     private void playAttachSound() {
-        this.world.playSound(null, this.posX, this.posY, this.posZ, Sounds.CART_ATTACHED, this.getSoundCategory(), 0.2F, 1.0F);
+        this.world.playSound(null, this.posX, this.posY, this.posZ, AstikorCarts.SoundEvents.CART_ATTACHED.get(), this.getSoundCategory(), 0.2F, 1.0F);
     }
 
     private void playDetachSound() {
-        this.world.playSound(null, this.posX, this.posY, this.posZ, Sounds.CART_DETACHED, this.getSoundCategory(), 0.2F, 0.1F);
+        this.world.playSound(null, this.posX, this.posY, this.posZ, AstikorCarts.SoundEvents.CART_DETACHED.get(), this.getSoundCategory(), 0.2F, 0.1F);
     }
 
     /**
