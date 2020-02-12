@@ -25,17 +25,19 @@ public class CPacketActionKey {
     }
 
     public static void handle(final CPacketActionKey msg, final Supplier<Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            final ServerPlayerEntity player = ctx.get().getSender();
-            final Entity pulling = player.isPassenger() ? Objects.requireNonNull(player.getRidingEntity()) : player;
-            final World world = player.world;
-            AstikorWorld.get(world).map(w -> w.getDrawn(pulling)).orElse(Optional.empty())
-                .map(c -> Optional.of(Pair.of(c, (Entity) null)))
-                .orElseGet(() -> world.getEntitiesWithinAABB(AbstractDrawnEntity.class, player.getBoundingBox().grow(3), entity -> entity != pulling).stream()
-                    .min(Comparator.comparing(pulling::getDistance))
-                    .map(c -> Pair.of(c, pulling))
-                ).ifPresent(p -> p.getFirst().setPulling(p.getSecond()));
-        });
+        final ServerPlayerEntity player = ctx.get().getSender();
+        if (player != null) {
+            ctx.get().enqueueWork(() -> {
+                final Entity pulling = player.isPassenger() ? Objects.requireNonNull(player.getRidingEntity()) : player;
+                final World world = player.world;
+                AstikorWorld.get(world).map(w -> w.getDrawn(pulling)).orElse(Optional.empty())
+                    .map(c -> Optional.of(Pair.of(c, (Entity) null)))
+                    .orElseGet(() -> world.getEntitiesWithinAABB(AbstractDrawnEntity.class, player.getBoundingBox().grow(3), entity -> entity != pulling).stream()
+                        .min(Comparator.comparing(pulling::getDistance))
+                        .map(c -> Pair.of(c, pulling))
+                    ).ifPresent(p -> p.getFirst().setPulling(p.getSecond()));
+            });
+        }
         ctx.get().setPacketHandled(true);
     }
 

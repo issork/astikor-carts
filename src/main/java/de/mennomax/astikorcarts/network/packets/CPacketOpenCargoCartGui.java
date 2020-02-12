@@ -18,13 +18,15 @@ public class CPacketOpenCargoCartGui {
     }
 
     public static void handle(final CPacketOpenCargoCartGui msg, final Supplier<Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            final ServerPlayerEntity player = ctx.get().getSender();
-            final Entity ridden = player.getRidingEntity();
-            if (ridden instanceof CargoCartEntity) {
-                ((CargoCartEntity) ridden).openContainer(player);
-            }
-        });
+        final ServerPlayerEntity player = ctx.get().getSender();
+        if (player != null) {
+            ctx.get().enqueueWork(() -> {
+                final Entity ridden = player.getRidingEntity();
+                if (ridden instanceof CargoCartEntity) {
+                    ((CargoCartEntity) ridden).openContainer(player);
+                }
+            });
+        }
         ctx.get().setPacketHandled(true);
     }
 
