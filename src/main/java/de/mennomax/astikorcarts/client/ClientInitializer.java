@@ -14,14 +14,18 @@ import de.mennomax.astikorcarts.entity.PlowCartEntity;
 import de.mennomax.astikorcarts.entity.PostilionEntity;
 import de.mennomax.astikorcarts.network.PacketHandler;
 import de.mennomax.astikorcarts.network.packets.CPacketActionKey;
+import de.mennomax.astikorcarts.network.packets.CPacketOpenCargoCartGui;
 import de.mennomax.astikorcarts.network.packets.CPacketToggleSlow;
 import de.mennomax.astikorcarts.world.AstikorWorld;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -61,6 +65,15 @@ public class ClientInitializer extends CommonInitializer {
                         PacketHandler.CHANNEL.sendToServer(new CPacketToggleSlow());
                         KeyBinding.setKeyBindState(binding.getKey(), false);
                     }
+                }
+            }
+        });
+        mod.bus().<GuiOpenEvent>addListener(e -> {
+            if (e.getGui() instanceof InventoryScreen) {
+                final ClientPlayerEntity player = Minecraft.getInstance().player;
+                if (player.getRidingEntity() instanceof CargoCartEntity) {
+                    e.setCanceled(true);
+                    PacketHandler.CHANNEL.sendToServer(new CPacketOpenCargoCartGui());
                 }
             }
         });
