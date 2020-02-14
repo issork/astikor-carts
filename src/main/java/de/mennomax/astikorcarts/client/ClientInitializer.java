@@ -12,7 +12,6 @@ import de.mennomax.astikorcarts.entity.CargoCartEntity;
 import de.mennomax.astikorcarts.entity.MobCartEntity;
 import de.mennomax.astikorcarts.entity.PlowCartEntity;
 import de.mennomax.astikorcarts.entity.PostilionEntity;
-import de.mennomax.astikorcarts.network.PacketHandler;
 import de.mennomax.astikorcarts.network.packets.CPacketActionKey;
 import de.mennomax.astikorcarts.network.packets.CPacketOpenCargoCartGui;
 import de.mennomax.astikorcarts.network.packets.CPacketToggleSlow;
@@ -46,7 +45,7 @@ public final class ClientInitializer extends CommonInitializer {
                 final World world = mc.world;
                 if (world != null) {
                     while (this.action.isPressed()) {
-                        PacketHandler.CHANNEL.sendToServer(new CPacketActionKey());
+                        AstikorCarts.CHANNEL.sendToServer(new CPacketActionKey());
                     }
                     if (!mc.isGamePaused()) {
                         AstikorWorld.get(world).ifPresent(AstikorWorld::tick);
@@ -62,7 +61,7 @@ public final class ClientInitializer extends CommonInitializer {
                 if (ridden != null && AstikorWorld.get(ridden.world).map(w -> w.isPulling(ridden)).orElse(false)) {
                     final KeyBinding binding = mc.gameSettings.keyBindSprint;
                     while (binding.isPressed()) {
-                        PacketHandler.CHANNEL.sendToServer(new CPacketToggleSlow());
+                        AstikorCarts.CHANNEL.sendToServer(new CPacketToggleSlow());
                         KeyBinding.setKeyBindState(binding.getKey(), false);
                     }
                 }
@@ -73,7 +72,7 @@ public final class ClientInitializer extends CommonInitializer {
                 final ClientPlayerEntity player = Minecraft.getInstance().player;
                 if (player.getRidingEntity() instanceof CargoCartEntity) {
                     e.setCanceled(true);
-                    PacketHandler.CHANNEL.sendToServer(new CPacketOpenCargoCartGui());
+                    AstikorCarts.CHANNEL.sendToServer(new CPacketOpenCargoCartGui());
                 }
             }
         });

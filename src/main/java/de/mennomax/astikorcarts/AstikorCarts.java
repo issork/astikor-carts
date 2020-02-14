@@ -7,6 +7,11 @@ import de.mennomax.astikorcarts.entity.PlowCartEntity;
 import de.mennomax.astikorcarts.entity.PostilionEntity;
 import de.mennomax.astikorcarts.inventory.container.PlowCartContainer;
 import de.mennomax.astikorcarts.item.CartItem;
+import de.mennomax.astikorcarts.network.NetBuilder;
+import de.mennomax.astikorcarts.network.packets.CPacketActionKey;
+import de.mennomax.astikorcarts.network.packets.CPacketOpenCargoCartGui;
+import de.mennomax.astikorcarts.network.packets.CPacketToggleSlow;
+import de.mennomax.astikorcarts.network.packets.SPacketDrawnUpdate;
 import de.mennomax.astikorcarts.server.ServerInitializer;
 import de.mennomax.astikorcarts.util.EntityBuilder;
 import net.minecraft.entity.EntityClassification;
@@ -25,6 +30,7 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.network.simple.SimpleChannel;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.function.Supplier;
@@ -32,6 +38,14 @@ import java.util.function.Supplier;
 @Mod(AstikorCarts.ID)
 public final class AstikorCarts {
     public static final String ID = "astikorcarts";
+
+    public static final SimpleChannel CHANNEL = new NetBuilder(new ResourceLocation(ID, "main"))
+        .version(1).optionalServer().requiredClient()
+        .serverbound(CPacketActionKey::new).consumer(() -> CPacketActionKey::handle)
+        .serverbound(CPacketToggleSlow::new).consumer(() -> CPacketToggleSlow::handle)
+        .clientbound(SPacketDrawnUpdate::new).consumer(() -> new SPacketDrawnUpdate.Handler())
+        .serverbound(CPacketOpenCargoCartGui::new).consumer(() -> CPacketOpenCargoCartGui::handle)
+        .build();
 
     private static final DefRegister REG = new DefRegister(ID);
 
