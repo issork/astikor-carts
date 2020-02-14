@@ -14,8 +14,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-public class CPacketActionKey {
-
+public final class CPacketActionKey {
     public static void encode(final CPacketActionKey packet, final PacketBuffer buffer) {
 
     }
@@ -40,5 +39,4 @@ public class CPacketActionKey {
         }
         ctx.get().setPacketHandled(true);
     }
-
 }

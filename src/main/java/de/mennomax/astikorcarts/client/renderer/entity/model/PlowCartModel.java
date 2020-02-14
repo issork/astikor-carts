@@ -3,7 +3,7 @@ package de.mennomax.astikorcarts.client.renderer.entity.model;
 import de.mennomax.astikorcarts.entity.PlowCartEntity;
 import net.minecraft.client.renderer.entity.model.RendererModel;
 
-public class PlowCartModel extends CartModel<PlowCartEntity> {
+public final class PlowCartModel extends CartModel<PlowCartEntity> {
     private final RendererModel axis;
     private final RendererModel[] triangle = new RendererModel[3];
     private final RendererModel shaft;

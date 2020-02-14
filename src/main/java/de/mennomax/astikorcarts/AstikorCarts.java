@@ -33,12 +33,13 @@ import java.util.function.Supplier;
 public final class AstikorCarts {
     public static final String ID = "astikorcarts";
 
-    private static final DefRegister OBJECTS = new DefRegister(ID);
+    private static final DefRegister REG = new DefRegister(ID);
 
     public static final class Items {
-        private Items() {}
+        private Items() {
+        }
 
-        private static final DefRegister.Forge<Item> R = OBJECTS.of(ForgeRegistries.ITEMS);
+        private static final DefRegister.Forge<Item> R = REG.of(ForgeRegistries.ITEMS);
 
         public static final RegObject<Item> WHEEL, CARGO_CART, PLOW_CART, MOB_CART;
 
@@ -52,9 +53,10 @@ public final class AstikorCarts {
     }
 
     public static final class EntityTypes {
-        private EntityTypes() {}
+        private EntityTypes() {
+        }
 
-        private static final DefRegister.Forge<EntityType<?>> R = OBJECTS.of(ForgeRegistries.ENTITIES);
+        private static final DefRegister.Forge<EntityType<?>> R = REG.of(ForgeRegistries.ENTITIES);
 
         public static final RegObject<EntityType<CargoCartEntity>> CARGO_CART;
         public static final RegObject<EntityType<PlowCartEntity>> PLOW_CART;
@@ -80,26 +82,29 @@ public final class AstikorCarts {
     }
 
     public static final class SoundEvents {
-        private SoundEvents() {}
+        private SoundEvents() {
+        }
 
-        private static final DefRegister.Forge<SoundEvent> R = OBJECTS.of(ForgeRegistries.SOUND_EVENTS);
+        private static final DefRegister.Forge<SoundEvent> R = REG.of(ForgeRegistries.SOUND_EVENTS);
 
         public static final RegObject<SoundEvent> CART_ATTACHED = R.make("cart.attached", SoundEvent::new);
         public static final RegObject<SoundEvent> CART_DETACHED = R.make("cart.detached", SoundEvent::new);
     }
 
     public static final class Stats {
-        private Stats() {}
+        private Stats() {
+        }
 
-        private static final DefRegister.Vanilla<ResourceLocation, IStatFormatter> R = OBJECTS.of(Registry.CUSTOM_STAT, net.minecraft.stats.Stats.CUSTOM::get, rl -> IStatFormatter.DEFAULT);
+        private static final DefRegister.Vanilla<ResourceLocation, IStatFormatter> R = REG.of(Registry.CUSTOM_STAT, net.minecraft.stats.Stats.CUSTOM::get, rl -> IStatFormatter.DEFAULT);
 
         public static final ResourceLocation CART_ONE_CM = R.make("cart_one_cm", rl -> rl, rl -> IStatFormatter.DISTANCE);
     }
 
     public static final class ContainerTypes {
-        private ContainerTypes() {}
+        private ContainerTypes() {
+        }
 
-        private static final DefRegister.Forge<ContainerType<?>> R = OBJECTS.of(ForgeRegistries.CONTAINERS);
+        private static final DefRegister.Forge<ContainerType<?>> R = REG.of(ForgeRegistries.CONTAINERS);
 
         public static final RegObject<ContainerType<PlowCartContainer>> PLOWCARTCONTAINER = R.make("plowcartcontainer", () -> IForgeContainerType.create(PlowCartContainer::new));
     }
@@ -107,7 +112,7 @@ public final class AstikorCarts {
     public AstikorCarts() {
         final Initializer.Context ctx = new InitContext();
         DistExecutor.runForDist(() -> ClientInitializer::new, () -> ServerInitializer::new).init(ctx);
-        OBJECTS.registerAll(ctx.modBus(), Items.R, EntityTypes.R, SoundEvents.R, ContainerTypes.R, Stats.R);
+        REG.registerAll(ctx.modBus(), Items.R, EntityTypes.R, SoundEvents.R, ContainerTypes.R, Stats.R);
     }
 
     private static class InitContext implements Initializer.Context {

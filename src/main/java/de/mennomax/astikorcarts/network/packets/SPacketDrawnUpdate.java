@@ -10,9 +10,9 @@ import net.minecraftforge.fml.network.NetworkEvent.Context;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-public class SPacketDrawnUpdate {
-
+public final class SPacketDrawnUpdate {
     private final int pullingId;
+
     private final int cartId;
 
     public SPacketDrawnUpdate(final int pullingId, final int cartId) {
@@ -45,5 +45,4 @@ public class SPacketDrawnUpdate {
         });
         ctx.get().setPacketHandled(true);
     }
-
 }

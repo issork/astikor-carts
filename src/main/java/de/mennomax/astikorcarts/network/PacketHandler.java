@@ -14,9 +14,7 @@ import net.minecraftforge.fml.network.NetworkRegistry.ChannelBuilder;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 @EventBusSubscriber(modid = AstikorCarts.ID, bus = Bus.MOD)
-public class PacketHandler {
-
-    private static int id = 0;
+public final class PacketHandler {
     public static final String VERSION = "1";
     public static final SimpleChannel CHANNEL = ChannelBuilder.named(new ResourceLocation(AstikorCarts.ID, "main"))
         .networkProtocolVersion(() -> VERSION)
@@ -26,10 +24,10 @@ public class PacketHandler {
 
     @SubscribeEvent
     public static void registerPackets(final FMLCommonSetupEvent event) {
+        int id = 0;
         CHANNEL.registerMessage(id++, CPacketActionKey.class, CPacketActionKey::encode, CPacketActionKey::decode, CPacketActionKey::handle);
         CHANNEL.registerMessage(id++, CPacketToggleSlow.class, CPacketToggleSlow::encode, CPacketToggleSlow::decode, CPacketToggleSlow::handle);
         CHANNEL.registerMessage(id++, SPacketDrawnUpdate.class, SPacketDrawnUpdate::encode, SPacketDrawnUpdate::decode, SPacketDrawnUpdate::handle);
         CHANNEL.registerMessage(id++, CPacketOpenCargoCartGui.class, CPacketOpenCargoCartGui::encode, CPacketOpenCargoCartGui::decode, CPacketOpenCargoCartGui::handle);
     }
-
 }

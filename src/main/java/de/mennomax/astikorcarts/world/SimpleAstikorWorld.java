@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.Optional;
 
-public class SimpleAstikorWorld implements AstikorWorld {
+public final class SimpleAstikorWorld implements AstikorWorld {
     private final Int2ObjectMap<AbstractDrawnEntity> pulling = new Int2ObjectOpenHashMap<>();
 
     @Override
@@ -20,7 +20,6 @@ public class SimpleAstikorWorld implements AstikorWorld {
         }
     }
 
-    @Nullable
     @Override
     public Optional<AbstractDrawnEntity> getDrawn(final Entity e) {
         return Optional.ofNullable(this.pulling.get(e.getEntityId()));

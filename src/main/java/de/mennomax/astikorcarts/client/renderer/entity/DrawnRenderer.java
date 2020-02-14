@@ -8,7 +8,6 @@ import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.util.math.MathHelper;
 
 public abstract class DrawnRenderer<T extends AbstractDrawnEntity, M extends EntityModel<T>> extends EntityRenderer<T> {
-
     protected M model;
 
     protected DrawnRenderer(final EntityRendererManager renderManager, final M model) {

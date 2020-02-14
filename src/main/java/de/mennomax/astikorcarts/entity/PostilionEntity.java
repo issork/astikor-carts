@@ -11,7 +11,7 @@ import net.minecraftforge.fml.network.NetworkHooks;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-public class PostilionEntity extends DummyLivingEntity {
+public final class PostilionEntity extends DummyLivingEntity {
     public PostilionEntity(final EntityType<? extends PostilionEntity> type, final World world) {
         super(type, world);
     }

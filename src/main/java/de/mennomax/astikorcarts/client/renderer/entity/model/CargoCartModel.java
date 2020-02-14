@@ -2,11 +2,8 @@ package de.mennomax.astikorcarts.client.renderer.entity.model;
 
 import de.mennomax.astikorcarts.entity.CargoCartEntity;
 import net.minecraft.client.renderer.entity.model.RendererModel;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
-@OnlyIn(Dist.CLIENT)
-public class CargoCartModel extends CartModel<CargoCartEntity> {
+public final class CargoCartModel extends CartModel<CargoCartEntity> {
     private final RendererModel boardBottom;
     private final RendererModel axis;
     private final RendererModel shaft;

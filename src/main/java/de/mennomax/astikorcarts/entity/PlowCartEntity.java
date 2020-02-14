@@ -26,8 +26,7 @@ import net.minecraftforge.items.ItemStackHandler;
 
 import java.util.ArrayList;
 
-public class PlowCartEntity extends AbstractDrawnInventoryEntity {
-
+public final class PlowCartEntity extends AbstractDrawnInventoryEntity {
     private static final double BLADEOFFSET = 1.7D;
     private static final DataParameter<Boolean> PLOWING = EntityDataManager.createKey(PlowCartEntity.class, DataSerializers.BOOLEAN);
     private static final ImmutableList<DataParameter<ItemStack>> TOOLS = ImmutableList.of(
@@ -154,12 +153,12 @@ public class PlowCartEntity extends AbstractDrawnInventoryEntity {
 
     }
 
-    public void openContainer(final PlayerEntity player) {
-        NetworkHooks.openGui((ServerPlayerEntity) player, new SimpleNamedContainerProvider((id, inv, plyr) -> {
-            return new PlowCartContainer(id, inv, this);
-        }, this.getDisplayName()), (writer) -> {
-            writer.writeInt(this.getEntityId());
-        });
+    private void openContainer(final PlayerEntity player) {
+        if (player instanceof ServerPlayerEntity) {
+            NetworkHooks.openGui((ServerPlayerEntity) player,
+                new SimpleNamedContainerProvider((windowId, playerInventory, p) -> new PlowCartContainer(windowId, playerInventory, this), this.getDisplayName()),
+                buf -> buf.writeInt(this.getEntityId())
+            );
+        }
     }
-
 }

@@ -16,7 +16,6 @@ import net.minecraftforge.items.ItemStackHandler;
 import javax.annotation.Nullable;
 
 public abstract class AbstractDrawnInventoryEntity extends AbstractDrawnEntity {
-
     public ItemStackHandler inventory = this.initInventory();
     private LazyOptional<ItemStackHandler> itemHandler = LazyOptional.of(() -> this.inventory);
 
@@ -70,5 +69,4 @@ public abstract class AbstractDrawnInventoryEntity extends AbstractDrawnEntity {
             return this.itemHandler.cast();
         return super.getCapability(capability, facing);
     }
-
 }

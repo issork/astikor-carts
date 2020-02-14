@@ -6,7 +6,7 @@ import de.mennomax.astikorcarts.entity.CargoCartEntity;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.util.ResourceLocation;
 
-public class CargoCartRenderer extends DrawnRenderer<CargoCartEntity, CargoCartModel> {
+public final class CargoCartRenderer extends DrawnRenderer<CargoCartEntity, CargoCartModel> {
     private static final ResourceLocation TEXTURE = new ResourceLocation(AstikorCarts.ID, "textures/entity/cargocart.png");
 
     public CargoCartRenderer(final EntityRendererManager renderManager) {
@@ -18,5 +18,4 @@ public class CargoCartRenderer extends DrawnRenderer<CargoCartEntity, CargoCartM
     protected ResourceLocation getEntityTexture(final CargoCartEntity entity) {
         return TEXTURE;
     }
-
 }

@@ -9,8 +9,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.ItemStackHandler;
 
 public abstract class CartContainer extends Container {
-
     protected final ItemStackHandler cartInv;
+
     protected final AbstractDrawnInventoryEntity cart;
 
     public CartContainer(final ContainerType<?> type, final int id, final AbstractDrawnInventoryEntity cart) {
@@ -50,5 +50,4 @@ public abstract class CartContainer extends Container {
     public void onContainerClosed(final PlayerEntity playerIn) {
         super.onContainerClosed(playerIn);
     }
-
 }

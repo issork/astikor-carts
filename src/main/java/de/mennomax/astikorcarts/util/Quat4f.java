@@ -3,7 +3,7 @@ package de.mennomax.astikorcarts.util;
 public final class Quat4f {
 	public static Quat4f UNIT = new Quat4f();
 
-	private final static float EPS = 1e-6F;
+	private static final float EPS = 1e-6F;
 
 	public final float x;
 

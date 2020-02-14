@@ -24,8 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class PlowBlockHandler {
-
+public final class PlowBlockHandler {
     private final List<PlowExecutor> executors = new ArrayList<>(2);
     private final ItemStack stack;
     private final int slot;
@@ -88,7 +87,6 @@ public class PlowBlockHandler {
     }
 
     private class ReplaceHandler implements PlowExecutor {
-
         private final HashMap<ArrayList<Block>, Block> replaceMap;
 
         public ReplaceHandler(final HashMap<ArrayList<Block>, Block> replaceMapIn) {
@@ -164,5 +162,4 @@ public class PlowBlockHandler {
         }
         return null;
     }
-
 }

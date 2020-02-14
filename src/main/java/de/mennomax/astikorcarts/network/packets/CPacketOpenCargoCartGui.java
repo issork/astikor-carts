@@ -8,8 +8,7 @@ import net.minecraftforge.fml.network.NetworkEvent.Context;
 
 import java.util.function.Supplier;
 
-public class CPacketOpenCargoCartGui {
-
+public final class CPacketOpenCargoCartGui {
     public static void encode(final CPacketOpenCargoCartGui packet, final PacketBuffer buffer) {
     }
 
@@ -29,5 +28,4 @@ public class CPacketOpenCargoCartGui {
         }
         ctx.get().setPacketHandled(true);
     }
-
 }

@@ -9,8 +9,7 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
-public class PlowCartContainer extends CartContainer {
-
+public final class PlowCartContainer extends CartContainer {
     public PlowCartContainer(final int id, final PlayerInventory playerInv, final PacketBuffer buf) {
         this(id, playerInv, (AbstractDrawnInventoryEntity) playerInv.player.world.getEntityByID(buf.readInt()));
     }
@@ -33,7 +32,6 @@ public class PlowCartContainer extends CartContainer {
     }
 
     static class PlowSlot extends SlotItemHandler {
-
         public PlowSlot(final IItemHandler itemHandler, final int index, final int xPosition, final int yPosition) {
             super(itemHandler, index, xPosition, yPosition);
         }
@@ -42,7 +40,5 @@ public class PlowCartContainer extends CartContainer {
         public boolean isItemValid(final ItemStack stack) {
             return true;
         }
-
     }
-
 }

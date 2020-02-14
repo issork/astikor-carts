@@ -4,7 +4,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
@@ -20,15 +19,14 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 
-public class CartItem extends Item {
+public final class CartItem extends Item {
     public CartItem(final Properties properties) {
         super(properties);
     }
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(final World world, final PlayerEntity player, final Hand hand) {
-        ItemStack stack = player.getHeldItem(hand);
-        CompoundNBT tag = stack.getOrCreateTag();
+        final ItemStack stack = player.getHeldItem(hand);
         final RayTraceResult result = rayTrace(world, player, FluidMode.ANY);
         if (result.getType() == Type.MISS) {
             return new ActionResult<>(ActionResultType.PASS, stack);

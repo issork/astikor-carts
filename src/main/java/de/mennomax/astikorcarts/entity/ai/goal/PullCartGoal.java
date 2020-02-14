@@ -6,7 +6,7 @@ import net.minecraft.entity.ai.goal.Goal;
 
 import java.util.EnumSet;
 
-public class PullCartGoal extends Goal {
+public final class PullCartGoal extends Goal {
     private final Entity mob;
 
     public PullCartGoal(final Entity entity) {
@@ -18,5 +18,4 @@ public class PullCartGoal extends Goal {
     public boolean shouldExecute() {
         return AstikorWorld.get(this.mob.world).map(w -> w.isPulling(this.mob)).orElse(false);
     }
-
 }

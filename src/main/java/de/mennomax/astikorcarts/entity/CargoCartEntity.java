@@ -21,7 +21,7 @@ import net.minecraftforge.items.ItemStackHandler;
 
 import java.util.ArrayList;
 
-public class CargoCartEntity extends AbstractDrawnInventoryEntity {
+public final class CargoCartEntity extends AbstractDrawnInventoryEntity {
     private static final DataParameter<Integer> CARGO = EntityDataManager.createKey(CargoCartEntity.class, DataSerializers.VARINT);
 
     public CargoCartEntity(final EntityType<? extends Entity> type, final World world) {

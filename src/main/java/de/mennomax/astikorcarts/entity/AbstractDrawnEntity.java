@@ -49,7 +49,6 @@ import java.util.List;
 import java.util.UUID;
 
 public abstract class AbstractDrawnEntity extends Entity implements IEntityAdditionalSpawnData {
-
     private static final DataParameter<Integer> TIME_SINCE_HIT = EntityDataManager.createKey(AbstractDrawnEntity.class, DataSerializers.VARINT);
     private static final DataParameter<Integer> FORWARD_DIRECTION = EntityDataManager.createKey(AbstractDrawnEntity.class, DataSerializers.VARINT);
     private static final DataParameter<Float> DAMAGE_TAKEN = EntityDataManager.createKey(AbstractDrawnEntity.class, DataSerializers.FLOAT);
@@ -601,5 +600,4 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             return this.pitch;
         }
     }
-
 }

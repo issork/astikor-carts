@@ -2,13 +2,7 @@ package de.mennomax.astikorcarts.config;
 
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.toml.TomlFormat;
-import de.mennomax.astikorcarts.AstikorCarts;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.ForgeConfigSpec.Builder;
-import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
-import net.minecraftforge.common.ForgeConfigSpec.DoubleValue;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -16,29 +10,27 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-@EventBusSubscriber(modid = AstikorCarts.ID, bus = Bus.MOD)
-public class AstikorCartsConfig {
-
+public final class AstikorCartsConfig {
     public static final Common COMMON;
-    public static final ForgeConfigSpec COMMONSPEC;
+
+    public static final ForgeConfigSpec COMMON_SPEC;
 
     static {
-        final Pair<Common, ForgeConfigSpec> specPair = new Builder().configure(Common::new);
+        final Pair<Common, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(Common::new);
         COMMON = specPair.getLeft();
-        COMMONSPEC = specPair.getRight();
+        COMMON_SPEC = specPair.getRight();
     }
 
     public static class Common {
-
-        public final DoubleValue speedModifier;
-        public final ConfigValue<ArrayList<String>> cargoPullable;
-        public final ConfigValue<ArrayList<String>> plowPullable;
-        public final ConfigValue<ArrayList<String>> mobPullable;
-        public final ConfigValue<Config> plowReplace;
+        public final ForgeConfigSpec.DoubleValue speedModifier;
+        public final ForgeConfigSpec.ConfigValue<ArrayList<String>> cargoPullable;
+        public final ForgeConfigSpec.ConfigValue<ArrayList<String>> plowPullable;
+        public final ForgeConfigSpec.ConfigValue<ArrayList<String>> mobPullable;
+        public final ForgeConfigSpec.ConfigValue<Config> plowReplace;
         // public final ConfigValue<Config> BREAKMAP;
         // public final ConfigValue<Config> PLACEMAP;
 
-        Common(final Builder builder) {
+        Common(final ForgeConfigSpec.Builder builder) {
             builder.push("common");
 
             this.speedModifier = builder.comment("Speed modifier for when the sprint key is pressed while riding a living entity")
@@ -103,7 +95,5 @@ public class AstikorCartsConfig {
 
             builder.pop();
         }
-
     }
-
 }

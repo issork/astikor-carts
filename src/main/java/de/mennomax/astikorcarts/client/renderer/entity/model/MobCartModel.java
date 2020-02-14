@@ -2,11 +2,8 @@ package de.mennomax.astikorcarts.client.renderer.entity.model;
 
 import de.mennomax.astikorcarts.entity.MobCartEntity;
 import net.minecraft.client.renderer.entity.model.RendererModel;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
-@OnlyIn(Dist.CLIENT)
-public class MobCartModel extends CartModel<MobCartEntity> {
+public final class MobCartModel extends CartModel<MobCartEntity> {
     private final RendererModel axis;
     private final RendererModel cartBase;
     private final RendererModel shaft;
@@ -57,5 +54,4 @@ public class MobCartModel extends CartModel<MobCartEntity> {
         this.body.addChild(this.boardFront);
         this.body.setRotationPoint(0.0F, -11.0F, 1.0F);
     }
-
 }

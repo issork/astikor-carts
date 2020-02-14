@@ -11,8 +11,7 @@ import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class CPacketToggleSlow {
-
+public final class CPacketToggleSlow {
     public static void encode(final CPacketToggleSlow msg, final PacketBuffer buf) {
 
     }
@@ -37,5 +36,4 @@ public class CPacketToggleSlow {
         }
         ctx.get().setPacketHandled(true);
     }
-
 }

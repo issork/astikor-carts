@@ -12,8 +12,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
-@SuppressWarnings("deprecation")
-public class PlowCartRenderer extends DrawnRenderer<PlowCartEntity, PlowCartModel> {
+public final class PlowCartRenderer extends DrawnRenderer<PlowCartEntity, PlowCartModel> {
     private static final ResourceLocation TEXTURE = new ResourceLocation(AstikorCarts.ID, "textures/entity/plowcart.png");
 
     public PlowCartRenderer(final EntityRendererManager renderManager) {

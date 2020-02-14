@@ -38,7 +38,7 @@ public interface AstikorWorld {
 
             @Override
             public <T> LazyOptional<T> getCapability(final net.minecraftforge.common.capabilities.Capability<T> cap, @Nullable final Direction side) {
-                return cap == Capability.INSTANCE ? this.instance.cast() : LazyOptional.empty();
+                return Capability.INSTANCE.orEmpty(cap, this.instance);
             }
         };
     }

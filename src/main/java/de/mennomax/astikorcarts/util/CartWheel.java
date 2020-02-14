@@ -8,8 +8,7 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
-public class CartWheel {
-
+public final class CartWheel {
     private float rotation;
     private float rotationIncrement;
     private final float offsetX;
@@ -72,5 +71,4 @@ public class CartWheel {
     public float getRotationIncrement() {
         return this.rotationIncrement;
     }
-
 }

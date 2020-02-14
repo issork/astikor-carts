@@ -8,7 +8,7 @@ import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
 
-public class PostilionRenderer extends EntityRenderer<PostilionEntity> {
+public final class PostilionRenderer extends EntityRenderer<PostilionEntity> {
     public PostilionRenderer(final EntityRendererManager manager) {
         super(manager);
     }
