@@ -10,6 +10,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.MoverType;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -201,13 +202,12 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
      * @param entityIn new pulling entity
      */
     public void setPulling(final Entity entityIn) {
-        if (this.pulling instanceof AbstractDrawnEntity) {
-            ((AbstractDrawnEntity) this.pulling).drawn = null;
-        }
         if (!this.world.isRemote) {
             if (this.canBePulledBy(entityIn)) {
                 if (entityIn == null) {
-                    if (this.pulling instanceof AbstractDrawnEntity) {
+                    if (this.pulling instanceof LivingEntity) {
+                        ((LivingEntity) this.pulling).getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(PULL_SLOWLY_MODIFIER);
+                    } else if (this.pulling instanceof AbstractDrawnEntity) {
                         ((AbstractDrawnEntity) this.pulling).drawn = null;
                     }
                     AstikorCarts.CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new SPacketDrawnUpdate(-1, this.getEntityId()));
@@ -219,9 +219,6 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
                     if (entityIn instanceof MobEntity) {
                         ((MobEntity) entityIn).getNavigator().clearPath();
                     }
-                    if (!(entityIn instanceof AbstractDrawnEntity)) {
-                        AstikorWorld.get(this.world).ifPresent(w -> w.addPulling(this));
-                    }
                     AstikorCarts.CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new SPacketDrawnUpdate(entityIn.getEntityId(), this.getEntityId()));
                     this.pullingUUID = entityIn.getUniqueID();
                     if (this.ticksExisted > 20) {
@@ -232,6 +229,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
                     ((AbstractDrawnEntity) entityIn).drawn = this;
                 }
                 this.pulling = entityIn;
+                AstikorWorld.get(this.world).ifPresent(w -> w.addPulling(this));
 
             }
         } else {
@@ -244,10 +242,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
                 this.pullingId = entityIn.getEntityId();
             }
             this.pulling = entityIn;
-        }
-        AstikorWorld.get(this.world).ifPresent(w -> w.addPulling(this));
-        if (this.pulling instanceof AbstractDrawnEntity) {
-            ((AbstractDrawnEntity) this.pulling).drawn = this;
+            AstikorWorld.get(this.world).ifPresent(w -> w.addPulling(this));
         }
     }
 
