@@ -1,4 +1,4 @@
-package de.mennomax.astikorcarts;
+package de.mennomax.astikorcarts.util;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -7,8 +7,10 @@ import net.minecraftforge.registries.ObjectHolderRegistry;
 
 import javax.annotation.Nullable;
 import java.util.NoSuchElementException;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
-public final class RegObject<T extends IForgeRegistryEntry<? super T>> {
+public final class RegObject<T extends IForgeRegistryEntry<? super T>> implements Predicate<T> {
     private final ResourceLocation name;
 
     @Nullable
@@ -23,6 +25,15 @@ public final class RegObject<T extends IForgeRegistryEntry<? super T>> {
             throw new NoSuchElementException("Registry object not present: " + this.name);
         }
         return this.value;
+    }
+
+    @Override
+    public boolean test(final T other) {
+        return this.value != null && this.value == other;
+    }
+
+    public Stream<T> stream() {
+        return this.value == null ? Stream.empty() : Stream.of(this.value);
     }
 
     public static <T extends IForgeRegistryEntry<T>, U extends T> RegObject<U> of(final ResourceLocation name, final IForgeRegistry<T> registry) {

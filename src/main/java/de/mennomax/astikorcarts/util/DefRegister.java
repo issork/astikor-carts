@@ -1,4 +1,4 @@
-package de.mennomax.astikorcarts;
+package de.mennomax.astikorcarts.util;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
