@@ -5,19 +5,16 @@ import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.client.renderer.entity.model.MobCartModel;
 import de.mennomax.astikorcarts.entity.MobCartEntity;
 import de.mennomax.astikorcarts.util.Mat4f;
-import de.mennomax.astikorcarts.util.Vec4f;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.HorseRenderer;
 import net.minecraft.client.renderer.entity.model.HorseModel;
 import net.minecraft.client.renderer.entity.model.RendererModel;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.horse.HorseEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
@@ -34,7 +31,7 @@ public final class MobCartRenderer extends DrawnRenderer<MobCartEntity, MobCartM
     @Override
     public void doRender(final MobCartEntity entity, final double x, final double y, final double z, final float yaw, final float delta) {
         super.doRender(entity, x, y, z, yaw, delta);
-        final LivingEntity coachman = entity.getControllingPassenger();
+        /*final LivingEntity coachman = entity.getControllingPassenger();
         final Entity pulling = entity.getPulling();
         if (pulling instanceof HorseEntity && coachman instanceof PlayerEntity) {
             final HorseEntity horse = (HorseEntity) pulling;
@@ -51,7 +48,7 @@ public final class MobCartRenderer extends DrawnRenderer<MobCartEntity, MobCartM
                 this.renderCurve(start.x(), start.y(), start.z(), end.x(), end.y(), end.z());
             }
             GlStateManager.popMatrix();
-        }
+        }*/
     }
 
     private void horseTransform(final Mat4f m, final HorseEntity entity, final float delta) {
