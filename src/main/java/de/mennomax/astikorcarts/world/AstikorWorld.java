@@ -11,6 +11,7 @@ import net.minecraftforge.common.util.NonNullSupplier;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public interface AstikorWorld {
     final class Capability {
@@ -30,6 +31,10 @@ public interface AstikorWorld {
 
     static LazyOptional<AstikorWorld> get(final World world) {
         return world.getCapability(Capability.INSTANCE);
+    }
+
+    static Stream<AstikorWorld> stream(final World world) {
+        return world.getCapability(Capability.INSTANCE).map(Stream::of).orElse(Stream.empty());
     }
 
     static ICapabilityProvider createProvider(final NonNullSupplier<AstikorWorld> factory) {

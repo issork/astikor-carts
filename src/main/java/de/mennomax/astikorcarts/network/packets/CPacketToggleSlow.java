@@ -20,14 +20,27 @@ public final class CPacketToggleSlow implements Message {
     }
 
     public static void handle(final CPacketToggleSlow msg, final ServerMessageContext ctx) {
-        final PlayerEntity sender = ctx.getPlayer();
-        final Entity ridden = sender.getRidingEntity();
-        if (ridden instanceof LivingEntity  && AstikorWorld.get(ridden.world).map(w -> w.isPulling(ridden)).orElse(false)) {
-            if (((LivingEntity) ridden).getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).hasModifier(AbstractDrawnEntity.PULL_SLOWLY_MODIFIER)) {
-                ((LivingEntity) ridden).getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(AbstractDrawnEntity.PULL_SLOWLY_MODIFIER);
+        final Entity pulling = getPulling(ctx.getPlayer());
+        if (pulling instanceof LivingEntity) {
+            if (((LivingEntity) pulling).getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).hasModifier(AbstractDrawnEntity.PULL_SLOWLY_MODIFIER)) {
+                ((LivingEntity) pulling).getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(AbstractDrawnEntity.PULL_SLOWLY_MODIFIER);
             } else {
-                ((LivingEntity) ridden).getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(AbstractDrawnEntity.PULL_SLOWLY_MODIFIER);
+                ((LivingEntity) pulling).getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(AbstractDrawnEntity.PULL_SLOWLY_MODIFIER);
             }
         }
+    }
+
+    public static Entity getPulling(final PlayerEntity player) {
+        final Entity ridden = player.getRidingEntity();
+        if (ridden == null) {
+            return null;
+        }
+        if (ridden instanceof AbstractDrawnEntity) {
+            return ((AbstractDrawnEntity) ridden).getPulling();
+        }
+        if (AstikorWorld.stream(ridden.world).allMatch(w -> w.isPulling(ridden))) {
+            return ridden;
+        }
+        return null;
     }
 }

@@ -21,7 +21,6 @@ import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.GuiOpenEvent;
@@ -57,8 +56,7 @@ public final class ClientInitializer extends CommonInitializer {
             final Minecraft mc = Minecraft.getInstance();
             final PlayerEntity player = mc.player;
             if (player != null) {
-                final Entity ridden = player.getRidingEntity();
-                if (ridden != null && AstikorWorld.get(ridden.world).map(w -> w.isPulling(ridden)).orElse(false)) {
+                if (CPacketToggleSlow.getPulling(player) != null) {
                     final KeyBinding binding = mc.gameSettings.keyBindSprint;
                     while (binding.isPressed()) {
                         AstikorCarts.CHANNEL.sendToServer(new CPacketToggleSlow());
