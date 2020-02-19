@@ -103,8 +103,9 @@ public final class AstikorCarts {
 
         private static final DefRegister.Forge<SoundEvent> R = REG.of(ForgeRegistries.SOUND_EVENTS);
 
-        public static final RegObject<SoundEvent> CART_ATTACHED = R.make("cart.attached", SoundEvent::new);
-        public static final RegObject<SoundEvent> CART_DETACHED = R.make("cart.detached", SoundEvent::new);
+        public static final RegObject<SoundEvent> CART_ATTACHED = R.make("entity.cart.attach", SoundEvent::new);
+        public static final RegObject<SoundEvent> CART_DETACHED = R.make("entity.cart.detach", SoundEvent::new);
+        public static final RegObject<SoundEvent> CART_PLACED = R.make("entity.cart.place", SoundEvent::new);
     }
 
     public static final class Stats {

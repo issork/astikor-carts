@@ -1,5 +1,6 @@
 package de.mennomax.astikorcarts.item;
 
+import de.mennomax.astikorcarts.AstikorCarts;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -9,6 +10,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.EntityPredicates;
 import net.minecraft.util.Hand;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.RayTraceContext.FluidMode;
 import net.minecraft.util.math.RayTraceResult;
@@ -52,6 +54,7 @@ public final class CartItem extends Item {
                 } else {
                     if (!world.isRemote()) {
                         world.addEntity(cart);
+                        world.playSound(null, cart.posX, cart.posY, cart.posZ, AstikorCarts.SoundEvents.CART_PLACED.get(), SoundCategory.BLOCKS, 0.75F, 0.8F);
                     }
                     if (!player.abilities.isCreativeMode) {
                         stack.shrink(1);
