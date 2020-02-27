@@ -1,16 +1,18 @@
 package de.mennomax.astikorcarts.client.renderer.entity;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.client.renderer.entity.model.MobCartModel;
 import de.mennomax.astikorcarts.entity.MobCartEntity;
 import de.mennomax.astikorcarts.util.Mat4f;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.HorseRenderer;
 import net.minecraft.client.renderer.entity.model.HorseModel;
-import net.minecraft.client.renderer.entity.model.RendererModel;
+import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -29,8 +31,8 @@ public final class MobCartRenderer extends DrawnRenderer<MobCartEntity, MobCartM
     }
 
     @Override
-    public void doRender(final MobCartEntity entity, final double x, final double y, final double z, final float yaw, final float delta) {
-        super.doRender(entity, x, y, z, yaw, delta);
+    public void render(final MobCartEntity entity, final float yaw, final float delta, final MatrixStack stack, final IRenderTypeBuffer source, final int packedLight) {
+        super.render(entity, yaw, delta, stack, source, packedLight);
         /*final LivingEntity coachman = entity.getControllingPassenger();
         final Entity pulling = entity.getPulling();
         if (pulling instanceof HorseEntity && coachman instanceof PlayerEntity) {
@@ -52,7 +54,7 @@ public final class MobCartRenderer extends DrawnRenderer<MobCartEntity, MobCartM
     }
 
     private void horseTransform(final Mat4f m, final HorseEntity entity, final float delta) {
-        final HorseModel<HorseEntity> horseModel = this.renderManager.<HorseEntity, HorseRenderer>getRenderer(entity).getEntityModel();
+        final HorseModel<HorseEntity> horseModel = ((HorseRenderer) this.renderManager.getRenderer(entity)).getEntityModel();
         float strength = 0.0F;
         float swing = 0.0F;
         if (!entity.isPassenger() && entity.isAlive()) {
@@ -66,7 +68,7 @@ public final class MobCartRenderer extends DrawnRenderer<MobCartEntity, MobCartM
             }
         }
         horseModel.setLivingAnimations(entity, swing, strength, delta);
-        final RendererModel head = ObfuscationReflectionHelper.getPrivateValue(HorseModel.class, horseModel, "field_217128_b");
+        final ModelRenderer head = ObfuscationReflectionHelper.getPrivateValue(HorseModel.class, horseModel, "field_217128_b");
         final Mat4f tmp = new Mat4f();
         m.mul(tmp.makeScale(-1.0F, -1.0F, 1.0F));
         m.mul(tmp.makeScale(1.1F, 1.1F, 1.1F));
@@ -74,7 +76,7 @@ public final class MobCartRenderer extends DrawnRenderer<MobCartEntity, MobCartM
         this.transform(m, head);
     }
 
-    private void transform(final Mat4f m, final RendererModel bone) {
+    private void transform(final Mat4f m, final ModelRenderer bone) {
         final Mat4f tmp = new Mat4f();
         m.mul(tmp.makeTranslation(bone.rotationPointX / 16.0F, bone.rotationPointY / 16.0F, bone.rotationPointZ / 16.0F));
         if (bone.rotateAngleZ != 0.0F) {
@@ -91,9 +93,9 @@ public final class MobCartRenderer extends DrawnRenderer<MobCartEntity, MobCartM
     private Mat4f modelView(final Entity entity, final float delta) {
         final Mat4f m = new Mat4f();
         m.makeTranslation(
-            (float) MathHelper.lerp(delta, entity.lastTickPosX, entity.posX),
-            (float) MathHelper.lerp(delta, entity.lastTickPosY, entity.posY),
-            (float) MathHelper.lerp(delta, entity.lastTickPosZ, entity.posZ));
+            (float) MathHelper.lerp(delta, entity.lastTickPosX, entity.getPosX()),
+            (float) MathHelper.lerp(delta, entity.lastTickPosY, entity.getPosY()),
+            (float) MathHelper.lerp(delta, entity.lastTickPosZ, entity.getPosZ()));
         final Mat4f r = new Mat4f();
         final float prevYaw, yaw;
         if (entity instanceof LivingEntity) {
@@ -103,7 +105,7 @@ public final class MobCartRenderer extends DrawnRenderer<MobCartEntity, MobCartM
             prevYaw = entity.prevRotationYaw;
             yaw = entity.rotationYaw;
         }
-        r.makeRotation((float) Math.toRadians(180.0F - MathHelper.func_219805_h(delta, prevYaw, yaw)), 0.0F, 1.0F, 0.0F);
+        r.makeRotation((float) Math.toRadians(180.0F - MathHelper.interpolateAngle(delta, prevYaw, yaw)), 0.0F, 1.0F, 0.0F);
         m.mul(r);
         return m;
     }
@@ -119,9 +121,9 @@ public final class MobCartRenderer extends DrawnRenderer<MobCartEntity, MobCartM
     private void renderLead(final double x, final double y, final double z, final double dx, final double dy, final double dz, final int offset) {
         final Tessellator tes = Tessellator.getInstance();
         final BufferBuilder buf = tes.getBuffer();
-        GlStateManager.disableTexture();
-        GlStateManager.disableLighting();
-        GlStateManager.disableCull();
+        RenderSystem.disableTexture();
+        RenderSystem.disableLighting();
+        RenderSystem.disableCull();
         final int n = 24;
         final double w = 0.025D * 2;
         final double m = Math.sqrt(dx * dx + dz * dz);
@@ -160,13 +162,13 @@ public final class MobCartRenderer extends DrawnRenderer<MobCartEntity, MobCartM
             buf.pos(x + dx * t + w * nz, y + dy * (t * t + t) * 0.5D, z + dz * t + w * -nx).color(r, g, b, 1.0F).endVertex();
         }
         tes.draw();
-        GlStateManager.enableLighting();
-        GlStateManager.enableTexture();
-        GlStateManager.enableCull();
+        RenderSystem.enableLighting();
+        RenderSystem.enableTexture();
+        RenderSystem.enableCull();
     }
 
     @Override
-    protected ResourceLocation getEntityTexture(final MobCartEntity entity) {
+    public ResourceLocation getEntityTexture(final MobCartEntity entity) {
         return TEXTURE;
     }
 }

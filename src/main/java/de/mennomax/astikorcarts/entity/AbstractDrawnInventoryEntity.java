@@ -38,7 +38,7 @@ public abstract class AbstractDrawnInventoryEntity extends AbstractDrawnEntity {
     @Override
     public void onDestroyedAndDoDrops(final DamageSource source) {
         for (int i = 0; i < this.inventory.getSlots(); i++) {
-            InventoryHelper.spawnItemStack(this.world, this.posX, this.posY, this.posZ, this.inventory.getStackInSlot(i));
+            InventoryHelper.spawnItemStack(this.world, this.getPosX(), this.getPosY(), this.getPosZ(), this.inventory.getStackInSlot(i));
         }
     }
 

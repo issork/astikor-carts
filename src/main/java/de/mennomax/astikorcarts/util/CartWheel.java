@@ -25,8 +25,8 @@ public final class CartWheel {
         this.offsetX = offsetXIn;
         this.offsetZ = offsetZIn;
         this.circumference = circumferenceIn;
-        this.posX = this.prevPosX = cartIn.posX;
-        this.posZ = this.prevPosZ = cartIn.posZ;
+        this.posX = this.prevPosX = cartIn.getPosX();
+        this.posZ = this.prevPosZ = cartIn.getPosZ();
     }
 
     public CartWheel(final AbstractDrawnEntity cartIn, final float offsetX) {
@@ -40,8 +40,8 @@ public final class CartWheel {
         final float yaw = (float) Math.toRadians(this.cart.rotationYaw);
         final float nx = -MathHelper.sin(yaw);
         final float nz = MathHelper.cos(yaw);
-        this.posX = this.cart.posX + nx * this.offsetZ - nz * this.offsetX;
-        this.posZ = this.cart.posZ + nz * this.offsetZ + nx * this.offsetX;
+        this.posX = this.cart.getPosX() + nx * this.offsetZ - nz * this.offsetX;
+        this.posZ = this.cart.getPosZ() + nz * this.offsetZ + nx * this.offsetX;
         final double dx = this.posX - this.prevPosX;
         final double dz = this.posZ - this.prevPosZ;
         final float distanceTravelled = (float) Math.sqrt(dx * dx + dz * dz);
@@ -49,11 +49,11 @@ public final class CartWheel {
         final double dzNormalized = dz / distanceTravelled;
         final float travelledForward = MathHelper.signum(dxNormalized * nx + dzNormalized * nz);
         if (distanceTravelled > 0.2) {
-            final BlockPos blockpos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.cart.posY - 0.2F), MathHelper.floor(this.posZ));
+            final BlockPos blockpos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.cart.getPosY() - 0.2F), MathHelper.floor(this.posZ));
             final BlockState blockstate = this.cart.world.getBlockState(blockpos);
             if (!blockstate.addRunningEffects(this.cart.world, blockpos, this.cart)) {
                 if (blockstate.getRenderType() != BlockRenderType.INVISIBLE) {
-                    this.cart.world.addParticle(new BlockParticleData(ParticleTypes.BLOCK, blockstate).setPos(blockpos), this.posX, this.cart.posY, this.posZ, dx, distanceTravelled, dz);
+                    this.cart.world.addParticle(new BlockParticleData(ParticleTypes.BLOCK, blockstate).setPos(blockpos), this.posX, this.cart.getPosY(), this.posZ, dx, distanceTravelled, dz);
                 }
             }
         }

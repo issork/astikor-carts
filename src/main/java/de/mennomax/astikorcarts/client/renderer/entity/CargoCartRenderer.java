@@ -15,7 +15,7 @@ public final class CargoCartRenderer extends DrawnRenderer<CargoCartEntity, Carg
     }
 
     @Override
-    protected ResourceLocation getEntityTexture(final CargoCartEntity entity) {
+    public ResourceLocation getEntityTexture(final CargoCartEntity entity) {
         return TEXTURE;
     }
 }
