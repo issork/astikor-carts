@@ -62,9 +62,9 @@ public final class AstikorCarts {
         static {
             WHEEL = R.make("wheel", () -> new Item(new Item.Properties().group(ItemGroup.MATERIALS)));
             final Supplier<Item> cart = () -> new CartItem(new Item.Properties().maxStackSize(1).group(ItemGroup.TRANSPORTATION));
-            CARGO_CART = R.make("cargocart", cart);
-            PLOW_CART = R.make("plowcart", cart);
-            MOB_CART = R.make("mobcart", cart);
+            CARGO_CART = R.make("cargo_cart", cart);
+            PLOW_CART = R.make("plow_cart", cart);
+            MOB_CART = R.make("mob_cart", cart);
         }
     }
 
@@ -80,13 +80,13 @@ public final class AstikorCarts {
         public static final RegObject<EntityType<PostilionEntity>> POSTILION;
 
         static {
-            CARGO_CART = R.make("cargocart", () -> EntityBuilder.create(CargoCartEntity::new, EntityClassification.MISC)
+            CARGO_CART = R.make("cargo_cart", () -> EntityBuilder.create(CargoCartEntity::new, EntityClassification.MISC)
                 .size(1.5F, 1.4F)
                 .build());
-            PLOW_CART = R.make("plowcart", () -> EntityBuilder.create(PlowCartEntity::new, EntityClassification.MISC)
+            PLOW_CART = R.make("plow_cart", () -> EntityBuilder.create(PlowCartEntity::new, EntityClassification.MISC)
                 .size(1.3F, 1.4F)
                 .build());
-            MOB_CART = R.make("mobcart", () -> EntityBuilder.create(MobCartEntity::new, EntityClassification.MISC)
+            MOB_CART = R.make("mob_cart", () -> EntityBuilder.create(MobCartEntity::new, EntityClassification.MISC)
                 .size(1.3F, 1.4F)
                 .build());
             POSTILION = R.make("postilion", () -> EntityBuilder.create(PostilionEntity::new, EntityClassification.MISC)
@@ -123,7 +123,7 @@ public final class AstikorCarts {
 
         private static final DefRegister.Forge<ContainerType<?>> R = REG.of(ForgeRegistries.CONTAINERS);
 
-        public static final RegObject<ContainerType<PlowCartContainer>> PLOWCARTCONTAINER = R.make("plowcartcontainer", () -> IForgeContainerType.create(PlowCartContainer::new));
+        public static final RegObject<ContainerType<PlowCartContainer>> PLOW_CART = R.make("plow_cart", () -> IForgeContainerType.create(PlowCartContainer::new));
     }
 
     public AstikorCarts() {

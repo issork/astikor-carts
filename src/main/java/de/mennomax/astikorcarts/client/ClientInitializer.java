@@ -76,7 +76,7 @@ public final class ClientInitializer extends CommonInitializer {
             RenderingRegistry.registerEntityRenderingHandler(AstikorCarts.EntityTypes.PLOW_CART.get(), PlowCartRenderer::new);
             RenderingRegistry.registerEntityRenderingHandler(AstikorCarts.EntityTypes.MOB_CART.get(), MobCartRenderer::new);
             RenderingRegistry.registerEntityRenderingHandler(AstikorCarts.EntityTypes.POSTILION.get(), PostilionRenderer::new);
-            ScreenManager.registerFactory(AstikorCarts.ContainerTypes.PLOWCARTCONTAINER.get(), PlowScreen::new);
+            ScreenManager.registerFactory(AstikorCarts.ContainerTypes.PLOW_CART.get(), PlowScreen::new);
             ClientRegistry.registerKeyBinding(this.action);
         });
     }
