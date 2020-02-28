@@ -1,6 +1,6 @@
 modLoader="javafml"
 loaderVersion="[28,)"
-issueTrackerURL="https://github.com/MennoMax/astikor-carts/"
+issueTrackerURL="https://github.com/MennoMax/astikor-carts/issues"
 [[mods]]
 modId="astikorcarts"
 version="${file.jarVersion}"
