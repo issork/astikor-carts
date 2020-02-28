@@ -74,14 +74,16 @@ public final class CargoCartEntity extends AbstractDrawnInventoryEntity {
 
     @Override
     public double getMountedYOffset() {
-        return 0.56D;
+        return 11.0D / 16.0D;
     }
 
     @Override
     public void updatePassenger(final Entity passenger) {
         if (this.isPassenger(passenger)) {
-            final Vec3d vec3d = (new Vec3d(-0.68D, 0.0D, 0.0D)).rotateYaw(-this.rotationYaw * 0.017453292F - ((float) Math.PI / 2F));
-            passenger.setPosition(this.getPosX() + vec3d.x, this.getPosY() + this.getMountedYOffset() + passenger.getYOffset(), this.getPosZ() + vec3d.z);
+            final Vec3d forward = this.getLookVec();
+            final Vec3d origin = new Vec3d(0.0D, this.getMountedYOffset(), 1.0D / 16.0D);
+            final Vec3d pos = origin.add(forward.scale(-0.68D));
+            passenger.setPosition(this.getPosX() + pos.x, this.getPosY() + pos.y - 0.1D + passenger.getYOffset(), this.getPosZ() + pos.z);
             passenger.setRenderYawOffset(this.rotationYaw + 180.0F);
             final float f2 = MathHelper.wrapDegrees(passenger.rotationYaw - this.rotationYaw + 180.0F);
             final float f1 = MathHelper.clamp(f2, -105.0F, 105.0F);
