@@ -10,17 +10,17 @@ import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-public final class RegObject<T extends IForgeRegistryEntry<? super T>> implements Predicate<T> {
+public final class RegObject<T extends IForgeRegistryEntry<T>, U extends T> implements Predicate<T> {
     private final ResourceLocation name;
 
     @Nullable
-    private T value;
+    private U value;
 
     public RegObject(final ResourceLocation name) {
         this.name = name;
     }
 
-    public T get() {
+    public U get() {
         if (this.value == null) {
             throw new NoSuchElementException("Registry object not present: " + this.name);
         }
@@ -36,8 +36,8 @@ public final class RegObject<T extends IForgeRegistryEntry<? super T>> implement
         return this.value == null ? Stream.empty() : Stream.of(this.value);
     }
 
-    public static <T extends IForgeRegistryEntry<T>, U extends T> RegObject<U> of(final ResourceLocation name, final IForgeRegistry<T> registry) {
-        final RegObject<U> obj = new RegObject<>(name);
+    public static <T extends IForgeRegistryEntry<T>, U extends T> RegObject<T, U> of(final ResourceLocation name, final IForgeRegistry<T> registry) {
+        final RegObject<T, U> obj = new RegObject<>(name);
         ObjectHolderRegistry.addHandler(n -> {
             if (n.test(registry.getRegistryName())) {
                 //noinspection unchecked

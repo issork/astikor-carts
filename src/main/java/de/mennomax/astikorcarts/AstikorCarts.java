@@ -57,7 +57,7 @@ public final class AstikorCarts {
 
         private static final DefRegister.Forge<Item> R = REG.of(ForgeRegistries.ITEMS);
 
-        public static final RegObject<Item> WHEEL, CARGO_CART, PLOW_CART, MOB_CART;
+        public static final RegObject<Item, Item> WHEEL, CARGO_CART, PLOW_CART, MOB_CART;
 
         static {
             WHEEL = R.make("wheel", () -> new Item(new Item.Properties().group(ItemGroup.MATERIALS)));
@@ -74,10 +74,10 @@ public final class AstikorCarts {
 
         private static final DefRegister.Forge<EntityType<?>> R = REG.of(ForgeRegistries.ENTITIES);
 
-        public static final RegObject<EntityType<CargoCartEntity>> CARGO_CART;
-        public static final RegObject<EntityType<PlowCartEntity>> PLOW_CART;
-        public static final RegObject<EntityType<MobCartEntity>> MOB_CART;
-        public static final RegObject<EntityType<PostilionEntity>> POSTILION;
+        public static final RegObject<EntityType<?>, EntityType<CargoCartEntity>> CARGO_CART;
+        public static final RegObject<EntityType<?>, EntityType<PlowCartEntity>> PLOW_CART;
+        public static final RegObject<EntityType<?>, EntityType<MobCartEntity>> MOB_CART;
+        public static final RegObject<EntityType<?>, EntityType<PostilionEntity>> POSTILION;
 
         static {
             CARGO_CART = R.make("cargo_cart", () -> EntityBuilder.create(CargoCartEntity::new, EntityClassification.MISC)
@@ -103,9 +103,9 @@ public final class AstikorCarts {
 
         private static final DefRegister.Forge<SoundEvent> R = REG.of(ForgeRegistries.SOUND_EVENTS);
 
-        public static final RegObject<SoundEvent> CART_ATTACHED = R.make("entity.cart.attach", SoundEvent::new);
-        public static final RegObject<SoundEvent> CART_DETACHED = R.make("entity.cart.detach", SoundEvent::new);
-        public static final RegObject<SoundEvent> CART_PLACED = R.make("entity.cart.place", SoundEvent::new);
+        public static final RegObject<SoundEvent, SoundEvent> CART_ATTACHED = R.make("entity.cart.attach", SoundEvent::new);
+        public static final RegObject<SoundEvent, SoundEvent> CART_DETACHED = R.make("entity.cart.detach", SoundEvent::new);
+        public static final RegObject<SoundEvent, SoundEvent> CART_PLACED = R.make("entity.cart.place", SoundEvent::new);
     }
 
     public static final class Stats {
@@ -123,7 +123,7 @@ public final class AstikorCarts {
 
         private static final DefRegister.Forge<ContainerType<?>> R = REG.of(ForgeRegistries.CONTAINERS);
 
-        public static final RegObject<ContainerType<PlowCartContainer>> PLOW_CART = R.make("plow_cart", () -> IForgeContainerType.create(PlowCartContainer::new));
+        public static final RegObject<ContainerType<?>, ContainerType<PlowCartContainer>> PLOW_CART = R.make("plow_cart", () -> IForgeContainerType.create(PlowCartContainer::new));
     }
 
     public AstikorCarts() {

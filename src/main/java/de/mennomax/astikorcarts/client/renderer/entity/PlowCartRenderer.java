@@ -21,7 +21,7 @@ import java.lang.reflect.Field;
 import java.util.function.Consumer;
 
 public final class PlowCartRenderer extends DrawnRenderer<PlowCartEntity, PlowCartModel> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(AstikorCarts.ID, "textures/entity/plowcart.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation(AstikorCarts.ID, "textures/entity/plow_cart.png");
 
     public PlowCartRenderer(final EntityRendererManager renderManager) {
         super(renderManager, new PlowCartModel());

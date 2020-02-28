@@ -23,7 +23,7 @@ import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import org.lwjgl.opengl.GL11;
 
 public final class MobCartRenderer extends DrawnRenderer<MobCartEntity, MobCartModel> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(AstikorCarts.ID, "textures/entity/mobcart.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation(AstikorCarts.ID, "textures/entity/mob_cart.png");
 
     public MobCartRenderer(final EntityRendererManager renderManager) {
         super(renderManager, new MobCartModel());

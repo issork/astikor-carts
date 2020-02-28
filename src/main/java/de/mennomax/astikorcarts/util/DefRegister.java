@@ -81,11 +81,11 @@ public final class DefRegister {
             this.registry = registry;
         }
 
-        public <U extends T> RegObject<U> make(final String name, final Supplier<U> supplier) {
+        public <U extends T> RegObject<T, U> make(final String name, final Supplier<U> supplier) {
             return this.make(name, rl -> supplier.get());
         }
 
-        public <U extends T> RegObject<U> make(final String name, final Function<ResourceLocation, U> supplier) {
+        public <U extends T> RegObject<T, U> make(final String name, final Function<ResourceLocation, U> supplier) {
             final ResourceLocation key = new ResourceLocation(this.namespace, name);
             this.entries.add(() -> supplier.apply(key).setRegistryName(key));
             return RegObject.of(key, this.registry);
