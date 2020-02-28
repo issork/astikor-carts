@@ -5,6 +5,7 @@ issueTrackerURL="https://github.com/MennoMax/astikor-carts/"
 modId="astikorcarts"
 version="${file.jarVersion}"
 displayName="AstikorCarts"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/astikorcarts"
 # A file name (in the root of the mod JAR) containing a logo for display
 #logoFile="examplemod.png"
 authors="MennoMax, pau101"
