@@ -179,7 +179,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         if (this.collidedHorizontally) {
             this.getPositionVec().add(0.0D, this.getEyeHeight(), 0.0D);
             final Vec3d start = new Vec3d(this.getPosX(), this.getPosY() + this.getHeight(), this.getPosZ());
-            final Vec3d end = new Vec3d(this.pulling.getPosX(), this.pulling.getPosY() + this.getHeight() / 2, this.pulling.getPosZ());
+            final Vec3d end = new Vec3d(this.pulling.getPosX(), this.pulling.getPosY() + this.pulling.getHeight() / 2, this.pulling.getPosZ());
             final RayTraceResult result = this.world.rayTraceBlocks(new RayTraceContext(start, end, BlockMode.COLLIDER, FluidMode.NONE, this));
             return result.getType() == Type.BLOCK;
         }
