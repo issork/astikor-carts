@@ -21,6 +21,6 @@ description="This mod adds carts that can be pulled by other entities to the gam
 [[dependencies.astikorcarts]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.14.2]"
+    versionRange="[1.14.4]"
     ordering="NONE"
     side="BOTH"
