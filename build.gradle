@@ -111,20 +111,20 @@ dependencies {
 
 }
 
-// Example for how to get properties into the manifest for reading by the runtime..
-//jar {
-//    manifest {
-//        attributes([
-//            "Specification-Title": "examplemod",
-//            "Specification-Vendor": "examplemodsareus",
-//            "Specification-Version": "1", // We are version 1 of ourselves
-//            "Implementation-Title": project.name,
-//            "Implementation-Version": "${version}",
-//            "Implementation-Vendor" :"examplemodsareus",
-//            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-//        ])
-//    }
-//}
+jar {
+    classifier "1.14.4"
+    manifest {
+        attributes([
+                "Specification-Title": "AstikorCarts",
+                "Specification-Vendor": "AstikorCarts",
+                "Specification-Version": "1",
+                "Implementation-Title": "AstikorCarts",
+                "Implementation-Version": version,
+                "Implementation-Vendor": "AstikorCarts",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
 
 // Example configuration to allow publishing using the maven-publish task
 // we define a custom artifact that is sourced from the reobfJar output task
