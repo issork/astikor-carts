@@ -238,8 +238,14 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
                 for (final CartWheel wheel : this.wheels) {
                     wheel.clearIncrement();
                 }
+                if (this.pulling instanceof AbstractDrawnEntity) {
+                    ((AbstractDrawnEntity) this.pulling).drawn = null;
+                }
             } else {
                 this.pullingId = entityIn.getEntityId();
+                if (entityIn instanceof AbstractDrawnEntity) {
+                    ((AbstractDrawnEntity) entityIn).drawn = this;
+                }
             }
             this.pulling = entityIn;
             AstikorWorld.get(this.world).ifPresent(w -> w.addPulling(this));
