@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
 import de.mennomax.astikorcarts.entity.PostilionEntity;
 import de.mennomax.astikorcarts.entity.ai.goal.PullCartGoal;
+import de.mennomax.astikorcarts.entity.ai.goal.RideCartGoal;
 import de.mennomax.astikorcarts.util.RegObject;
 import de.mennomax.astikorcarts.world.AstikorWorld;
 import de.mennomax.astikorcarts.world.SimpleAstikorWorld;
@@ -54,6 +55,7 @@ public class CommonInitializer implements Initializer {
             final Entity entity = e.getEntity();
             if (!e.getWorld().isRemote && entity instanceof MobEntity) {
                 ((MobEntity) entity).goalSelector.addGoal(1, new PullCartGoal(entity));
+                ((MobEntity) entity).goalSelector.addGoal(1, new RideCartGoal(entity));
             }
         });
         mod.bus().<PlayerInteractEvent.EntityInteract>addListener(e -> {
