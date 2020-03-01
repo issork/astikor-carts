@@ -15,7 +15,7 @@ public final class SimpleAstikorWorld implements AstikorWorld {
     @Override
     public void addPulling(final AbstractDrawnEntity drawn) {
         @Nullable final Entity pulling = drawn.getPulling();
-        if (pulling != null && !(pulling instanceof AbstractDrawnEntity)) {
+        if (pulling != null) {
             this.pulling.put(pulling.getEntityId(), drawn);
         }
     }
@@ -38,7 +38,9 @@ public final class SimpleAstikorWorld implements AstikorWorld {
             if (cart.shouldStopPulledTick()) {
                 it.remove();
             } else {
-                cart.pulledTick();
+                if (!(cart.getPulling() instanceof AbstractDrawnEntity)) {
+                    cart.pulledTick();
+                }
             }
         }
     }
