@@ -10,7 +10,8 @@
   "entity.astikorcarts.postilion": "Postillón",  
   "key.categories.astikorcarts": "AstikorCarts",
   "key.astikorcarts.desc": "Botón de Acción",
-  "subtitles.astikorcarts.cart.attached": "Carreta colocada",
-  "subtitles.astikorcarts.cart.detached": "Carreta rota",
+  "subtitles.astikorcarts.cart.attached": "Carreta unida",
+  "subtitles.astikorcarts.cart.detached": "Carreta separada",
+  "subtitles.astikorcarts.cart.placed": "Carreta colocada",
   "stat.astikorcarts.cart_one_cm": "Distancia de la Carreta"
 }
