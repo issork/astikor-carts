@@ -8,5 +8,9 @@
   "entity.astikorcarts.plow_cart": "Arado",
   "entity.astikorcarts.mob_cart": "Carreta de Transporte",
   "key.categories.astikorcarts": "AstikorCarts",
-  "key.astikorcarts.desc": "Botón de Acción"
+  "key.astikorcarts.desc": "Botón de Acción",
+  "subtitles.astikorcarts.cart.attached": "Carreta unida",
+  "subtitles.astikorcarts.cart.detached": "Carreta separada",
+  "subtitles.astikorcarts.cart.placed": "Carreta colocada",
+  "stat.astikorcarts.cart_one_cm": "Distancia de la Carreta"
 }
