@@ -5,6 +5,7 @@ import de.mennomax.astikorcarts.config.AstikorCartsConfig;
 import de.mennomax.astikorcarts.entity.PostilionEntity;
 import de.mennomax.astikorcarts.entity.ai.goal.PullCartGoal;
 import de.mennomax.astikorcarts.entity.ai.goal.RideCartGoal;
+import de.mennomax.astikorcarts.util.GoalAdder;
 import de.mennomax.astikorcarts.util.RegObject;
 import de.mennomax.astikorcarts.world.AstikorWorld;
 import de.mennomax.astikorcarts.world.SimpleAstikorWorld;
@@ -21,7 +22,6 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -51,13 +51,11 @@ public class CommonInitializer implements Initializer {
         mod.bus().<AttachCapabilitiesEvent<World>, World>addGenericListener(World.class, e ->
             e.addCapability(new ResourceLocation(AstikorCarts.ID, "astikor"), AstikorWorld.createProvider(SimpleAstikorWorld::new))
         );
-        mod.bus().<EntityJoinWorldEvent>addListener(e -> {
-            final Entity entity = e.getEntity();
-            if (!e.getWorld().isRemote && entity instanceof MobEntity) {
-                ((MobEntity) entity).goalSelector.addGoal(1, new PullCartGoal(entity));
-                ((MobEntity) entity).goalSelector.addGoal(1, new RideCartGoal(entity));
-            }
-        });
+        mod.bus().register(GoalAdder.mobGoal(MobEntity.class)
+            .add(1, PullCartGoal::new)
+            .add(1, RideCartGoal::new)
+            .build()
+        );
         mod.bus().<PlayerInteractEvent.EntityInteract>addListener(e -> {
             final Entity rider = e.getTarget().getControllingPassenger();
             if (rider instanceof PostilionEntity) {
