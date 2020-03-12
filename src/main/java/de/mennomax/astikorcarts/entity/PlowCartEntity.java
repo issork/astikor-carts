@@ -73,6 +73,9 @@ public final class PlowCartEntity extends AbstractDrawnInventoryEntity {
     @Override
     public void pulledTick() {
         super.pulledTick();
+        if (this.getPulling() == null) {
+            return;
+        }
         if (!this.world.isRemote) {
             PlayerEntity player = null;
             if (this.getPulling() instanceof PlayerEntity) {
