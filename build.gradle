@@ -11,11 +11,11 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
-//apply plugin: 'maven-publish'
+apply plugin: 'maven-publish'
 
 version = '1.0.2'
-group = 'de.mennomax.astikorcarts' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'astikorcarts'
+group = 'de.mennomax' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = 'astikorcarts-1.14.4'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
@@ -112,7 +112,6 @@ dependencies {
 }
 
 jar {
-    classifier "1.14.4"
     manifest {
         attributes([
                 "Specification-Title": "AstikorCarts",
@@ -126,24 +125,20 @@ jar {
     }
 }
 
-// Example configuration to allow publishing using the maven-publish task
-// we define a custom artifact that is sourced from the reobfJar output task
-// and then declare that to be published
-// Note you'll need to add a repository here
-//def reobfFile = file("$buildDir/reobfJar/output.jar")
-//def reobfArtifact = artifacts.add('default', reobfFile) {
-//    type 'jar'
-//    builtBy 'reobfJar'
-//}
-//publishing {
-//    publications {
-//        mavenJava(MavenPublication) {
-//            artifact reobfArtifact
-//        }
-//    }
-//    repositories {
-//        maven {
-//            url "file:///${project.projectDir}/mcmodsrepo"
-//        }
-//    }
-//}
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifactId project.archivesBaseName
+        }
+    }
+    repositories {
+        maven {
+            url "sftp://mvn.mennomax.de:22/var/www/mvn.mennomax.de"
+            credentials {
+                username "$mavenUser"
+                password "$mavenPassword"
+            }
+        }
+    }
+}
