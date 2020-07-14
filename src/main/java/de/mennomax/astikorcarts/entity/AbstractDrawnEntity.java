@@ -110,6 +110,9 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
      * when being pulled. (unless this cart is being pulled by another cart)
      */
     public void pulledTick() {
+        if (this.pulling == null) {
+            return;
+        }
         Vec3d targetVec = this.getRelativeTargetVec(1.0F);
         this.handleRotation(targetVec);
         while (this.rotationYaw - this.prevRotationYaw < -180.0F) {
