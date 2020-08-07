@@ -1,14 +1,12 @@
 package de.mennomax.astikorcarts.config;
 
 import com.electronwill.nightconfig.core.Config;
-import com.electronwill.nightconfig.toml.TomlFormat;
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 public final class AstikorCartsConfig {
     public static final Common COMMON;
@@ -26,7 +24,7 @@ public final class AstikorCartsConfig {
         public final ForgeConfigSpec.ConfigValue<ArrayList<String>> cargoPullable;
         public final ForgeConfigSpec.ConfigValue<ArrayList<String>> plowPullable;
         public final ForgeConfigSpec.ConfigValue<ArrayList<String>> mobPullable;
-        public final ForgeConfigSpec.ConfigValue<Config> plowReplace;
+        public final ForgeConfigSpec.ConfigValue<List<? extends Config>> plowReplace;
         // public final ConfigValue<Config> BREAKMAP;
         // public final ConfigValue<Config> PLACEMAP;
 
@@ -58,18 +56,25 @@ public final class AstikorCartsConfig {
                     "minecraft:mule",
                     "minecraft:pig")));
 
-            final Map<String, Object> itemReplaceMap = new HashMap<>();
-            final Map<String, Object> hoeReplaceMap = new HashMap<>();
-            hoeReplaceMap.put("minecraft:farmland", Arrays.asList("minecraft:dirt", "minecraft:grass_block", "minecraft:grass_path"));
-            hoeReplaceMap.put("minecraft:dirt", Arrays.asList("minecraft:coarse_dirt"));
-            itemReplaceMap.put("#forge:tools/hoes", Config.wrap(hoeReplaceMap, TomlFormat.instance()));
-            final Map<String, Object> shovelReplaceMap = new HashMap<>();
-            shovelReplaceMap.put("minecraft:grass_path", Arrays.asList("minecraft:grass_block", "minecraft:dirt"));
-            itemReplaceMap.put("#forge:tools/shovels", Config.wrap(shovelReplaceMap, TomlFormat.instance()));
-            this.plowReplace = builder.comment("<new block> -> <old blocks> mappings to replace blocks (for example to till dirt with a hoe)."
-                + "\nIf the item can be damaged, it will be damaged, else it will be consumed - unless the player is in creative mode."
-                + "\nItem and the value list also supports tags.")
-                .define("plowCart.replaceMap", Config.wrap(itemReplaceMap, TomlFormat.instance()));
+            final Config shovel = Config.inMemory();
+            shovel.add("tool", "forge:shovels");
+            final Config path = Config.inMemory();
+            path.add("target", Arrays.asList("minecraft:grass_block", "minecraft:dirt"));
+            path.add("result", "minecraft:grass_path");
+            shovel.add("blocks", Arrays.asList(path));
+            final Config hoe = Config.inMemory();
+            hoe.add("tool", "forge:hoes");
+            final Config farmland = Config.inMemory();
+            farmland.add("target", Arrays.asList("minecraft:dirt", "minecraft:grass_block", "minecraft:grass_path"));
+            farmland.add("result", "minecraft:farmland");
+            final Config dirt = Config.inMemory();
+            dirt.add("target", Arrays.asList("minecraft:coarse_dirt"));
+            dirt.add("result", "minecraft:dirt");
+            hoe.add("blocks", Arrays.asList(farmland, dirt));
+            this.plowReplace = builder.comment("Mappings to replace blocks (for example to till dirt with a hoe).\n"
+                + "If the item can be damaged, it will be damaged otherwise it will be consumed.\n"
+                + "Both tags and registry names may be used.")
+                .defineList("plowCart.replaceMap", Arrays.asList(shovel, hoe), o -> true);
 
             // Will be implemented later.
             // Map<String, Object> breakMap = new HashMap<>();
