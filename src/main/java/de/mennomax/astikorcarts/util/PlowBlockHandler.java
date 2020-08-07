@@ -26,10 +26,11 @@ import net.minecraftforge.registries.ForgeRegistries;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-public final class PlowBlockHandler {
+public final class PlowBlockHandler implements BiConsumer<PlayerEntity, BlockPos> {
     private final List<PlowExecutor> executors = new ArrayList<>(2);
     private final ItemStack stack;
     private final int slot;
@@ -86,7 +87,8 @@ public final class PlowBlockHandler {
         // }
     }
 
-    public void tillBlock(final PlayerEntity player, final BlockPos blockPos) {
+    @Override
+    public void accept(final PlayerEntity player, final BlockPos blockPos) {
         for (final PlowExecutor exe : this.executors) {
             exe.tillBlock(player, blockPos);
         }
