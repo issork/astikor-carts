@@ -74,7 +74,26 @@ public final class AstikorCartsConfig {
             this.plowReplace = builder.comment("Mappings to replace blocks (for example to till dirt with a hoe).\n"
                 + "If the item can be damaged, it will be damaged otherwise it will be consumed.\n"
                 + "Both tags and registry names may be used.")
-                .defineList("plowCart.replaceMap", Arrays.asList(shovel, hoe), o -> true);
+                .defineList("plowCart.replaceMap", Arrays.asList(shovel, hoe), o -> {
+                    if (!(o instanceof Config)) return false;
+                    final Config config = (Config) o;
+                    final Object tool = config.get("tool");
+                    if (!(tool instanceof String)) return false;
+                    final Object blocks = config.get("blocks");
+                    if (!(blocks instanceof List<?>)) return false;
+                    for (final Object block : (List<?>) blocks) {
+                        if (!(block instanceof Config)) return false;
+                        final Config blockConfig = (Config) block;
+                        final Object result = blockConfig.get("result");
+                        if (!(result instanceof String)) return false;
+                        final Object targets = blockConfig.get("targets");
+                        if (!(targets instanceof List<?>)) return false;
+                        for (final Object target : (List<?>) targets) {
+                            if (!(target instanceof String)) return false;
+                        }
+                    }
+                    return true;
+                });
 
             // Will be implemented later.
             // Map<String, Object> breakMap = new HashMap<>();
