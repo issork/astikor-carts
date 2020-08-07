@@ -39,7 +39,6 @@ public final class PlowBlockHandler {
      * SupressWarnings because of cast from Object to List(String). Safe because the
      * object is a string list as defined in {@link AstikorCartsConfig}
      */
-    @SuppressWarnings("unchecked")
     public PlowBlockHandler(final ItemStack stackIn, final int slotIn, final PlowCartEntity plowIn) {
         this.stack = stackIn;
         this.slot = slotIn;
@@ -57,7 +56,7 @@ public final class PlowBlockHandler {
                         if (result == null) continue;
                         final Block resultBlock = ForgeRegistries.BLOCKS.getValue(result);
                         if (resultBlock == null) continue;
-                        final List<String> targets = block.get("target");
+                        final List<String> targets = block.get("targets");
                         targets.stream()
                             .map(ResourceLocation::tryCreate)
                             .filter(Objects::nonNull)
