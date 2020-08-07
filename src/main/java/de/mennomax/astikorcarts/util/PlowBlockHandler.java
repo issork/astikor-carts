@@ -2,14 +2,14 @@ package de.mennomax.astikorcarts.util;
 
 import com.electronwill.nightconfig.core.Config;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.mojang.datafixers.util.Pair;
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
 import de.mennomax.astikorcarts.entity.PlowCartEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
@@ -31,6 +31,12 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public final class PlowBlockHandler implements BiConsumer<PlayerEntity, BlockPos> {
+    private static final ImmutableMap<ResourceLocation, Class<? extends Item>> BUILTIN_ITEMS = new ImmutableMap.Builder<ResourceLocation, Class<? extends Item>>()
+        .put(new ResourceLocation("forge:shovels"), ShovelItem.class)
+        .put(new ResourceLocation("forge:pickaxes"), PickaxeItem.class)
+        .put(new ResourceLocation("forge:axes"), AxeItem.class)
+        .put(new ResourceLocation("forge:hoes"), HoeItem.class)
+        .build();
     private final List<PlowExecutor> executors = new ArrayList<>(2);
     private final ItemStack stack;
     private final int slot;
@@ -50,7 +56,10 @@ public final class PlowBlockHandler implements BiConsumer<PlayerEntity, BlockPos
                 final ResourceLocation tool = ResourceLocation.tryCreate(config.get("tool"));
                 if (tool == null) continue;
                 final Tag<Item> tag = ItemTags.getCollection().get(tool);
-                if (tag != null && tag.contains(this.stack.getItem()) || ForgeRegistries.ITEMS.containsKey(tool) && ForgeRegistries.ITEMS.getValue(tool) == this.stack.getItem()) {
+                if ((tag == null && BUILTIN_ITEMS.containsKey(tool) && BUILTIN_ITEMS.get(tool).isAssignableFrom(this.stack.getItem().getClass()) ||
+                        tag != null && tag.contains(this.stack.getItem())) ||
+                        ForgeRegistries.ITEMS.containsKey(tool) && ForgeRegistries.ITEMS.getValue(tool) == this.stack.getItem()
+                ) {
                     final List<Config> blocks = config.get("blocks");
                     for (final Config block : blocks) {
                         final ResourceLocation result = ResourceLocation.tryCreate(block.get("result"));
