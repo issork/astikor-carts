@@ -84,12 +84,12 @@ public final class PlowCartEntity extends AbstractDrawnInventoryEntity {
                 player = (PlayerEntity) this.getPulling().getControllingPassenger();
             }
             if (this.dataManager.get(PLOWING) && player != null) {
-                if (this.prevPosX != this.getPosX() || this.prevPosZ != this.getPosZ()) {
+                if (this.prevPosX != this.posX || this.prevPosZ != this.posZ) {
                     for (int i = 0; i < this.inventory.getSlots(); i++) {
                         final float offset = 38.0F - i * 38.0F;
-                        final double blockPosX = this.getPosX() + MathHelper.sin((this.rotationYaw - offset) * 0.017453292F) * BLADEOFFSET;
-                        final double blockPosZ = this.getPosZ() - MathHelper.cos((this.rotationYaw - offset) * 0.017453292F) * BLADEOFFSET;
-                        final BlockPos blockPos = new BlockPos(blockPosX, this.getPosY() - 0.5D, blockPosZ);
+                        final double blockPosX = this.posX + MathHelper.sin((this.rotationYaw - offset) * 0.017453292F) * BLADEOFFSET;
+                        final double blockPosZ = this.posZ - MathHelper.cos((this.rotationYaw - offset) * 0.017453292F) * BLADEOFFSET;
+                        final BlockPos blockPos = new BlockPos(blockPosX, this.posY - 0.5D, blockPosZ);
                         this.plowRunners[i].tillBlock(player, blockPos);
                     }
                 }
@@ -100,7 +100,7 @@ public final class PlowCartEntity extends AbstractDrawnInventoryEntity {
     @Override
     public boolean processInitialInteract(final PlayerEntity player, final Hand hand) {
         if (!this.world.isRemote) {
-            if (player.isCrouching()) {
+            if (player.isSneaking()) {
                 this.openContainer(player);
             } else {
                 this.dataManager.set(PLOWING, !this.dataManager.get(PLOWING));
