@@ -59,16 +59,16 @@ public final class AstikorCartsConfig {
             final Config shovel = Config.inMemory();
             shovel.add("tool", "forge:shovels");
             final Config path = Config.inMemory();
-            path.add("target", Arrays.asList("minecraft:grass_block", "minecraft:dirt"));
+            path.add("targets", Arrays.asList("minecraft:grass_block", "minecraft:dirt"));
             path.add("result", "minecraft:grass_path");
             shovel.add("blocks", Arrays.asList(path));
             final Config hoe = Config.inMemory();
             hoe.add("tool", "forge:hoes");
             final Config farmland = Config.inMemory();
-            farmland.add("target", Arrays.asList("minecraft:dirt", "minecraft:grass_block", "minecraft:grass_path"));
+            farmland.add("targets", Arrays.asList("minecraft:dirt", "minecraft:grass_block", "minecraft:grass_path"));
             farmland.add("result", "minecraft:farmland");
             final Config dirt = Config.inMemory();
-            dirt.add("target", Arrays.asList("minecraft:coarse_dirt"));
+            dirt.add("targets", Arrays.asList("minecraft:coarse_dirt"));
             dirt.add("result", "minecraft:dirt");
             hoe.add("blocks", Arrays.asList(farmland, dirt));
             this.plowReplace = builder.comment("Mappings to replace blocks (for example to till dirt with a hoe).\n"
