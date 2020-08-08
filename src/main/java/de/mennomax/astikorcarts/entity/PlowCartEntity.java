@@ -25,19 +25,26 @@ import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraftforge.items.ItemStackHandler;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiConsumer;
 
 public final class PlowCartEntity extends AbstractDrawnInventoryEntity {
+    private static final int SLOT_COUNT = 3;
     private static final double BLADEOFFSET = 1.7D;
     private static final DataParameter<Boolean> PLOWING = EntityDataManager.createKey(PlowCartEntity.class, DataSerializers.BOOLEAN);
     private static final ImmutableList<DataParameter<ItemStack>> TOOLS = ImmutableList.of(
         EntityDataManager.createKey(PlowCartEntity.class, DataSerializers.ITEMSTACK),
         EntityDataManager.createKey(PlowCartEntity.class, DataSerializers.ITEMSTACK),
         EntityDataManager.createKey(PlowCartEntity.class, DataSerializers.ITEMSTACK));
-    private final PlowBlockHandler[] plowRunners = new PlowBlockHandler[3];
+    private final List<BiConsumer<PlayerEntity, BlockPos>> plowRunners;
 
     public PlowCartEntity(final EntityType<? extends Entity> entityTypeIn, final World worldIn) {
         super(entityTypeIn, worldIn);
         this.spacing = 2.0D;
+        this.plowRunners = new ArrayList<>(SLOT_COUNT);
+        for (int n = 0; n < SLOT_COUNT; n++) {
+            this.plowRunners.add((player, pos) -> {});
+        }
         for (int i = 0; i < TOOLS.size(); i++) {
             this.updateRunnerForSlot(i, this.inventory.getStackInSlot(i));
         }
@@ -84,13 +91,13 @@ public final class PlowCartEntity extends AbstractDrawnInventoryEntity {
                 player = (PlayerEntity) this.getPulling().getControllingPassenger();
             }
             if (this.dataManager.get(PLOWING) && player != null) {
-                if (this.prevPosX != this.posX || this.prevPosZ != this.posZ) {
-                    for (int i = 0; i < this.inventory.getSlots(); i++) {
+                if (this.prevPosX != this.getPosX() || this.prevPosZ != this.getPosZ()) {
+                    for (int i = 0; i < SLOT_COUNT; i++) {
                         final float offset = 38.0F - i * 38.0F;
-                        final double blockPosX = this.posX + MathHelper.sin((this.rotationYaw - offset) * 0.017453292F) * BLADEOFFSET;
-                        final double blockPosZ = this.posZ - MathHelper.cos((this.rotationYaw - offset) * 0.017453292F) * BLADEOFFSET;
-                        final BlockPos blockPos = new BlockPos(blockPosX, this.posY - 0.5D, blockPosZ);
-                        this.plowRunners[i].tillBlock(player, blockPos);
+                        final double blockPosX = this.getPosX() + MathHelper.sin((this.rotationYaw - offset) * 0.017453292F) * BLADEOFFSET;
+                        final double blockPosZ = this.getPosZ() - MathHelper.cos((this.rotationYaw - offset) * 0.017453292F) * BLADEOFFSET;
+                        final BlockPos blockPos = new BlockPos(blockPosX, this.getPosY() - 0.5D, blockPosZ);
+                        this.plowRunners.get(i).accept(player, blockPos);
                     }
                 }
             }
@@ -100,7 +107,7 @@ public final class PlowCartEntity extends AbstractDrawnInventoryEntity {
     @Override
     public boolean processInitialInteract(final PlayerEntity player, final Hand hand) {
         if (!this.world.isRemote) {
-            if (player.isSneaking()) {
+            if (player.isCrouching()) {
                 this.openContainer(player);
             } else {
                 this.dataManager.set(PLOWING, !this.dataManager.get(PLOWING));
@@ -110,7 +117,9 @@ public final class PlowCartEntity extends AbstractDrawnInventoryEntity {
     }
 
     public void updateRunnerForSlot(final int slot, final ItemStack stack) {
-        this.plowRunners[slot] = new PlowBlockHandler(stack, slot, this);
+        if (!this.world.isRemote && slot < this.plowRunners.size()) {
+            this.plowRunners.set(slot, new PlowBlockHandler(stack, slot, this));
+        }
     }
 
     public void updateSlot(final int slot) {
