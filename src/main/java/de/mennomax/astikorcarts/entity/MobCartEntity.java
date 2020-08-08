@@ -47,7 +47,7 @@ public final class MobCartEntity extends AbstractDrawnEntity {
     @Override
     public boolean processInitialInteract(final PlayerEntity player, final Hand hand) {
         if (!this.world.isRemote) {
-            if (player.isCrouching()) {
+            if (player.func_226563_dT_()) {
                 for (final Entity entity : this.getPassengers()) {
                     if (!(entity instanceof PlayerEntity)) {
                         entity.stopRiding();

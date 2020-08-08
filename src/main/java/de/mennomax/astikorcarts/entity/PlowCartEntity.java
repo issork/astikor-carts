@@ -107,7 +107,7 @@ public final class PlowCartEntity extends AbstractDrawnInventoryEntity {
     @Override
     public boolean processInitialInteract(final PlayerEntity player, final Hand hand) {
         if (!this.world.isRemote) {
-            if (player.isCrouching()) {
+            if (player.func_226563_dT_()) {
                 this.openContainer(player);
             } else {
                 this.dataManager.set(PLOWING, !this.dataManager.get(PLOWING));

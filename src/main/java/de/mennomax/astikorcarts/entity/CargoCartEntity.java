@@ -63,7 +63,7 @@ public final class CargoCartEntity extends AbstractDrawnInventoryEntity {
     @Override
     public boolean processInitialInteract(final PlayerEntity player, final Hand hand) {
         if (!this.world.isRemote) {
-            if (player.isCrouching()) {
+            if (player.func_226563_dT_()) {
                 this.openContainer(player);
             } else {
                 player.startRiding(this);
