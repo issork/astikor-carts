@@ -1,12 +1,17 @@
 {
-  "item.astikorcarts.cargocart": "Телега",
-  "item.astikorcarts.plowcart": "Плуг",
+  "item.astikorcarts.cargo_cart": "Телега",
+  "item.astikorcarts.plow_cart": "Плуг",
+  "item.astikorcarts.mob_cart": "Телега для мобов",
   "item.astikorcarts.wheel": "Колесо",
-  "item.astikorcarts.mobcart": "Телега для мобов",
   "itemGroup.astikorcarts": "AstikorCarts",
-  "entity.astikorcarts.cargocart": "Телега",
-  "entity.astikorcarts.plowcart": "Плуг",
-  "entity.astikorcarts.mobcart": "Телега для мобов",
+  "entity.astikorcarts.cargo_cart": "Телега",
+  "entity.astikorcarts.plow_cart": "Плуг",
+  "entity.astikorcarts.mob_cart": "Телега для мобов",
+  "entity.astikorcarts.postilion": "Форейтор",
   "key.categories.astikorcarts": "AstikorCarts",
-  "key.astikorcarts.desc": "Клавиша действия"
+  "key.astikorcarts.desc": "Клавиша действия",
+  "subtitles.astikorcarts.cart.attached": "Телега прикрепляется",
+  "subtitles.astikorcarts.cart.detached": "Телега открепляется",
+  "subtitles.astikorcarts.cart.placed": "Телега расположена",
+  "stat.astikorcarts.cart_one_cm": "Проеханная с телегой дистанция"
 }
