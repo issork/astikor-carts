@@ -1,8 +1,11 @@
 item.astikorcarts:cargocart.name=Телега
 item.astikorcarts:plowcart.name=Плуг
+item.astikorcarts:mobcart.name=Транспортная тележка
 item.astikorcarts:wheel.name=Колесо
 itemGroup.astikorcarts=AstikorCarts
 entity.astikorcarts:cargocart.name=Телега
 entity.astikorcarts:plowcart.name=Плуг
+entity.astikorcarts:mobcart.name=Транспортная тележка
 key.categories.astikorcarts=AstikorCarts
 key.astikorcarts.desc=Клавиша действия
+config.astikorcarts:speedmodifier=Модификатор скорости
