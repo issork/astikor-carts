@@ -162,7 +162,7 @@ public final class PlowBlockHandler implements BiConsumer<PlayerEntity, BlockPos
                 if (stack.isEmpty()) {
                     ForgeEventFactory.onPlayerDestroyItem(player, copy, null);
                     this.plow.updateSlot(this.slot);
-                    this.plow.world.playSound(this.plow.posX, this.plow.posY, this.plow.posZ, SoundEvents.ENTITY_ITEM_BREAK, this.plow.getSoundCategory(), 0.8F, 0.8F + this.plow.world.rand.nextFloat() * 0.4F, false);
+                    this.plow.world.playSound(this.plow.getPosX(), this.plow.getPosY(), this.plow.getPosZ(), SoundEvents.ENTITY_ITEM_BREAK, this.plow.getSoundCategory(), 0.8F, 0.8F + this.plow.world.rand.nextFloat() * 0.4F, false);
                 }
             } else {
                 stack.shrink(1);

@@ -15,7 +15,7 @@ public final class PlowCartContainer extends CartContainer {
     }
 
     public PlowCartContainer(final int id, final PlayerInventory playerInv, final AbstractDrawnInventoryEntity cart) {
-        super(AstikorCarts.ContainerTypes.PLOWCARTCONTAINER.get(), id, cart);
+        super(AstikorCarts.ContainerTypes.PLOW_CART.get(), id, cart);
         this.addSlot(new PlowSlot(this.cartInv, 0, 57, 24));
         this.addSlot(new PlowSlot(this.cartInv, 1, 80, 17));
         this.addSlot(new PlowSlot(this.cartInv, 2, 103, 24));

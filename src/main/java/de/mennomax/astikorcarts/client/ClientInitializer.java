@@ -9,9 +9,6 @@ import de.mennomax.astikorcarts.client.renderer.entity.MobCartRenderer;
 import de.mennomax.astikorcarts.client.renderer.entity.PlowCartRenderer;
 import de.mennomax.astikorcarts.client.renderer.entity.PostilionRenderer;
 import de.mennomax.astikorcarts.entity.CargoCartEntity;
-import de.mennomax.astikorcarts.entity.MobCartEntity;
-import de.mennomax.astikorcarts.entity.PlowCartEntity;
-import de.mennomax.astikorcarts.entity.PostilionEntity;
 import de.mennomax.astikorcarts.network.packets.CPacketActionKey;
 import de.mennomax.astikorcarts.network.packets.CPacketOpenCargoCartGui;
 import de.mennomax.astikorcarts.network.packets.CPacketToggleSlow;
@@ -75,11 +72,11 @@ public final class ClientInitializer extends CommonInitializer {
             }
         });
         mod.modBus().<FMLClientSetupEvent>addListener(e -> {
-            RenderingRegistry.registerEntityRenderingHandler(CargoCartEntity.class, CargoCartRenderer::new);
-            RenderingRegistry.registerEntityRenderingHandler(PlowCartEntity.class, PlowCartRenderer::new);
-            RenderingRegistry.registerEntityRenderingHandler(MobCartEntity.class, MobCartRenderer::new);
-            RenderingRegistry.registerEntityRenderingHandler(PostilionEntity.class, PostilionRenderer::new);
-            ScreenManager.registerFactory(AstikorCarts.ContainerTypes.PLOWCARTCONTAINER.get(), PlowScreen::new);
+            RenderingRegistry.registerEntityRenderingHandler(AstikorCarts.EntityTypes.CARGO_CART.get(), CargoCartRenderer::new);
+            RenderingRegistry.registerEntityRenderingHandler(AstikorCarts.EntityTypes.PLOW_CART.get(), PlowCartRenderer::new);
+            RenderingRegistry.registerEntityRenderingHandler(AstikorCarts.EntityTypes.MOB_CART.get(), MobCartRenderer::new);
+            RenderingRegistry.registerEntityRenderingHandler(AstikorCarts.EntityTypes.POSTILION.get(), PostilionRenderer::new);
+            ScreenManager.registerFactory(AstikorCarts.ContainerTypes.PLOW_CART.get(), PlowScreen::new);
             ClientRegistry.registerKeyBinding(this.action);
         });
     }

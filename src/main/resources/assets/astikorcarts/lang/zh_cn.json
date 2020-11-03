@@ -1,12 +1,12 @@
 {
-  "item.astikorcarts.cargocart": "马车",
-  "item.astikorcarts.plowcart": "犁",
-  "item.astikorcarts.mobcart": "牲畜运载马车",
+  "item.astikorcarts.cargo_cart": "马车",
+  "item.astikorcarts.plow_cart": "犁",
+  "item.astikorcarts.mob_cart": "牲畜运载马车",
   "item.astikorcarts.wheel": "车轮",
   "itemGroup.astikorcarts": "AstikorCarts",
-  "entity.astikorcarts.cargocart": "马车",
-  "entity.astikorcarts.plowcart": "犁",
-  "entity.astikorcarts.mobcart": "牲畜运载马车",
+  "entity.astikorcarts.cargo_cart": "马车",
+  "entity.astikorcarts.plow_cart": "犁",
+  "entity.astikorcarts.mob_cart": "牲畜运载马车",
   "key.categories.astikorcarts": "AstikorCarts",
   "key.astikorcarts.desc": "将动物栓上车",
   "config.astikorcarts.speedmodifier": "改变速度"

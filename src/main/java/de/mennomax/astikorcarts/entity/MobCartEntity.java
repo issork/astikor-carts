@@ -34,7 +34,7 @@ public final class MobCartEntity extends AbstractDrawnEntity {
         if (pulling != null && coachman != null && pulling.getControllingPassenger() == null) {
             final PostilionEntity postilion = AstikorCarts.EntityTypes.POSTILION.get().create(this.world);
             if (postilion != null) {
-                postilion.setPositionAndRotation(pulling.posX, pulling.posY, pulling.posZ, coachman.rotationYaw, coachman.rotationPitch);
+                postilion.setPositionAndRotation(pulling.getPosX(), pulling.getPosY(), pulling.getPosZ(), coachman.rotationYaw, coachman.rotationPitch);
                 if (postilion.startRiding(pulling)) {
                     this.world.addEntity(postilion);
                 } else {
@@ -47,7 +47,7 @@ public final class MobCartEntity extends AbstractDrawnEntity {
     @Override
     public boolean processInitialInteract(final PlayerEntity player, final Hand hand) {
         if (!this.world.isRemote) {
-            if (player.isSneaking()) {
+            if (player.func_226563_dT_()) {
                 for (final Entity entity : this.getPassengers()) {
                     if (!(entity instanceof PlayerEntity)) {
                         entity.stopRiding();
@@ -79,7 +79,7 @@ public final class MobCartEntity extends AbstractDrawnEntity {
 
     @Override
     public double getMountedYOffset() {
-        return 0.7D;
+        return 11.0D / 16.0D;
     }
 
     @Override
@@ -95,8 +95,10 @@ public final class MobCartEntity extends AbstractDrawnEntity {
                 }
             }
 
-            final Vec3d vec3d = new Vec3d(f, 0.0D, 0.0D).rotateYaw(-this.rotationYaw * 0.017453292F - ((float) Math.PI / 2F));
-            passenger.setPosition(this.posX + vec3d.x, this.posY + this.getMountedYOffset() + passenger.getYOffset(), this.posZ + vec3d.z);
+            final Vec3d forward = this.getLookVec();
+            final Vec3d origin = new Vec3d(0.0D, this.getMountedYOffset(), 1.0D / 16.0D);
+            final Vec3d pos = origin.add(forward.scale(f + MathHelper.sin((float) Math.toRadians(this.rotationPitch)) * 0.7D));
+            passenger.setPosition(this.getPosX() + pos.x, this.getPosY() + pos.y + passenger.getYOffset(), this.getPosZ() + pos.z);
             passenger.setRenderYawOffset(this.rotationYaw);
             final float f2 = MathHelper.wrapDegrees(passenger.rotationYaw - this.rotationYaw);
             final float f1 = MathHelper.clamp(f2, -105.0F, 105.0F);

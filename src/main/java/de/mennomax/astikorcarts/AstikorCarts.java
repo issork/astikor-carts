@@ -57,14 +57,14 @@ public final class AstikorCarts {
 
         private static final DefRegister.Forge<Item> R = REG.of(ForgeRegistries.ITEMS);
 
-        public static final RegObject<Item> WHEEL, CARGO_CART, PLOW_CART, MOB_CART;
+        public static final RegObject<Item, Item> WHEEL, CARGO_CART, PLOW_CART, MOB_CART;
 
         static {
             WHEEL = R.make("wheel", () -> new Item(new Item.Properties().group(ItemGroup.MATERIALS)));
             final Supplier<Item> cart = () -> new CartItem(new Item.Properties().maxStackSize(1).group(ItemGroup.TRANSPORTATION));
-            CARGO_CART = R.make("cargocart", cart);
-            PLOW_CART = R.make("plowcart", cart);
-            MOB_CART = R.make("mobcart", cart);
+            CARGO_CART = R.make("cargo_cart", cart);
+            PLOW_CART = R.make("plow_cart", cart);
+            MOB_CART = R.make("mob_cart", cart);
         }
     }
 
@@ -74,19 +74,19 @@ public final class AstikorCarts {
 
         private static final DefRegister.Forge<EntityType<?>> R = REG.of(ForgeRegistries.ENTITIES);
 
-        public static final RegObject<EntityType<CargoCartEntity>> CARGO_CART;
-        public static final RegObject<EntityType<PlowCartEntity>> PLOW_CART;
-        public static final RegObject<EntityType<MobCartEntity>> MOB_CART;
-        public static final RegObject<EntityType<PostilionEntity>> POSTILION;
+        public static final RegObject<EntityType<?>, EntityType<CargoCartEntity>> CARGO_CART;
+        public static final RegObject<EntityType<?>, EntityType<PlowCartEntity>> PLOW_CART;
+        public static final RegObject<EntityType<?>, EntityType<MobCartEntity>> MOB_CART;
+        public static final RegObject<EntityType<?>, EntityType<PostilionEntity>> POSTILION;
 
         static {
-            CARGO_CART = R.make("cargocart", () -> EntityBuilder.create(CargoCartEntity::new, EntityClassification.MISC)
+            CARGO_CART = R.make("cargo_cart", () -> EntityBuilder.create(CargoCartEntity::new, EntityClassification.MISC)
                 .size(1.5F, 1.4F)
                 .build());
-            PLOW_CART = R.make("plowcart", () -> EntityBuilder.create(PlowCartEntity::new, EntityClassification.MISC)
+            PLOW_CART = R.make("plow_cart", () -> EntityBuilder.create(PlowCartEntity::new, EntityClassification.MISC)
                 .size(1.3F, 1.4F)
                 .build());
-            MOB_CART = R.make("mobcart", () -> EntityBuilder.create(MobCartEntity::new, EntityClassification.MISC)
+            MOB_CART = R.make("mob_cart", () -> EntityBuilder.create(MobCartEntity::new, EntityClassification.MISC)
                 .size(1.3F, 1.4F)
                 .build());
             POSTILION = R.make("postilion", () -> EntityBuilder.create(PostilionEntity::new, EntityClassification.MISC)
@@ -103,9 +103,9 @@ public final class AstikorCarts {
 
         private static final DefRegister.Forge<SoundEvent> R = REG.of(ForgeRegistries.SOUND_EVENTS);
 
-        public static final RegObject<SoundEvent> CART_ATTACHED = R.make("entity.cart.attach", SoundEvent::new);
-        public static final RegObject<SoundEvent> CART_DETACHED = R.make("entity.cart.detach", SoundEvent::new);
-        public static final RegObject<SoundEvent> CART_PLACED = R.make("entity.cart.place", SoundEvent::new);
+        public static final RegObject<SoundEvent, SoundEvent> CART_ATTACHED = R.make("entity.cart.attach", SoundEvent::new);
+        public static final RegObject<SoundEvent, SoundEvent> CART_DETACHED = R.make("entity.cart.detach", SoundEvent::new);
+        public static final RegObject<SoundEvent, SoundEvent> CART_PLACED = R.make("entity.cart.place", SoundEvent::new);
     }
 
     public static final class Stats {
@@ -123,7 +123,7 @@ public final class AstikorCarts {
 
         private static final DefRegister.Forge<ContainerType<?>> R = REG.of(ForgeRegistries.CONTAINERS);
 
-        public static final RegObject<ContainerType<PlowCartContainer>> PLOWCARTCONTAINER = R.make("plowcartcontainer", () -> IForgeContainerType.create(PlowCartContainer::new));
+        public static final RegObject<ContainerType<?>, ContainerType<PlowCartContainer>> PLOW_CART = R.make("plow_cart", () -> IForgeContainerType.create(PlowCartContainer::new));
     }
 
     public AstikorCarts() {
