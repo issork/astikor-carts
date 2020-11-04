@@ -65,7 +65,7 @@ public final class ClientInitializer extends CommonInitializer {
         mod.bus().<GuiOpenEvent>addListener(e -> {
             if (e.getGui() instanceof InventoryScreen) {
                 final ClientPlayerEntity player = Minecraft.getInstance().player;
-                if (player.getRidingEntity() instanceof CargoCartEntity) {
+                if (player != null && player.getRidingEntity() instanceof CargoCartEntity) {
                     e.setCanceled(true);
                     AstikorCarts.CHANNEL.sendToServer(new CPacketOpenCargoCartGui());
                 }

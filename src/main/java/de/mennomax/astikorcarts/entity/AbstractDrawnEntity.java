@@ -12,6 +12,7 @@ import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -210,7 +211,8 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             if (this.canBePulledBy(entityIn)) {
                 if (entityIn == null) {
                     if (this.pulling instanceof LivingEntity) {
-                        ((LivingEntity) this.pulling).getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(PULL_SLOWLY_MODIFIER);
+                        final ModifiableAttributeInstance attr = ((LivingEntity) this.pulling).getAttribute(Attributes.MOVEMENT_SPEED);
+                        if (attr != null) attr.removeModifier(PULL_SLOWLY_MODIFIER);
                     } else if (this.pulling instanceof AbstractDrawnEntity) {
                         ((AbstractDrawnEntity) this.pulling).drawn = null;
                     }
