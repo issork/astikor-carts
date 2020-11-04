@@ -100,7 +100,7 @@ public final class PlowCartModel extends CartModel<PlowCartEntity> {
     public void setRotationAngles(final PlowCartEntity entity, final float delta, final float limbSwingAmount, final float ageInTicks, final float netHeadYaw, final float pitch) {
         super.setRotationAngles(entity, delta, limbSwingAmount, ageInTicks, netHeadYaw, pitch);
         for (final ModelRenderer renderer : this.plowShaftUpper) {
-            renderer.rotateAngleX = entity.getPlowing() ? (float) Math.PI / 4.0F : (float) Math.PI / 2.5F;
+            renderer.rotateAngleX = (float) (entity.getPlowing() ? Math.PI / 4.0D - Math.toRadians(pitch) : Math.PI / 2.5D);
         }
     }
 }
