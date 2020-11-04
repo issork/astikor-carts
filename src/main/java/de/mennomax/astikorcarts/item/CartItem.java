@@ -2,6 +2,7 @@ package de.mennomax.astikorcarts.item;
 
 import de.mennomax.astikorcarts.AstikorCarts;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -45,7 +46,14 @@ public final class CartItem extends Item {
             }
 
             if (result.getType() == Type.BLOCK) {
-                final Entity cart = ForgeRegistries.ENTITIES.getValue(this.getRegistryName()).create(world);
+                final EntityType<?> type = ForgeRegistries.ENTITIES.getValue(this.getRegistryName());
+                if (type == null) {
+                    return ActionResult.resultPass(stack);
+                }
+                final Entity cart = type.create(world);
+                if (cart == null) {
+                    return ActionResult.resultPass(stack);
+                }
                 cart.setPosition(result.getHitVec().x, result.getHitVec().y, result.getHitVec().z);
                 cart.rotationYaw = (player.rotationYaw + 180) % 360;
                 if (!world.hasNoCollisions(cart, cart.getBoundingBox().grow(0.1F, -0.1F, 0.1F))) {
