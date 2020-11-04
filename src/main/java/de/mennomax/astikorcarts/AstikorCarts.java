@@ -14,7 +14,6 @@ import de.mennomax.astikorcarts.network.packets.CPacketToggleSlow;
 import de.mennomax.astikorcarts.network.packets.SPacketDrawnUpdate;
 import de.mennomax.astikorcarts.server.ServerInitializer;
 import de.mennomax.astikorcarts.util.DefRegister;
-import de.mennomax.astikorcarts.util.EntityBuilder;
 import de.mennomax.astikorcarts.util.RegObject;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
@@ -80,20 +79,20 @@ public final class AstikorCarts {
         public static final RegObject<EntityType<?>, EntityType<PostilionEntity>> POSTILION;
 
         static {
-            CARGO_CART = R.make("cargo_cart", () -> EntityBuilder.create(CargoCartEntity::new, EntityClassification.MISC)
+            CARGO_CART = R.make("cargo_cart", () -> EntityType.Builder.create(CargoCartEntity::new, EntityClassification.MISC)
                 .size(1.5F, 1.4F)
-                .build());
-            PLOW_CART = R.make("plow_cart", () -> EntityBuilder.create(PlowCartEntity::new, EntityClassification.MISC)
+                .build(ID + ":cargo_cart"));
+            PLOW_CART = R.make("plow_cart", () -> EntityType.Builder.create(PlowCartEntity::new, EntityClassification.MISC)
                 .size(1.3F, 1.4F)
-                .build());
-            MOB_CART = R.make("mob_cart", () -> EntityBuilder.create(MobCartEntity::new, EntityClassification.MISC)
+                .build(ID + ":plow_cart"));
+            MOB_CART = R.make("mob_cart", () -> EntityType.Builder.create(MobCartEntity::new, EntityClassification.MISC)
                 .size(1.3F, 1.4F)
-                .build());
-            POSTILION = R.make("postilion", () -> EntityBuilder.create(PostilionEntity::new, EntityClassification.MISC)
+                .build(ID + ":mob_cart"));
+            POSTILION = R.make("postilion", () -> EntityType.Builder.create(PostilionEntity::new, EntityClassification.MISC)
                 .size(0.25F, 0.25F)
-                .insummonable()
-                .unserializable()
-                .build());
+                .disableSummoning()
+                .disableSerialization()
+                .build(ID + ":postilion"));
         }
     }
 

@@ -11,6 +11,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ITag;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
@@ -55,7 +56,7 @@ public final class PlowBlockHandler implements BiConsumer<PlayerEntity, BlockPos
             for (final Config config : AstikorCartsConfig.COMMON.plowReplace.get()) {
                 final ResourceLocation tool = ResourceLocation.tryCreate(config.get("tool"));
                 if (tool == null) continue;
-                final Tag<Item> tag = ItemTags.getCollection().get(tool);
+                final ITag<Item> tag = ItemTags.getCollection().get(tool);
                 if ((tag == null && BUILTIN_ITEMS.containsKey(tool) && BUILTIN_ITEMS.get(tool).isAssignableFrom(this.stack.getItem().getClass()) ||
                         tag != null && tag.contains(this.stack.getItem())) ||
                         ForgeRegistries.ITEMS.containsKey(tool) && ForgeRegistries.ITEMS.getValue(tool) == this.stack.getItem()
@@ -71,7 +72,7 @@ public final class PlowBlockHandler implements BiConsumer<PlayerEntity, BlockPos
                             .map(ResourceLocation::tryCreate)
                             .filter(Objects::nonNull)
                             .<Predicate<BlockState>>flatMap(rl -> {
-                                final Tag<Block> targetTag = BlockTags.getCollection().get(rl);
+                                final ITag<Block> targetTag = BlockTags.getCollection().get(rl);
                                 if (targetTag != null) {
                                     return Stream.of(s -> s.isIn(targetTag));
                                 }

@@ -17,6 +17,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -105,15 +106,15 @@ public final class PlowCartEntity extends AbstractDrawnInventoryEntity {
     }
 
     @Override
-    public boolean processInitialInteract(final PlayerEntity player, final Hand hand) {
+    public ActionResultType processInitialInteract(final PlayerEntity player, final Hand hand) {
         if (!this.world.isRemote) {
-            if (player.func_226563_dT_()) {
+            if (player.isSneaking()) {
                 this.openContainer(player);
             } else {
                 this.dataManager.set(PLOWING, !this.dataManager.get(PLOWING));
             }
         }
-        return true;
+        return ActionResultType.SUCCESS;
     }
 
     public void updateRunnerForSlot(final int slot, final ItemStack stack) {

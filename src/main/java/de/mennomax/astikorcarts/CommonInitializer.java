@@ -11,7 +11,9 @@ import de.mennomax.astikorcarts.world.AstikorWorld;
 import de.mennomax.astikorcarts.world.SimpleAstikorWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.ai.attributes.GlobalEntityTypeAttributes;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
@@ -23,6 +25,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.registries.IForgeRegistryEntry;
@@ -47,6 +50,9 @@ public class CommonInitializer implements Initializer {
                 public void readNBT(final Capability<AstikorWorld> capability, final AstikorWorld instance, final Direction side, final INBT nbt) {
                 }
             }, SimpleAstikorWorld::new);
+            e.enqueueWork(() -> {
+                GlobalEntityTypeAttributes.put(AstikorCarts.EntityTypes.POSTILION.get(), LivingEntity.registerAttributes().create());
+            });
         });
         mod.bus().<AttachCapabilitiesEvent<World>, World>addGenericListener(World.class, e ->
             e.addCapability(new ResourceLocation(AstikorCarts.ID, "astikor"), AstikorWorld.createProvider(SimpleAstikorWorld::new))

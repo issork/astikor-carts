@@ -1,6 +1,7 @@
 modLoader="javafml"
-loaderVersion="[31,)"
+loaderVersion="[34,)"
 issueTrackerURL="https://github.com/MennoMax/astikor-carts/issues"
+license="MIT"
 [[mods]]
 modId="astikorcarts"
 version="${file.jarVersion}"
@@ -14,13 +15,13 @@ description="This mod adds carts that can be pulled by other entities to the gam
 [[dependencies.astikorcarts]]
     modId = "forge"
     mandatory=true
-    versionRange="[31,)"
+    versionRange="[34,)"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.astikorcarts]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.15.2]"
+    versionRange="[1.16.3]"
     ordering="NONE"
     side="BOTH"

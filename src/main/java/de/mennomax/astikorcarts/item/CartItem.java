@@ -14,7 +14,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.RayTraceContext.FluidMode;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.RayTraceResult.Type;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -30,16 +30,16 @@ public final class CartItem extends Item {
         final ItemStack stack = player.getHeldItem(hand);
         final RayTraceResult result = rayTrace(world, player, FluidMode.ANY);
         if (result.getType() == Type.MISS) {
-            return ActionResult.func_226250_c_(stack);
+            return ActionResult.resultPass(stack);
         } else {
-            final Vec3d lookVec = player.getLook(1.0F);
+            final Vector3d lookVec = player.getLook(1.0F);
             final List<Entity> list = world.getEntitiesInAABBexcluding(player, player.getBoundingBox().expand(lookVec.scale(5.0D)).grow(5.0D), EntityPredicates.NOT_SPECTATING.and(Entity::canBeCollidedWith));
             if (!list.isEmpty()) {
-                final Vec3d eyePos = player.getEyePosition(1.0F);
+                final Vector3d eyePos = player.getEyePosition(1.0F);
                 for (final Entity entity : list) {
                     final AxisAlignedBB axisalignedbb = entity.getBoundingBox().grow(entity.getCollisionBorderSize());
                     if (axisalignedbb.contains(eyePos)) {
-                        return ActionResult.func_226250_c_(stack);
+                        return ActionResult.resultPass(stack);
                     }
                 }
             }
@@ -48,8 +48,8 @@ public final class CartItem extends Item {
                 final Entity cart = ForgeRegistries.ENTITIES.getValue(this.getRegistryName()).create(world);
                 cart.setPosition(result.getHitVec().x, result.getHitVec().y, result.getHitVec().z);
                 cart.rotationYaw = (player.rotationYaw + 180) % 360;
-                if (!world.func_226665_a__(cart, cart.getBoundingBox().grow(0.1F, -0.1F, 0.1F))) {
-                    return ActionResult.func_226251_d_(stack);
+                if (!world.hasNoCollisions(cart, cart.getBoundingBox().grow(0.1F, -0.1F, 0.1F))) {
+                    return ActionResult.resultFail(stack);
                 } else {
                     if (!world.isRemote()) {
                         world.addEntity(cart);
@@ -59,10 +59,10 @@ public final class CartItem extends Item {
                         stack.shrink(1);
                     }
                     player.addStat(Stats.ITEM_USED.get(this));
-                    return ActionResult.func_226248_a_(stack);
+                    return ActionResult.resultSuccess(stack);
                 }
             } else {
-                return ActionResult.func_226250_c_(stack);
+                return ActionResult.resultPass(stack);
             }
         }
     }

@@ -93,13 +93,11 @@ public final class DefRegister {
 
         @Override
         public void register(final IEventBus bus) {
-            bus.addListener(this::onRegister);
+            bus.addGenericListener(this.registry.getRegistrySuperType(), this::onRegister);
         }
 
-        private void onRegister(final RegistryEvent.Register<?> event) {
-            if (event.getRegistry() == this.registry) {
-                this.entries.forEach(sup -> this.registry.register(sup.get()));
-            }
+        private void onRegister(final RegistryEvent.Register<T> event) {
+            this.entries.forEach(sup -> this.registry.register(sup.get()));
         }
     }
 }

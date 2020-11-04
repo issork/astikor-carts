@@ -12,6 +12,7 @@ import net.minecraft.client.gui.screen.StatsScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.list.AbstractList;
 import net.minecraft.stats.Stat;
+import net.minecraft.util.Util;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
@@ -54,7 +55,7 @@ public final class OregonSubscriber {
             });
         }
         if (screen instanceof ChatScreen && (event.getKeyCode() == GLFW.GLFW_KEY_ENTER || event.getKeyCode() == GLFW.GLFW_KEY_KP_ENTER)) {
-            screen.children().stream()
+            screen.getEventListeners().stream()
                 .filter(TextFieldWidget.class::isInstance)
                 .map(TextFieldWidget.class::cast)
                 .findFirst().ifPresent(field -> {
@@ -171,7 +172,7 @@ public final class OregonSubscriber {
             this.in.addLast(s);
             final ClientPlayerEntity player = Minecraft.getInstance().player;
             if (player != null) {
-                player.sendMessage(new StringTextComponent(s).setStyle(new Style().setItalic(true).setColor(TextFormatting.WHITE)));
+                player.sendMessage(new StringTextComponent(s).mergeStyle(TextFormatting.ITALIC, TextFormatting.WHITE), Util.DUMMY_UUID);
             }
         }
 
@@ -195,7 +196,7 @@ public final class OregonSubscriber {
             mc.runImmediately(() -> {
                 final ClientPlayerEntity player = mc.player;
                 if (player != null) {
-                    player.sendMessage(new StringTextComponent(s).setStyle(new Style().setItalic(true).setColor(TextFormatting.GRAY)));
+                    player.sendMessage(new StringTextComponent(s).mergeStyle(TextFormatting.ITALIC, TextFormatting.GRAY), Util.DUMMY_UUID);
                 }
             });
         }

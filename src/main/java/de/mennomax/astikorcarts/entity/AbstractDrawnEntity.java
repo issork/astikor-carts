@@ -10,8 +10,8 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.MoverType;
-import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -32,7 +32,7 @@ import net.minecraft.util.math.RayTraceContext.BlockMode;
 import net.minecraft.util.math.RayTraceContext.FluidMode;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.RayTraceResult.Type;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
@@ -53,7 +53,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     private static final DataParameter<Integer> FORWARD_DIRECTION = EntityDataManager.createKey(AbstractDrawnEntity.class, DataSerializers.VARINT);
     private static final DataParameter<Float> DAMAGE_TAKEN = EntityDataManager.createKey(AbstractDrawnEntity.class, DataSerializers.FLOAT);
     public static final UUID PULL_SLOWLY_MODIFIER_UUID = UUID.fromString("49B0E52E-48F2-4D89-BED7-4F5DF26F1263");
-    public static final AttributeModifier PULL_SLOWLY_MODIFIER = (new AttributeModifier(PULL_SLOWLY_MODIFIER_UUID, "Pull slowly modifier", AstikorCartsConfig.COMMON.speedModifier.get(), AttributeModifier.Operation.MULTIPLY_TOTAL)).setSaved(false);
+    public static final AttributeModifier PULL_SLOWLY_MODIFIER = (new AttributeModifier(PULL_SLOWLY_MODIFIER_UUID, "Pull slowly modifier", AstikorCartsConfig.COMMON.speedModifier.get(), AttributeModifier.Operation.MULTIPLY_TOTAL));
     private int lerpSteps;
     private double lerpX;
     private double lerpY;
@@ -113,7 +113,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         if (this.pulling == null) {
             return;
         }
-        Vec3d targetVec = this.getRelativeTargetVec(1.0F);
+        Vector3d targetVec = this.getRelativeTargetVec(1.0F);
         this.handleRotation(targetVec);
         while (this.rotationYaw - this.prevRotationYaw < -180.0F) {
             this.prevRotationYaw -= 360.0F;
@@ -121,13 +121,13 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         while (this.rotationYaw - this.prevRotationYaw >= 180.0F) {
             this.prevRotationYaw += 360.0F;
         }
-        if (this.pulling.onGround) {
-            targetVec = new Vec3d(targetVec.x, 0.0D, targetVec.z);
+        if (this.pulling.isOnGround()) {
+            targetVec = new Vector3d(targetVec.x, 0.0D, targetVec.z);
         }
         final double targetVecLength = targetVec.length();
         final double r = 0.2D;
         final double diff = targetVecLength - this.spacing;
-        final Vec3d move;
+        final Vector3d move;
         if (Math.abs(diff) < r) {
             move = this.getMotion();
         } else {
@@ -181,8 +181,8 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     public boolean shouldRemovePulling() {
         if (this.collidedHorizontally) {
             this.getPositionVec().add(0.0D, this.getEyeHeight(), 0.0D);
-            final Vec3d start = new Vec3d(this.getPosX(), this.getPosY() + this.getHeight(), this.getPosZ());
-            final Vec3d end = new Vec3d(this.pulling.getPosX(), this.pulling.getPosY() + this.pulling.getHeight() / 2, this.pulling.getPosZ());
+            final Vector3d start = new Vector3d(this.getPosX(), this.getPosY() + this.getHeight(), this.getPosZ());
+            final Vector3d end = new Vector3d(this.pulling.getPosX(), this.pulling.getPosY() + this.pulling.getHeight() / 2, this.pulling.getPosZ());
             final RayTraceResult result = this.world.rayTraceBlocks(new RayTraceContext(start, end, BlockMode.COLLIDER, FluidMode.NONE, this));
             return result.getType() == Type.BLOCK;
         }
@@ -210,7 +210,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             if (this.canBePulledBy(entityIn)) {
                 if (entityIn == null) {
                     if (this.pulling instanceof LivingEntity) {
-                        ((LivingEntity) this.pulling).getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(PULL_SLOWLY_MODIFIER);
+                        ((LivingEntity) this.pulling).getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(PULL_SLOWLY_MODIFIER);
                     } else if (this.pulling instanceof AbstractDrawnEntity) {
                         ((AbstractDrawnEntity) this.pulling).drawn = null;
                     }
@@ -305,7 +305,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
      * Relative to the cart position.
      * @param delta
      */
-    public Vec3d getRelativeTargetVec(final float delta) {
+    public Vector3d getRelativeTargetVec(final float delta) {
         final double x;
         final double y;
         final double z;
@@ -322,7 +322,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         final float nx = -MathHelper.sin(yaw);
         final float nz = MathHelper.cos(yaw);
         final double r = 0.2D;
-        return new Vec3d(x + nx * r, y, z + nz * r);
+        return new Vector3d(x + nx * r, y, z + nz * r);
     }
 
     /**
@@ -330,16 +330,16 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
      *
      * @param target
      */
-    public void handleRotation(final Vec3d target) {
+    public void handleRotation(final Vector3d target) {
         this.rotationYaw = getYaw(target);
         this.rotationPitch = getPitch(target);
     }
 
-    public static float getYaw(final Vec3d vec) {
+    public static float getYaw(final Vector3d vec) {
         return MathHelper.wrapDegrees((float) Math.toDegrees(-MathHelper.atan2(vec.x, vec.z)));
     }
 
-    public static float getPitch(final Vec3d vec) {
+    public static float getPitch(final Vector3d vec) {
         return MathHelper.wrapDegrees((float) Math.toDegrees(-MathHelper.atan2(vec.y, MathHelper.sqrt(vec.x * vec.x + vec.z * vec.z))));
     }
 
@@ -434,7 +434,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             this.rotationPitch = (float) (this.rotationPitch + (this.lerpPitch - this.rotationPitch) / this.lerpSteps);
             this.lerpSteps--;
             this.onGround = true;
-            this.move(MoverType.SELF, new Vec3d(dx, dy, dz));
+            this.move(MoverType.SELF, new Vector3d(dx, dy, dz));
             this.setRotation(this.rotationYaw, this.rotationPitch);
         }
     }
@@ -559,7 +559,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
 
     public class RenderInfo {
         final float delta;
-        Vec3d target;
+        Vector3d target;
         float yaw = Float.NaN;
         float pitch = Float.NaN;
 
@@ -567,7 +567,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             this.delta = delta;
         }
 
-        public Vec3d getTarget() {
+        public Vector3d getTarget() {
             if (this.target == null) {
                 if (AbstractDrawnEntity.this.pulling == null) {
                     this.target = AbstractDrawnEntity.this.getLook(this.delta);

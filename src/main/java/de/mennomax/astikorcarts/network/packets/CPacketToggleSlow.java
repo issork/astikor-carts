@@ -6,7 +6,7 @@ import de.mennomax.astikorcarts.network.ServerMessageContext;
 import de.mennomax.astikorcarts.world.AstikorWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
 
@@ -22,10 +22,10 @@ public final class CPacketToggleSlow implements Message {
     public static void handle(final CPacketToggleSlow msg, final ServerMessageContext ctx) {
         final Entity pulling = getPulling(ctx.getPlayer());
         if (pulling instanceof LivingEntity) {
-            if (((LivingEntity) pulling).getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).hasModifier(AbstractDrawnEntity.PULL_SLOWLY_MODIFIER)) {
-                ((LivingEntity) pulling).getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(AbstractDrawnEntity.PULL_SLOWLY_MODIFIER);
+            if (((LivingEntity) pulling).getAttribute(Attributes.MOVEMENT_SPEED).hasModifier(AbstractDrawnEntity.PULL_SLOWLY_MODIFIER)) {
+                ((LivingEntity) pulling).getAttribute(Attributes.MOVEMENT_SPEED).removeModifier(AbstractDrawnEntity.PULL_SLOWLY_MODIFIER);
             } else {
-                ((LivingEntity) pulling).getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(AbstractDrawnEntity.PULL_SLOWLY_MODIFIER);
+                ((LivingEntity) pulling).getAttribute(Attributes.MOVEMENT_SPEED).applyNonPersistentModifier(AbstractDrawnEntity.PULL_SLOWLY_MODIFIER);
             }
         }
     }

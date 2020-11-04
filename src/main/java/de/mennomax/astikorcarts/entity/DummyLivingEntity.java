@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.HandSide;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
 import java.util.Collections;
 
@@ -122,7 +123,7 @@ public abstract class DummyLivingEntity extends LivingEntity {
     }
 
     @Override
-    public void onStruckByLightning(final LightningBoltEntity bolt) {
+    public void func_241841_a(final ServerWorld world, final LightningBoltEntity bolt) {
     }
 
     @Override
