@@ -38,6 +38,12 @@ public final class CargoCartEntity extends AbstractDrawnInventoryEntity {
     protected ItemStackHandler initInventory() {
         return new CartItemStackHandler<CargoCartEntity>(54, this) {
             @Override
+            protected void onLoad() {
+                super.onLoad();
+                this.onContentsChanged(0);
+            }
+
+            @Override
             protected void onContentsChanged(final int slot) {
                 int tempload = 0;
                 for (int i = 0; i < this.getSlots(); i++) {
@@ -107,18 +113,6 @@ public final class CargoCartEntity extends AbstractDrawnInventoryEntity {
     protected void registerData() {
         super.registerData();
         this.dataManager.register(CARGO, 0);
-    }
-
-    @Override
-    protected void readAdditional(final CompoundNBT compound) {
-        super.readAdditional(compound);
-        this.dataManager.set(CARGO, compound.getInt("Cargo"));
-    }
-
-    @Override
-    protected void writeAdditional(final CompoundNBT compound) {
-        super.writeAdditional(compound);
-        compound.putInt("Cargo", this.dataManager.get(CARGO));
     }
 
     public void openContainer(final PlayerEntity player) {
