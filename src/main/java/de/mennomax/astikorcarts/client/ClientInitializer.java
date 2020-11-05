@@ -118,8 +118,7 @@ public final class ClientInitializer extends CommonInitializer {
                     .fill(62, 55, 2, 9)
                 )
             )
-            // TODO: change cargo rendering
-            .add(new ResourceLocation(AstikorCarts.ID, "textures/entity/cargo_cart.png"), new AssembledTexture(128, 64)
+            .add(new ResourceLocation(AstikorCarts.ID, "textures/entity/cargo_cart.png"), new AssembledTexture(64, 64)
                 .add(new Material(new ResourceLocation("block/oak_planks"), 16)
                     .fill(0, 0, 60, 49, Material.R0, 0, 2)
                     .fill(0, 27, 60, 12, Material.R0, 0, 1)
@@ -133,7 +132,8 @@ public final class ClientInitializer extends CommonInitializer {
                 )
                 .add(new Material(new ResourceLocation("block/stone"), 16)
                     .fill(62, 55, 2, 9)
-                ))
+                )
+            )
             .register(mod.modBus());
     }
 }

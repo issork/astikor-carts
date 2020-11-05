@@ -87,10 +87,6 @@ public final class PlowCartModel extends CartModel<PlowCartEntity> {
         this.body.addChild(this.parts);
     }
 
-    public ModelRenderer getBody() {
-        return this.body;
-    }
-
     public ModelRenderer getShaft(final int original) {
         return this.plowShaftLower[original];
     }

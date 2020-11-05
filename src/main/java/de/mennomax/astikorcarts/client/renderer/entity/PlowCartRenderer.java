@@ -53,26 +53,4 @@ public final class PlowCartRenderer extends DrawnRenderer<PlowCartEntity, PlowCa
             }, stack);
         }
     }
-
-    private static final Field CHILD_MODELS = ObfuscationReflectionHelper.findField(ModelRenderer.class, "field_78805_m");
-
-    @SuppressWarnings("unchecked")
-    private void attach(final ModelRenderer bone, final ModelRenderer attachment, final Consumer<MatrixStack> function, final MatrixStack stack) {
-        stack.push();
-        bone.translateRotate(stack);
-        if (bone == attachment) {
-            function.accept(stack);
-        } else {
-            final ObjectList<ModelRenderer> childModels;
-            try {
-                childModels = (ObjectList<ModelRenderer>) CHILD_MODELS.get(bone);
-            } catch (final IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-            for (final ModelRenderer child : childModels) {
-                this.attach(child, attachment, function, stack);
-            }
-        }
-        stack.pop();
-    }
 }

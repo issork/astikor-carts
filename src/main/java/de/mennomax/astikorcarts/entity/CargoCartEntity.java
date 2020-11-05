@@ -1,29 +1,43 @@
 package de.mennomax.astikorcarts.entity;
 
+import com.google.common.collect.ImmutableList;
 import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
 import de.mennomax.astikorcarts.inventory.container.CargoCartContainer;
 import de.mennomax.astikorcarts.util.CartItemStackHandler;
+import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.SimpleNamedContainerProvider;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.items.ItemStackHandler;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Iterator;
 
 public final class CargoCartEntity extends AbstractDrawnInventoryEntity {
-    private static final DataParameter<Integer> CARGO = EntityDataManager.createKey(CargoCartEntity.class, DataSerializers.VARINT);
+    private static final ImmutableList<DataParameter<ItemStack>> CARGO = ImmutableList.of(
+        EntityDataManager.createKey(CargoCartEntity.class, DataSerializers.ITEMSTACK),
+        EntityDataManager.createKey(CargoCartEntity.class, DataSerializers.ITEMSTACK),
+        EntityDataManager.createKey(CargoCartEntity.class, DataSerializers.ITEMSTACK),
+        EntityDataManager.createKey(CargoCartEntity.class, DataSerializers.ITEMSTACK));
 
     public CargoCartEntity(final EntityType<? extends Entity> type, final World world) {
         super(type, world);
@@ -45,24 +59,32 @@ public final class CargoCartEntity extends AbstractDrawnInventoryEntity {
 
             @Override
             protected void onContentsChanged(final int slot) {
-                int tempload = 0;
+                final Object2IntMap<Item> totals = new Object2IntLinkedOpenHashMap<>();
+                final Object2ObjectMap<Item, ItemStack> stacks = new Object2ObjectOpenHashMap<>();
                 for (int i = 0; i < this.getSlots(); i++) {
-                    if (!this.getStackInSlot(i).isEmpty()) {
-                        tempload++;
+                    final ItemStack stack = this.getStackInSlot(i);
+                    if (!stack.isEmpty()) {
+                        totals.mergeInt(stack.getItem(), 1, Integer::sum);
+                        stacks.putIfAbsent(stack.getItem(), stack);
                     }
                 }
-                final int newValue;
-                if (tempload > 31)
-                    newValue = 4;
-                else if (tempload > 16)
-                    newValue = 3;
-                else if (tempload > 8)
-                    newValue = 2;
-                else if (tempload > 3)
-                    newValue = 1;
-                else
-                    newValue = 0;
-                this.cart.getDataManager().set(CARGO, newValue);
+                final Iterator<Object2IntMap.Entry<Item>> topTotals = totals.object2IntEntrySet().stream()
+                    .sorted(Comparator.<Object2IntMap.Entry<Item>>comparingInt(e -> -e.getIntValue())
+                        .thenComparingInt(e -> e.getKey() instanceof BlockItem ? 0 : 1))
+                    .limit(CARGO.size()).iterator();
+                final ItemStack[] items = new ItemStack[CARGO.size()];
+                Arrays.fill(items, ItemStack.EMPTY);
+                final int forth = this.getSlots() / CARGO.size();
+                for (int pos = 0; topTotals.hasNext() && pos < CARGO.size(); ) {
+                    final Object2IntMap.Entry<Item> entry = topTotals.next();
+                    final int count = Math.max(1, (entry.getIntValue() + forth / 2) / forth);
+                    for (int n = 0; n < count && pos < CARGO.size(); n++) {
+                        items[pos++] = stacks.getOrDefault(entry.getKey(), ItemStack.EMPTY).copy();
+                    }
+                }
+                for (int i = 0; i < CARGO.size(); i++) {
+                    this.cart.getDataManager().set(CARGO.get(i), items[i]);
+                }
             }
         };
     }
@@ -100,8 +122,12 @@ public final class CargoCartEntity extends AbstractDrawnInventoryEntity {
         }
     }
 
-    public int getCargo() {
-        return this.dataManager.get(CARGO);
+    public NonNullList<ItemStack> getCargo() {
+        final NonNullList<ItemStack> cargo = NonNullList.withSize(CARGO.size(), ItemStack.EMPTY);
+        for (int i = 0; i < CARGO.size(); i++) {
+            cargo.set(i, this.dataManager.get(CARGO.get(i)));
+        }
+        return cargo;
     }
 
     @Override
@@ -112,7 +138,9 @@ public final class CargoCartEntity extends AbstractDrawnInventoryEntity {
     @Override
     protected void registerData() {
         super.registerData();
-        this.dataManager.register(CARGO, 0);
+        for (final DataParameter<ItemStack> parameter : CARGO) {
+            this.dataManager.register(parameter, ItemStack.EMPTY);
+        }
     }
 
     public void openContainer(final PlayerEntity player) {

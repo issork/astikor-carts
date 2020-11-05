@@ -3,13 +3,19 @@ package de.mennomax.astikorcarts.client.renderer.entity;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import de.mennomax.astikorcarts.entity.AbstractDrawnEntity;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.model.EntityModel;
+import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3f;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+
+import java.lang.reflect.Field;
+import java.util.function.Consumer;
 
 public abstract class DrawnRenderer<T extends AbstractDrawnEntity, M extends EntityModel<T>> extends EntityRenderer<T> {
     protected M model;
@@ -50,5 +56,27 @@ public abstract class DrawnRenderer<T extends AbstractDrawnEntity, M extends Ent
             stack.translate(0.0D, angle / 32.0F, 0.0D);
         }
         stack.scale(-1.0F, -1.0F, 1.0F);
+    }
+
+    private static final Field CHILD_MODELS = ObfuscationReflectionHelper.findField(ModelRenderer.class, "field_78805_m");
+
+    @SuppressWarnings("unchecked")
+    protected void attach(final ModelRenderer bone, final ModelRenderer attachment, final Consumer<MatrixStack> function, final MatrixStack stack) {
+        stack.push();
+        bone.translateRotate(stack);
+        if (bone == attachment) {
+            function.accept(stack);
+        } else {
+            final ObjectList<ModelRenderer> childModels;
+            try {
+                childModels = (ObjectList<ModelRenderer>) CHILD_MODELS.get(bone);
+            } catch (final IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+            for (final ModelRenderer child : childModels) {
+                this.attach(child, attachment, function, stack);
+            }
+        }
+        stack.pop();
     }
 }

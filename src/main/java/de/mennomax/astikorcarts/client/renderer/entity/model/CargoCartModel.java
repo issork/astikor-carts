@@ -10,10 +10,9 @@ public final class CargoCartModel extends CartModel<CargoCartEntity> {
     private final ModelRenderer boardFront;
     private final ModelRenderer[] boardsSide = new ModelRenderer[4];
     private final ModelRenderer[] boardsRear = new ModelRenderer[2];
-    private final ModelRenderer[] cargo = new ModelRenderer[4];
 
     public CargoCartModel() {
-        super(128, 64);
+        super(64, 64);
 
         this.boardBottom = new ModelRenderer(this, 0, 0);
         this.boardBottom.addBox(-15.5F, -11.0F, -2.0F, 29, 22, 1);
@@ -58,25 +57,6 @@ public final class CargoCartModel extends CartModel<CargoCartEntity> {
         this.boardsRear[1] = new ModelRenderer(this, 50, 35);
         this.boardsRear[1].addBox(-12.0F, -12.0F, 13.5F, 2, 11, 1);
 
-        this.cargo[0] = new ModelRenderer(this, 66, 38);
-        this.cargo[0].addBox(-9.5F, -5.0F, -12.5F, 8, 8, 8);
-        this.cargo[0].setRotationPoint(0.0F, -5.0F, -1.0F);
-        this.cargo[0].rotateAngleY = 0.05F;
-
-        this.cargo[1] = new ModelRenderer(this, 66, 18);
-        this.cargo[1].addBox(-1.0F, -7.0F, -12.5F, 11, 10, 10);
-        this.cargo[1].setRotationPoint(0.0F, -5.0F, -1.0F);
-
-        this.cargo[2] = new ModelRenderer(this, 66, 0);
-        this.cargo[2].addBox(-10.5F, -5.0F, -8.5F, 20, 8, 10);
-        this.cargo[2].setRotationPoint(0.0F, -5.0F, -1.0F);
-        this.cargo[2].rotateAngleY = (float) Math.PI;
-
-        this.cargo[3] = new ModelRenderer(this, 66, 54);
-        this.cargo[3].addBox(-12.0F, -7.0F, 1.0F, 20, 2, 3);
-        this.cargo[3].setRotationPoint(0.0F, -5.0F, -1.0F);
-        this.cargo[3].rotateAngleY = -1.067F;
-
         this.body.addChild(this.axis);
         this.body.addChild(this.shaft);
         this.body.addChild(this.boardBottom);
@@ -87,17 +67,5 @@ public final class CargoCartModel extends CartModel<CargoCartEntity> {
         this.body.addChild(this.boardsSide[1]);
         this.body.addChild(this.boardsSide[2]);
         this.body.addChild(this.boardsSide[3]);
-        this.body.addChild(this.cargo[0]);
-        this.body.addChild(this.cargo[1]);
-        this.body.addChild(this.cargo[2]);
-        this.body.addChild(this.cargo[3]);
-    }
-
-    @Override
-    public void setRotationAngles(final CargoCartEntity entity, final float delta, final float limbSwingAmount, final float ageInTicks, final float netHeadYaw, final float pitch) {
-        super.setRotationAngles(entity, delta, limbSwingAmount, ageInTicks, netHeadYaw, pitch);
-        for (int i = 0; i < this.cargo.length; i++) {
-            this.cargo[i].showModel = i < entity.getCargo();
-        }
     }
 }

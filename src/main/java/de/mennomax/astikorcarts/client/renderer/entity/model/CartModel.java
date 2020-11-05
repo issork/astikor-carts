@@ -51,6 +51,10 @@ public abstract class CartModel<T extends AbstractDrawnEntity> extends EntityMod
         }
     }
 
+    public ModelRenderer getBody() {
+        return this.body;
+    }
+
     @Override
     public void render(final MatrixStack stack, final IVertexBuilder buf, final int packedLight, final int packedOverlay, final float red, final float green, final float blue, final float alpha) {
         this.body.render(stack, buf, packedLight, packedOverlay, red, green, blue, alpha);
