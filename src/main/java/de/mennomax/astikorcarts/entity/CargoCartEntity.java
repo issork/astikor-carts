@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
 import de.mennomax.astikorcarts.inventory.container.CargoCartContainer;
+import de.mennomax.astikorcarts.network.packets.SPacketCartingJukebox;
 import de.mennomax.astikorcarts.util.CartItemStackHandler;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -16,6 +17,11 @@ import net.minecraft.inventory.container.SimpleNamedContainerProvider;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.item.MusicDiscItem;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.StringNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
@@ -24,7 +30,11 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.ItemStackHandler;
 
 import java.util.ArrayList;
@@ -92,13 +102,47 @@ public final class CargoCartEntity extends AbstractDrawnInventoryEntity {
     @Override
     public ActionResultType processInitialInteract(final PlayerEntity player, final Hand hand) {
         if (!this.world.isRemote) {
-            if (player.isSneaking()) {
+            final ItemStack held = player.getHeldItem(hand);
+            if (held.getItem() instanceof MusicDiscItem) {
+                if (this.jukebox(player, held)) {
+                    return ActionResultType.SUCCESS;
+                } else {
+                    return ActionResultType.FAIL;
+                }
+            } else if (player.isSneaking()) {
                 this.openContainer(player);
             } else {
                 player.startRiding(this);
             }
         }
         return ActionResultType.SUCCESS;
+    }
+
+    private boolean jukebox(final PlayerEntity player, final ItemStack held) {
+        if (!this.hasJukebox()) return false;
+        for (int i = 0; i < this.inventory.getSlots(); i++) {
+            final ItemStack stack = this.inventory.getStackInSlot(i);
+            if (stack.getItem() != Items.JUKEBOX) continue;
+            final CompoundNBT tag = stack.getOrCreateChildTag("BlockEntityTag");
+            if (tag.contains("RecordItem", Constants.NBT.TAG_COMPOUND)) continue;
+            tag.put("RecordItem", held.write(new CompoundNBT()));
+            final CompoundNBT display = stack.getOrCreateChildTag("display");
+            final ListNBT lore = display.getList("Lore", Constants.NBT.TAG_STRING);
+            lore.add(StringNBT.valueOf(ITextComponent.Serializer.toJson(new TranslationTextComponent(held.getTranslationKey() + ".desc"))));
+            display.put("Lore", lore);
+            AstikorCarts.CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new SPacketCartingJukebox(this, (MusicDiscItem) held.getItem()));
+            if (!player.abilities.isCreativeMode) held.shrink(1);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean hasJukebox() {
+        for (final DataParameter<ItemStack> slot : CARGO) {
+            final ItemStack cargo = this.dataManager.get(slot);
+            if (cargo.getItem() == Items.JUKEBOX) return true;
+        }
+        return false;
     }
 
     @Override

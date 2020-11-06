@@ -11,6 +11,7 @@ import de.mennomax.astikorcarts.network.NetBuilder;
 import de.mennomax.astikorcarts.network.packets.CPacketActionKey;
 import de.mennomax.astikorcarts.network.packets.CPacketOpenCargoCartGui;
 import de.mennomax.astikorcarts.network.packets.CPacketToggleSlow;
+import de.mennomax.astikorcarts.network.packets.SPacketCartingJukebox;
 import de.mennomax.astikorcarts.network.packets.SPacketDrawnUpdate;
 import de.mennomax.astikorcarts.server.ServerInitializer;
 import de.mennomax.astikorcarts.util.DefRegister;
@@ -45,6 +46,7 @@ public final class AstikorCarts {
         .serverbound(CPacketActionKey::new).consumer(() -> CPacketActionKey::handle)
         .serverbound(CPacketToggleSlow::new).consumer(() -> CPacketToggleSlow::handle)
         .clientbound(SPacketDrawnUpdate::new).consumer(() -> new SPacketDrawnUpdate.Handler())
+        .clientbound(SPacketCartingJukebox::new).consumer(() -> new SPacketCartingJukebox.Handler())
         .serverbound(CPacketOpenCargoCartGui::new).consumer(() -> CPacketOpenCargoCartGui::handle)
         .build();
 
