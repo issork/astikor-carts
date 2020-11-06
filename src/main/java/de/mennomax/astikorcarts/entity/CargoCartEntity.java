@@ -102,7 +102,7 @@ public final class CargoCartEntity extends AbstractDrawnInventoryEntity {
     @Override
     public ActionResultType processInitialInteract(final PlayerEntity player, final Hand hand) {
         final ItemStack held = player.getHeldItem(hand);
-        if (held.getItem() instanceof MusicDiscItem) {
+        if (held.getItem() instanceof MusicDiscItem && this.hasJukebox()) {
             if (this.world.isRemote) return ActionResultType.SUCCESS;
             if (this.jukebox(player, held)) return ActionResultType.CONSUME;
             return ActionResultType.FAIL;
@@ -121,7 +121,6 @@ public final class CargoCartEntity extends AbstractDrawnInventoryEntity {
     }
 
     private boolean jukebox(final PlayerEntity player, final ItemStack held) {
-        if (!this.hasJukebox()) return false;
         for (int i = 0; i < this.inventory.getSlots(); i++) {
             final ItemStack stack = this.inventory.getStackInSlot(i);
             if (stack.getItem() != Items.JUKEBOX) continue;
