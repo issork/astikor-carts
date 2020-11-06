@@ -1,13 +1,13 @@
 {
     "entity.cart.attach": {
         "sounds": [
-            "minecraft:mob/horse/armor"
+            "astikorcarts:entity/cart/attach"
         ],
         "subtitle": "subtitles.astikorcarts.cart.attached"
     },
     "entity.cart.detach": {
         "sounds": [
-            "minecraft:random/break"
+            "astikorcarts:entity/cart/detach"
         ],
         "subtitle": "subtitles.astikorcarts.cart.detached"
     },
