@@ -47,6 +47,9 @@ public final class CartingJukeboxMessage implements Message {
             final Entity e = world.getEntityByID(msg.cartId);
             if (e instanceof CargoCartEntity) {
                 ctx.getMinecraft().getSoundHandler().play(new CartingJukeboxSound((CargoCartEntity) e, msg.disc));
+                if (e.getDistanceSq(ctx.getPlayer()) < 64.0D * 64.0D) {
+                    ctx.getMinecraft().ingameGUI.func_238451_a_(msg.disc.getDescription());
+                }
             }
         }
     }
