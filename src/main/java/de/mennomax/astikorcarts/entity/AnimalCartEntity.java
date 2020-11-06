@@ -17,8 +17,8 @@ import net.minecraft.world.World;
 
 import java.util.ArrayList;
 
-public final class MobCartEntity extends AbstractDrawnEntity {
-    public MobCartEntity(final EntityType<? extends Entity> entityTypeIn, final World worldIn) {
+public final class AnimalCartEntity extends AbstractDrawnEntity {
+    public AnimalCartEntity(final EntityType<? extends Entity> entityTypeIn, final World worldIn) {
         super(entityTypeIn, worldIn);
     }
 
@@ -123,6 +123,6 @@ public final class MobCartEntity extends AbstractDrawnEntity {
 
     @Override
     public Item getCartItem() {
-        return AstikorCarts.Items.MOB_CART.get();
+        return AstikorCarts.Items.ANIMAL_CART.get();
     }
 }

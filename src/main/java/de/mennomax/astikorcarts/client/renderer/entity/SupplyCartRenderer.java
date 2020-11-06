@@ -2,8 +2,8 @@ package de.mennomax.astikorcarts.client.renderer.entity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import de.mennomax.astikorcarts.AstikorCarts;
-import de.mennomax.astikorcarts.client.renderer.entity.model.CargoCartModel;
-import de.mennomax.astikorcarts.entity.CargoCartEntity;
+import de.mennomax.astikorcarts.client.renderer.entity.model.SupplyCartModel;
+import de.mennomax.astikorcarts.entity.SupplyCartEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
@@ -19,16 +19,16 @@ import net.minecraft.util.math.vector.Vector3f;
 
 import java.util.Objects;
 
-public final class CargoCartRenderer extends DrawnRenderer<CargoCartEntity, CargoCartModel> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(AstikorCarts.ID, "textures/entity/cargo_cart.png");
+public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, SupplyCartModel> {
+    private static final ResourceLocation TEXTURE = new ResourceLocation(AstikorCarts.ID, "textures/entity/supply_cart.png");
 
-    public CargoCartRenderer(final EntityRendererManager renderManager) {
-        super(renderManager, new CargoCartModel());
+    public SupplyCartRenderer(final EntityRendererManager renderManager) {
+        super(renderManager, new SupplyCartModel());
         this.shadowSize = 1.0F;
     }
 
     @Override
-    protected void renderContents(final CargoCartEntity entity, final float delta, final MatrixStack stack, final IRenderTypeBuffer source, final int packedLight) {
+    protected void renderContents(final SupplyCartEntity entity, final float delta, final MatrixStack stack, final IRenderTypeBuffer source, final int packedLight) {
         super.renderContents(entity, delta, stack, source, packedLight);
         final NonNullList<ItemStack> cargo = entity.getCargo();
         for (int i = 0; i < cargo.size(); i++) {
@@ -59,7 +59,7 @@ public final class CargoCartRenderer extends DrawnRenderer<CargoCartEntity, Carg
     }
 
     @Override
-    public ResourceLocation getEntityTexture(final CargoCartEntity entity) {
+    public ResourceLocation getEntityTexture(final SupplyCartEntity entity) {
         return TEXTURE;
     }
 }

@@ -2,8 +2,8 @@ package de.mennomax.astikorcarts.client.renderer.entity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import de.mennomax.astikorcarts.AstikorCarts;
-import de.mennomax.astikorcarts.client.renderer.entity.model.PlowCartModel;
-import de.mennomax.astikorcarts.entity.PlowCartEntity;
+import de.mennomax.astikorcarts.client.renderer.entity.model.PlowModel;
+import de.mennomax.astikorcarts.entity.PlowEntity;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -20,21 +20,21 @@ import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import java.lang.reflect.Field;
 import java.util.function.Consumer;
 
-public final class PlowCartRenderer extends DrawnRenderer<PlowCartEntity, PlowCartModel> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(AstikorCarts.ID, "textures/entity/plow_cart.png");
+public final class PlowRenderer extends DrawnRenderer<PlowEntity, PlowModel> {
+    private static final ResourceLocation TEXTURE = new ResourceLocation(AstikorCarts.ID, "textures/entity/plow.png");
 
-    public PlowCartRenderer(final EntityRendererManager renderManager) {
-        super(renderManager, new PlowCartModel());
+    public PlowRenderer(final EntityRendererManager renderManager) {
+        super(renderManager, new PlowModel());
         this.shadowSize = 1.0F;
     }
 
     @Override
-    public ResourceLocation getEntityTexture(final PlowCartEntity entity) {
+    public ResourceLocation getEntityTexture(final PlowEntity entity) {
         return TEXTURE;
     }
 
     @Override
-    protected void renderContents(final PlowCartEntity entity, final float delta, final MatrixStack stack, final IRenderTypeBuffer source, final int packedLight) {
+    protected void renderContents(final PlowEntity entity, final float delta, final MatrixStack stack, final IRenderTypeBuffer source, final int packedLight) {
         super.renderContents(entity, delta, stack, source, packedLight);
         for (int i = 0; i < entity.inventory.getSlots(); i++) {
             final ItemStack itemStack = entity.getStackInSlot(i);

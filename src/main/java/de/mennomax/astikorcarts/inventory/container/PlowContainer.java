@@ -9,12 +9,12 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
-public final class PlowCartContainer extends CartContainer {
-    public PlowCartContainer(final int id, final PlayerInventory playerInv, final PacketBuffer buf) {
+public final class PlowContainer extends CartContainer {
+    public PlowContainer(final int id, final PlayerInventory playerInv, final PacketBuffer buf) {
         this(id, playerInv, (AbstractDrawnInventoryEntity) playerInv.player.world.getEntityByID(buf.readInt()));
     }
 
-    public PlowCartContainer(final int id, final PlayerInventory playerInv, final AbstractDrawnInventoryEntity cart) {
+    public PlowContainer(final int id, final PlayerInventory playerInv, final AbstractDrawnInventoryEntity cart) {
         super(AstikorCarts.ContainerTypes.PLOW_CART.get(), id, cart);
         this.addSlot(new PlowSlot(this.cartInv, 0, 57, 24));
         this.addSlot(new PlowSlot(this.cartInv, 1, 80, 17));

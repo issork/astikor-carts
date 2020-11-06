@@ -1,22 +1,19 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "pcp",
-    "pcp",
+    "ppp",
+    "ppp",
     "wpw"
   ],
   "key": {
     "p": {
       "tag": "minecraft:planks"
     },
-    "c": {
-      "tag": "forge:chests/wooden"
-    },
     "w": {
       "item": "astikorcarts:wheel"
     }
   },
   "result": {
-    "item": "astikorcarts:cargo_cart"
+    "item": "astikorcarts:animal_cart"
   }
 }

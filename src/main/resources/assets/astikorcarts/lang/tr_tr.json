@@ -1,10 +1,10 @@
 {
-  "item.astikorcarts.cargo_cart": "At ArabasÄ±",
-  "item.astikorcarts.plow_cart": "Pulluk",
+  "item.astikorcarts.supply_cart": "At ArabasÄ±",
+  "item.astikorcarts.plow": "Pulluk",
   "item.astikorcarts.wheel": "Tekerlek",
   "itemGroup.astikorcarts": "AstikorCarts",
-  "entity.astikorcarts.cargo_cart": "At ArabasÄ±",
-  "entity.astikorcarts.plow_cart": "Pulluk",
+  "entity.astikorcarts.supply_cart": "At ArabasÄ±",
+  "entity.astikorcarts.plow": "Pulluk",
   "key.categories.astikorcarts": "AstikorCarts",
   "key.astikorcarts.desc": "Etkinlik TuÅŸu"
 }

@@ -3,7 +3,7 @@ package de.mennomax.astikorcarts.entity;
 import com.google.common.collect.ImmutableList;
 import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
-import de.mennomax.astikorcarts.inventory.container.CargoCartContainer;
+import de.mennomax.astikorcarts.inventory.container.SupplyCartContainer;
 import de.mennomax.astikorcarts.network.clientbound.CartingJukeboxMessage;
 import de.mennomax.astikorcarts.util.CartItemStackHandler;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
@@ -42,14 +42,14 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 
-public final class CargoCartEntity extends AbstractDrawnInventoryEntity {
+public final class SupplyCartEntity extends AbstractDrawnInventoryEntity {
     private static final ImmutableList<DataParameter<ItemStack>> CARGO = ImmutableList.of(
-        EntityDataManager.createKey(CargoCartEntity.class, DataSerializers.ITEMSTACK),
-        EntityDataManager.createKey(CargoCartEntity.class, DataSerializers.ITEMSTACK),
-        EntityDataManager.createKey(CargoCartEntity.class, DataSerializers.ITEMSTACK),
-        EntityDataManager.createKey(CargoCartEntity.class, DataSerializers.ITEMSTACK));
+        EntityDataManager.createKey(SupplyCartEntity.class, DataSerializers.ITEMSTACK),
+        EntityDataManager.createKey(SupplyCartEntity.class, DataSerializers.ITEMSTACK),
+        EntityDataManager.createKey(SupplyCartEntity.class, DataSerializers.ITEMSTACK),
+        EntityDataManager.createKey(SupplyCartEntity.class, DataSerializers.ITEMSTACK));
 
-    public CargoCartEntity(final EntityType<? extends Entity> type, final World world) {
+    public SupplyCartEntity(final EntityType<? extends Entity> type, final World world) {
         super(type, world);
     }
 
@@ -60,7 +60,7 @@ public final class CargoCartEntity extends AbstractDrawnInventoryEntity {
 
     @Override
     protected ItemStackHandler initInventory() {
-        return new CartItemStackHandler<CargoCartEntity>(54, this) {
+        return new CartItemStackHandler<SupplyCartEntity>(54, this) {
             @Override
             protected void onLoad() {
                 super.onLoad();
@@ -177,7 +177,7 @@ public final class CargoCartEntity extends AbstractDrawnInventoryEntity {
 
     @Override
     public Item getCartItem() {
-        return AstikorCarts.Items.CARGO_CART.get();
+        return AstikorCarts.Items.SUPPLY_CART.get();
     }
 
     @Override
@@ -191,7 +191,7 @@ public final class CargoCartEntity extends AbstractDrawnInventoryEntity {
     public void openContainer(final PlayerEntity player) {
         if (!this.world.isRemote) {
             player.openContainer(new SimpleNamedContainerProvider((id, inv, plyr) -> {
-                return new CargoCartContainer(id, inv, this);
+                return new SupplyCartContainer(id, inv, this);
             }, this.getDisplayName()));
         }
     }

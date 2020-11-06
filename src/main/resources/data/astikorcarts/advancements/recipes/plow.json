@@ -1,14 +1,14 @@
 {
   "rewards": {
     "recipes": [
-      "astikorcarts:plow_cart"
+      "astikorcarts:plow"
     ]
   },
   "criteria": {
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "astikorcarts:plow_cart"
+        "recipe": "astikorcarts:plow"
       }
     },
     "has_wheel": {

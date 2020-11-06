@@ -1,12 +1,12 @@
 {
-  "item.astikorcarts.cargo_cart": "Karren",
-  "item.astikorcarts.plow_cart": "Pflug",
-  "item.astikorcarts.mob_cart": "Transportkarren",
+  "item.astikorcarts.supply_cart": "Karren",
+  "item.astikorcarts.plow": "Pflug",
+  "item.astikorcarts.animal_cart": "Transportkarren",
   "item.astikorcarts.wheel": "Rad",
   "itemGroup.astikorcarts": "AstikorCarts",
-  "entity.astikorcarts.cargo_cart": "Karren",
-  "entity.astikorcarts.plow_cart": "Pflug",
-  "entity.astikorcarts.mob_cart": "Transportkarren",
+  "entity.astikorcarts.supply_cart": "Karren",
+  "entity.astikorcarts.plow": "Pflug",
+  "entity.astikorcarts.animal_cart": "Transportkarren",
   "key.categories.astikorcarts": "AstikorCarts",
   "key.astikorcarts.desc": "Aktionstaste"
 }

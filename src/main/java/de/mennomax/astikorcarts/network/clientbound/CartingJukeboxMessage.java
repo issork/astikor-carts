@@ -1,7 +1,7 @@
 package de.mennomax.astikorcarts.network.clientbound;
 
 import de.mennomax.astikorcarts.client.sound.CartingJukeboxSound;
-import de.mennomax.astikorcarts.entity.CargoCartEntity;
+import de.mennomax.astikorcarts.entity.SupplyCartEntity;
 import de.mennomax.astikorcarts.network.ClientMessageContext;
 import de.mennomax.astikorcarts.network.Message;
 import net.minecraft.entity.Entity;
@@ -22,7 +22,7 @@ public final class CartingJukeboxMessage implements Message {
     public CartingJukeboxMessage() {
     }
 
-    public CartingJukeboxMessage(final CargoCartEntity cart, final MusicDiscItem disc) {
+    public CartingJukeboxMessage(final SupplyCartEntity cart, final MusicDiscItem disc) {
         this.cartId = cart.getEntityId();
         this.disc = disc;
     }
@@ -45,8 +45,8 @@ public final class CartingJukeboxMessage implements Message {
         public void accept(final CartingJukeboxMessage msg, final ClientMessageContext ctx) {
             final World world = ctx.getWorld();
             final Entity e = world.getEntityByID(msg.cartId);
-            if (e instanceof CargoCartEntity) {
-                ctx.getMinecraft().getSoundHandler().play(new CartingJukeboxSound((CargoCartEntity) e, msg.disc));
+            if (e instanceof SupplyCartEntity) {
+                ctx.getMinecraft().getSoundHandler().play(new CartingJukeboxSound((SupplyCartEntity) e, msg.disc));
                 if (e.getDistanceSq(ctx.getPlayer()) < 64.0D * 64.0D) {
                     ctx.getMinecraft().ingameGUI.func_238451_a_(msg.disc.getDescription());
                 }

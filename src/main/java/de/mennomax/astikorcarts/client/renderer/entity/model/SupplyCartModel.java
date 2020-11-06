@@ -1,9 +1,9 @@
 package de.mennomax.astikorcarts.client.renderer.entity.model;
 
-import de.mennomax.astikorcarts.entity.CargoCartEntity;
+import de.mennomax.astikorcarts.entity.SupplyCartEntity;
 import net.minecraft.client.renderer.model.ModelRenderer;
 
-public final class CargoCartModel extends CartModel<CargoCartEntity> {
+public final class SupplyCartModel extends CartModel<SupplyCartEntity> {
     private final ModelRenderer boardBottom;
     private final ModelRenderer axis;
     private final ModelRenderer shaft;
@@ -11,7 +11,7 @@ public final class CargoCartModel extends CartModel<CargoCartEntity> {
     private final ModelRenderer[] boardsSide = new ModelRenderer[4];
     private final ModelRenderer[] boardsRear = new ModelRenderer[2];
 
-    public CargoCartModel() {
+    public SupplyCartModel() {
         super(64, 64);
 
         this.boardBottom = new ModelRenderer(this, 0, 0);

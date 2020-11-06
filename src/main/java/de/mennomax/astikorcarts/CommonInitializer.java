@@ -25,7 +25,6 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.registries.IForgeRegistryEntry;
@@ -74,15 +73,15 @@ public class CommonInitializer implements Initializer {
             }
         });
         mod.bus().addGenericListener(Item.class, this.remap(ImmutableMap.<String, RegObject<Item, ? extends Item>>builder()
-            .put("cargocart", AstikorCarts.Items.CARGO_CART)
-            .put("plowcart", AstikorCarts.Items.PLOW_CART)
-            .put("mobcart", AstikorCarts.Items.MOB_CART)
+            .put("cargo_cart", AstikorCarts.Items.SUPPLY_CART)
+            .put("plow_cart", AstikorCarts.Items.PLOW)
+            .put("mob_cart", AstikorCarts.Items.ANIMAL_CART)
             .build()
         ));
         mod.bus().addGenericListener(EntityType.class, this.remap(ImmutableMap.<String, RegObject<EntityType<?>, ? extends EntityType<?>>>builder()
-            .put("cargocart", AstikorCarts.EntityTypes.CARGO_CART)
-            .put("plowcart", AstikorCarts.EntityTypes.PLOW_CART)
-            .put("mobcart", AstikorCarts.EntityTypes.MOB_CART)
+            .put("cargo_cart", AstikorCarts.EntityTypes.SUPPLY_CART)
+            .put("plow_cart", AstikorCarts.EntityTypes.PLOW)
+            .put("mob_cart", AstikorCarts.EntityTypes.ANIMAL_CART)
             .build()
         ));
     }

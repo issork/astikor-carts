@@ -1,22 +1,22 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "sss",
-    "psp",
+    "pcp",
+    "pcp",
     "wpw"
   ],
   "key": {
     "p": {
       "tag": "minecraft:planks"
     },
-    "s": {
-      "tag": "forge:rods/wooden"
+    "c": {
+      "tag": "forge:chests/wooden"
     },
     "w": {
       "item": "astikorcarts:wheel"
     }
   },
   "result": {
-    "item": "astikorcarts:plow_cart"
+    "item": "astikorcarts:supply_cart"
   }
 }

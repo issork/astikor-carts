@@ -3,8 +3,8 @@ package de.mennomax.astikorcarts.client.renderer.entity;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.mennomax.astikorcarts.AstikorCarts;
-import de.mennomax.astikorcarts.client.renderer.entity.model.MobCartModel;
-import de.mennomax.astikorcarts.entity.MobCartEntity;
+import de.mennomax.astikorcarts.client.renderer.entity.model.AnimalCartModel;
+import de.mennomax.astikorcarts.entity.AnimalCartEntity;
 import de.mennomax.astikorcarts.util.Mat4f;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -22,16 +22,16 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import org.lwjgl.opengl.GL11;
 
-public final class MobCartRenderer extends DrawnRenderer<MobCartEntity, MobCartModel> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(AstikorCarts.ID, "textures/entity/mob_cart.png");
+public final class AnimalCartRenderer extends DrawnRenderer<AnimalCartEntity, AnimalCartModel> {
+    private static final ResourceLocation TEXTURE = new ResourceLocation(AstikorCarts.ID, "textures/entity/animal_cart.png");
 
-    public MobCartRenderer(final EntityRendererManager renderManager) {
-        super(renderManager, new MobCartModel());
+    public AnimalCartRenderer(final EntityRendererManager renderManager) {
+        super(renderManager, new AnimalCartModel());
         this.shadowSize = 1.0F;
     }
 
     @Override
-    public void render(final MobCartEntity entity, final float yaw, final float delta, final MatrixStack stack, final IRenderTypeBuffer source, final int packedLight) {
+    public void render(final AnimalCartEntity entity, final float yaw, final float delta, final MatrixStack stack, final IRenderTypeBuffer source, final int packedLight) {
         super.render(entity, yaw, delta, stack, source, packedLight);
         /*final LivingEntity coachman = entity.getControllingPassenger();
         final Entity pulling = entity.getPulling();
@@ -168,7 +168,7 @@ public final class MobCartRenderer extends DrawnRenderer<MobCartEntity, MobCartM
     }
 
     @Override
-    public ResourceLocation getEntityTexture(final MobCartEntity entity) {
+    public ResourceLocation getEntityTexture(final AnimalCartEntity entity) {
         return TEXTURE;
     }
 }

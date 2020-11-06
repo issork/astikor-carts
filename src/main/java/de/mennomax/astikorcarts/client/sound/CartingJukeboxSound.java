@@ -1,14 +1,14 @@
 package de.mennomax.astikorcarts.client.sound;
 
-import de.mennomax.astikorcarts.entity.CargoCartEntity;
+import de.mennomax.astikorcarts.entity.SupplyCartEntity;
 import net.minecraft.client.audio.TickableSound;
 import net.minecraft.item.MusicDiscItem;
 import net.minecraft.util.SoundCategory;
 
 public class CartingJukeboxSound extends TickableSound {
-    private final CargoCartEntity cart;
+    private final SupplyCartEntity cart;
 
-    public CartingJukeboxSound(final CargoCartEntity cart, final MusicDiscItem disc) {
+    public CartingJukeboxSound(final SupplyCartEntity cart, final MusicDiscItem disc) {
         super(disc.getSound(), SoundCategory.RECORDS);
         this.cart = cart;
     }

@@ -1,6 +1,6 @@
 {
     "parent": "minecraft:item/generated",
     "textures": {
-        "layer0": "astikorcarts:items/plow_cart"
+        "layer0": "astikorcarts:items/animal_cart"
     }
 }

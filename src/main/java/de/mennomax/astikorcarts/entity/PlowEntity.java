@@ -3,7 +3,7 @@ package de.mennomax.astikorcarts.entity;
 import com.google.common.collect.ImmutableList;
 import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
-import de.mennomax.astikorcarts.inventory.container.PlowCartContainer;
+import de.mennomax.astikorcarts.inventory.container.PlowContainer;
 import de.mennomax.astikorcarts.util.CartItemStackHandler;
 import de.mennomax.astikorcarts.util.ProxyItemUseContext;
 import net.minecraft.entity.Entity;
@@ -31,16 +31,16 @@ import net.minecraftforge.items.ItemStackHandler;
 
 import java.util.ArrayList;
 
-public final class PlowCartEntity extends AbstractDrawnInventoryEntity {
+public final class PlowEntity extends AbstractDrawnInventoryEntity {
     private static final int SLOT_COUNT = 3;
     private static final double BLADEOFFSET = 1.7D;
-    private static final DataParameter<Boolean> PLOWING = EntityDataManager.createKey(PlowCartEntity.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<Boolean> PLOWING = EntityDataManager.createKey(PlowEntity.class, DataSerializers.BOOLEAN);
     private static final ImmutableList<DataParameter<ItemStack>> TOOLS = ImmutableList.of(
-        EntityDataManager.createKey(PlowCartEntity.class, DataSerializers.ITEMSTACK),
-        EntityDataManager.createKey(PlowCartEntity.class, DataSerializers.ITEMSTACK),
-        EntityDataManager.createKey(PlowCartEntity.class, DataSerializers.ITEMSTACK));
+        EntityDataManager.createKey(PlowEntity.class, DataSerializers.ITEMSTACK),
+        EntityDataManager.createKey(PlowEntity.class, DataSerializers.ITEMSTACK),
+        EntityDataManager.createKey(PlowEntity.class, DataSerializers.ITEMSTACK));
 
-    public PlowCartEntity(final EntityType<? extends Entity> entityTypeIn, final World worldIn) {
+    public PlowEntity(final EntityType<? extends Entity> entityTypeIn, final World worldIn) {
         super(entityTypeIn, worldIn);
         this.spacing = 2.0D;
     }
@@ -52,7 +52,7 @@ public final class PlowCartEntity extends AbstractDrawnInventoryEntity {
 
     @Override
     protected ItemStackHandler initInventory() {
-        return new CartItemStackHandler<PlowCartEntity>(SLOT_COUNT, this) {
+        return new CartItemStackHandler<PlowEntity>(SLOT_COUNT, this) {
             @Override
             protected void onLoad() {
                 for (int i = 0; i < TOOLS.size(); i++) {
@@ -136,7 +136,7 @@ public final class PlowCartEntity extends AbstractDrawnInventoryEntity {
 
     @Override
     public Item getCartItem() {
-        return AstikorCarts.Items.PLOW_CART.get();
+        return AstikorCarts.Items.PLOW.get();
     }
 
     @Override
@@ -164,7 +164,7 @@ public final class PlowCartEntity extends AbstractDrawnInventoryEntity {
     private void openContainer(final PlayerEntity player) {
         if (player instanceof ServerPlayerEntity) {
             NetworkHooks.openGui((ServerPlayerEntity) player,
-                new SimpleNamedContainerProvider((windowId, playerInventory, p) -> new PlowCartContainer(windowId, playerInventory, this), this.getDisplayName()),
+                new SimpleNamedContainerProvider((windowId, playerInventory, p) -> new PlowContainer(windowId, playerInventory, this), this.getDisplayName()),
                 buf -> buf.writeInt(this.getEntityId())
             );
         }

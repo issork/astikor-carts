@@ -1,9 +1,9 @@
 package de.mennomax.astikorcarts.client.renderer.entity.model;
 
-import de.mennomax.astikorcarts.entity.PlowCartEntity;
+import de.mennomax.astikorcarts.entity.PlowEntity;
 import net.minecraft.client.renderer.model.ModelRenderer;
 
-public final class PlowCartModel extends CartModel<PlowCartEntity> {
+public final class PlowModel extends CartModel<PlowEntity> {
     private final ModelRenderer axis;
     private final ModelRenderer[] triangle = new ModelRenderer[3];
     private final ModelRenderer shaft;
@@ -15,7 +15,7 @@ public final class PlowCartModel extends CartModel<PlowCartEntity> {
     private final ModelRenderer parts;
     private final ModelRenderer shafts;
 
-    public PlowCartModel() {
+    public PlowModel() {
         super(64, 64);
 
         this.axis = new ModelRenderer(this, 0, 0);
@@ -93,7 +93,7 @@ public final class PlowCartModel extends CartModel<PlowCartEntity> {
 
 
     @Override
-    public void setRotationAngles(final PlowCartEntity entity, final float delta, final float limbSwingAmount, final float ageInTicks, final float netHeadYaw, final float pitch) {
+    public void setRotationAngles(final PlowEntity entity, final float delta, final float limbSwingAmount, final float ageInTicks, final float netHeadYaw, final float pitch) {
         super.setRotationAngles(entity, delta, limbSwingAmount, ageInTicks, netHeadYaw, pitch);
         for (final ModelRenderer renderer : this.plowShaftUpper) {
             renderer.rotateAngleX = (float) (entity.getPlowing() ? Math.PI / 4.0D - Math.toRadians(pitch) : Math.PI / 2.5D);

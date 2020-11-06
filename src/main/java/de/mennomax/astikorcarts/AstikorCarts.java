@@ -1,15 +1,15 @@
 package de.mennomax.astikorcarts;
 
 import de.mennomax.astikorcarts.client.ClientInitializer;
-import de.mennomax.astikorcarts.entity.CargoCartEntity;
-import de.mennomax.astikorcarts.entity.MobCartEntity;
-import de.mennomax.astikorcarts.entity.PlowCartEntity;
+import de.mennomax.astikorcarts.entity.SupplyCartEntity;
+import de.mennomax.astikorcarts.entity.AnimalCartEntity;
+import de.mennomax.astikorcarts.entity.PlowEntity;
 import de.mennomax.astikorcarts.entity.PostilionEntity;
-import de.mennomax.astikorcarts.inventory.container.PlowCartContainer;
+import de.mennomax.astikorcarts.inventory.container.PlowContainer;
 import de.mennomax.astikorcarts.item.CartItem;
 import de.mennomax.astikorcarts.network.NetBuilder;
 import de.mennomax.astikorcarts.network.serverbound.ActionKeyMessage;
-import de.mennomax.astikorcarts.network.serverbound.OpenCargoCartMessage;
+import de.mennomax.astikorcarts.network.serverbound.OpenSupplyCartMessage;
 import de.mennomax.astikorcarts.network.serverbound.ToggleSlowMessage;
 import de.mennomax.astikorcarts.network.clientbound.CartingJukeboxMessage;
 import de.mennomax.astikorcarts.network.clientbound.UpdateDrawnMessage;
@@ -47,7 +47,7 @@ public final class AstikorCarts {
         .serverbound(ToggleSlowMessage::new).consumer(() -> ToggleSlowMessage::handle)
         .clientbound(UpdateDrawnMessage::new).consumer(() -> new UpdateDrawnMessage.Handler())
         .clientbound(CartingJukeboxMessage::new).consumer(() -> new CartingJukeboxMessage.Handler())
-        .serverbound(OpenCargoCartMessage::new).consumer(() -> OpenCargoCartMessage::handle)
+        .serverbound(OpenSupplyCartMessage::new).consumer(() -> OpenSupplyCartMessage::handle)
         .build();
 
     private static final DefRegister REG = new DefRegister(ID);
@@ -58,14 +58,14 @@ public final class AstikorCarts {
 
         private static final DefRegister.Forge<Item> R = REG.of(ForgeRegistries.ITEMS);
 
-        public static final RegObject<Item, Item> WHEEL, CARGO_CART, PLOW_CART, MOB_CART;
+        public static final RegObject<Item, Item> WHEEL, SUPPLY_CART, PLOW, ANIMAL_CART;
 
         static {
             WHEEL = R.make("wheel", () -> new Item(new Item.Properties().group(ItemGroup.MATERIALS)));
             final Supplier<Item> cart = () -> new CartItem(new Item.Properties().maxStackSize(1).group(ItemGroup.TRANSPORTATION));
-            CARGO_CART = R.make("cargo_cart", cart);
-            PLOW_CART = R.make("plow_cart", cart);
-            MOB_CART = R.make("mob_cart", cart);
+            SUPPLY_CART = R.make("supply_cart", cart);
+            PLOW = R.make("plow", cart);
+            ANIMAL_CART = R.make("animal_cart", cart);
         }
     }
 
@@ -75,21 +75,21 @@ public final class AstikorCarts {
 
         private static final DefRegister.Forge<EntityType<?>> R = REG.of(ForgeRegistries.ENTITIES);
 
-        public static final RegObject<EntityType<?>, EntityType<CargoCartEntity>> CARGO_CART;
-        public static final RegObject<EntityType<?>, EntityType<PlowCartEntity>> PLOW_CART;
-        public static final RegObject<EntityType<?>, EntityType<MobCartEntity>> MOB_CART;
+        public static final RegObject<EntityType<?>, EntityType<SupplyCartEntity>> SUPPLY_CART;
+        public static final RegObject<EntityType<?>, EntityType<PlowEntity>> PLOW;
+        public static final RegObject<EntityType<?>, EntityType<AnimalCartEntity>> ANIMAL_CART;
         public static final RegObject<EntityType<?>, EntityType<PostilionEntity>> POSTILION;
 
         static {
-            CARGO_CART = R.make("cargo_cart", () -> EntityType.Builder.create(CargoCartEntity::new, EntityClassification.MISC)
+            SUPPLY_CART = R.make("supply_cart", () -> EntityType.Builder.create(SupplyCartEntity::new, EntityClassification.MISC)
                 .size(1.5F, 1.4F)
-                .build(ID + ":cargo_cart"));
-            PLOW_CART = R.make("plow_cart", () -> EntityType.Builder.create(PlowCartEntity::new, EntityClassification.MISC)
+                .build(ID + ":supply_cart"));
+            PLOW = R.make("plow", () -> EntityType.Builder.create(PlowEntity::new, EntityClassification.MISC)
                 .size(1.3F, 1.4F)
-                .build(ID + ":plow_cart"));
-            MOB_CART = R.make("mob_cart", () -> EntityType.Builder.create(MobCartEntity::new, EntityClassification.MISC)
+                .build(ID + ":plow"));
+            ANIMAL_CART = R.make("animal_cart", () -> EntityType.Builder.create(AnimalCartEntity::new, EntityClassification.MISC)
                 .size(1.3F, 1.4F)
-                .build(ID + ":mob_cart"));
+                .build(ID + ":animal_cart"));
             POSTILION = R.make("postilion", () -> EntityType.Builder.create(PostilionEntity::new, EntityClassification.MISC)
                 .size(0.25F, 0.25F)
                 .disableSummoning()
@@ -124,7 +124,7 @@ public final class AstikorCarts {
 
         private static final DefRegister.Forge<ContainerType<?>> R = REG.of(ForgeRegistries.CONTAINERS);
 
-        public static final RegObject<ContainerType<?>, ContainerType<PlowCartContainer>> PLOW_CART = R.make("plow_cart", () -> IForgeContainerType.create(PlowCartContainer::new));
+        public static final RegObject<ContainerType<?>, ContainerType<PlowContainer>> PLOW_CART = R.make("plow", () -> IForgeContainerType.create(PlowContainer::new));
     }
 
     public AstikorCarts() {

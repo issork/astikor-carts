@@ -6,8 +6,8 @@ import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.Slot;
 import net.minecraftforge.items.SlotItemHandler;
 
-public final class CargoCartContainer extends CartContainer {
-    public CargoCartContainer(final int id, final PlayerInventory playerInv, final AbstractDrawnInventoryEntity cart) {
+public final class SupplyCartContainer extends CartContainer {
+    public SupplyCartContainer(final int id, final PlayerInventory playerInv, final AbstractDrawnInventoryEntity cart) {
         super(ContainerType.GENERIC_9X6, id, cart);
         final int upperInvHeight = 36;
 

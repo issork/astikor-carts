@@ -1,14 +1,14 @@
 {
   "rewards": {
     "recipes": [
-      "astikorcarts:mob_cart"
+      "astikorcarts:supply_cart"
     ]
   },
   "criteria": {
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "astikorcarts:mob_cart"
+        "recipe": "astikorcarts:supply_cart"
       }
     },
     "has_wheel": {
