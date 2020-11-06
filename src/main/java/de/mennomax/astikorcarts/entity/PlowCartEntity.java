@@ -1,9 +1,6 @@
 package de.mennomax.astikorcarts.entity;
 
-import java.util.ArrayList;
-
 import com.google.common.collect.ImmutableList;
-
 import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
 import de.mennomax.astikorcarts.inventory.container.PlowCartContainer;
@@ -31,6 +28,8 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraftforge.items.ItemStackHandler;
+
+import java.util.ArrayList;
 
 public final class PlowCartEntity extends AbstractDrawnInventoryEntity {
     private static final int SLOT_COUNT = 3;
@@ -88,15 +87,17 @@ public final class PlowCartEntity extends AbstractDrawnInventoryEntity {
             if (this.dataManager.get(PLOWING) && player != null) {
                 if (this.prevPosX != this.getPosX() || this.prevPosZ != this.getPosZ()) {
                     for (int i = 0; i < SLOT_COUNT; i++) {
-                        if (!getStackInSlot(i).isEmpty()) {
-                            final boolean damageable = getStackInSlot(i).isDamageable();
+                        final ItemStack stack = this.getStackInSlot(i);
+                        if (!stack.isEmpty()) {
                             final float offset = 38.0F - i * 38.0F;
-                            final double blockPosX = this.getPosX() + MathHelper.sin((this.rotationYaw - offset) * 0.017453292F) * BLADEOFFSET;
-                            final double blockPosZ = this.getPosZ() - MathHelper.cos((this.rotationYaw - offset) * 0.017453292F) * BLADEOFFSET;
+                            final double blockPosX = this.getPosX() + MathHelper.sin((float) Math.toRadians(this.rotationYaw - offset)) * BLADEOFFSET;
+                            final double blockPosZ = this.getPosZ() - MathHelper.cos((float) Math.toRadians(this.rotationYaw - offset)) * BLADEOFFSET;
                             final BlockPos blockPos = new BlockPos(blockPosX, this.getPosY() - 0.5D, blockPosZ);
-                            getStackInSlot(i).getItem().onItemUse(new ProxyItemUseContext(player, getStackInSlot(i), new BlockRayTraceResult(Vector3d.ZERO, Direction.UP, blockPos, false)));
-                            if (getStackInSlot(i).isEmpty()) {
-                                if (damageable) this.playSound(SoundEvents.ENTITY_ITEM_BREAK, 0.8F, 0.8F + this.world.rand.nextFloat() * 0.4F);
+                            final boolean damageable = stack.isDamageable();
+                            final int count = stack.getCount();
+                            stack.getItem().onItemUse(new ProxyItemUseContext(player, stack, new BlockRayTraceResult(Vector3d.ZERO, Direction.UP, blockPos, false)));
+                            if (damageable && stack.getCount() < count) {
+                                this.playSound(SoundEvents.ENTITY_ITEM_BREAK, 0.8F, 0.8F + this.world.rand.nextFloat() * 0.4F);
                                 this.updateSlot(i);
                             }
                         }
