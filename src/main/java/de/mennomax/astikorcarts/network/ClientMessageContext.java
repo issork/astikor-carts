@@ -27,6 +27,6 @@ public class ClientMessageContext extends MessageContext {
     }
 
     public PlayerEntity getPlayer() {
-        return Objects.requireNonNull(this.context.getSender());
+        return Objects.requireNonNull(this.getMinecraft().player);
     }
 }
