@@ -8,11 +8,11 @@ import de.mennomax.astikorcarts.entity.PostilionEntity;
 import de.mennomax.astikorcarts.inventory.container.PlowCartContainer;
 import de.mennomax.astikorcarts.item.CartItem;
 import de.mennomax.astikorcarts.network.NetBuilder;
-import de.mennomax.astikorcarts.network.packets.CPacketActionKey;
-import de.mennomax.astikorcarts.network.packets.CPacketOpenCargoCartGui;
-import de.mennomax.astikorcarts.network.packets.CPacketToggleSlow;
-import de.mennomax.astikorcarts.network.packets.SPacketCartingJukebox;
-import de.mennomax.astikorcarts.network.packets.SPacketDrawnUpdate;
+import de.mennomax.astikorcarts.network.serverbound.ActionKeyMessage;
+import de.mennomax.astikorcarts.network.serverbound.OpenCargoCartMessage;
+import de.mennomax.astikorcarts.network.serverbound.ToggleSlowMessage;
+import de.mennomax.astikorcarts.network.clientbound.CartingJukeboxMessage;
+import de.mennomax.astikorcarts.network.clientbound.UpdateDrawnMessage;
 import de.mennomax.astikorcarts.server.ServerInitializer;
 import de.mennomax.astikorcarts.util.DefRegister;
 import de.mennomax.astikorcarts.util.RegObject;
@@ -43,11 +43,11 @@ public final class AstikorCarts {
 
     public static final SimpleChannel CHANNEL = new NetBuilder(new ResourceLocation(ID, "main"))
         .version(1).optionalServer().requiredClient()
-        .serverbound(CPacketActionKey::new).consumer(() -> CPacketActionKey::handle)
-        .serverbound(CPacketToggleSlow::new).consumer(() -> CPacketToggleSlow::handle)
-        .clientbound(SPacketDrawnUpdate::new).consumer(() -> new SPacketDrawnUpdate.Handler())
-        .clientbound(SPacketCartingJukebox::new).consumer(() -> new SPacketCartingJukebox.Handler())
-        .serverbound(CPacketOpenCargoCartGui::new).consumer(() -> CPacketOpenCargoCartGui::handle)
+        .serverbound(ActionKeyMessage::new).consumer(() -> ActionKeyMessage::handle)
+        .serverbound(ToggleSlowMessage::new).consumer(() -> ToggleSlowMessage::handle)
+        .clientbound(UpdateDrawnMessage::new).consumer(() -> new UpdateDrawnMessage.Handler())
+        .clientbound(CartingJukeboxMessage::new).consumer(() -> new CartingJukeboxMessage.Handler())
+        .serverbound(OpenCargoCartMessage::new).consumer(() -> OpenCargoCartMessage::handle)
         .build();
 
     private static final DefRegister REG = new DefRegister(ID);

@@ -1,4 +1,4 @@
-package de.mennomax.astikorcarts.network.packets;
+package de.mennomax.astikorcarts.network.serverbound;
 
 import de.mennomax.astikorcarts.entity.AbstractDrawnEntity;
 import de.mennomax.astikorcarts.network.Message;
@@ -11,7 +11,7 @@ import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
 
-public final class CPacketToggleSlow implements Message {
+public final class ToggleSlowMessage implements Message {
     @Override
     public void encode(final PacketBuffer buf) {
     }
@@ -20,7 +20,7 @@ public final class CPacketToggleSlow implements Message {
     public void decode(final PacketBuffer buf) {
     }
 
-    public static void handle(final CPacketToggleSlow msg, final ServerMessageContext ctx) {
+    public static void handle(final ToggleSlowMessage msg, final ServerMessageContext ctx) {
         final Entity pulling = getPulling(ctx.getPlayer());
         if (pulling instanceof LivingEntity) {
             final ModifiableAttributeInstance attr = ((LivingEntity) pulling).getAttribute(Attributes.MOVEMENT_SPEED);

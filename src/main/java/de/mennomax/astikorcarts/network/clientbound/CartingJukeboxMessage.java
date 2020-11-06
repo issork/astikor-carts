@@ -1,4 +1,4 @@
-package de.mennomax.astikorcarts.network.packets;
+package de.mennomax.astikorcarts.network.clientbound;
 
 import de.mennomax.astikorcarts.client.sound.CartingJukeboxSound;
 import de.mennomax.astikorcarts.entity.CargoCartEntity;
@@ -14,15 +14,15 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.function.BiConsumer;
 
-public class SPacketCartingJukebox implements Message {
+public final class CartingJukeboxMessage implements Message {
     private int cartId;
 
     private MusicDiscItem disc;
 
-    public SPacketCartingJukebox() {
+    public CartingJukeboxMessage() {
     }
 
-    public SPacketCartingJukebox(final CargoCartEntity cart, final MusicDiscItem disc) {
+    public CartingJukeboxMessage(final CargoCartEntity cart, final MusicDiscItem disc) {
         this.cartId = cart.getEntityId();
         this.disc = disc;
     }
@@ -40,9 +40,9 @@ public class SPacketCartingJukebox implements Message {
         this.disc = (MusicDiscItem) (item instanceof MusicDiscItem ? item : Items.MUSIC_DISC_11);
     }
 
-    public static final class Handler implements BiConsumer<SPacketCartingJukebox, ClientMessageContext> {
+    public static final class Handler implements BiConsumer<CartingJukeboxMessage, ClientMessageContext> {
         @Override
-        public void accept(final SPacketCartingJukebox msg, final ClientMessageContext ctx) {
+        public void accept(final CartingJukeboxMessage msg, final ClientMessageContext ctx) {
             final World world = ctx.getWorld();
             final Entity e = world.getEntityByID(msg.cartId);
             if (e instanceof CargoCartEntity) {

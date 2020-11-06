@@ -2,7 +2,7 @@ package de.mennomax.astikorcarts.entity;
 
 import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
-import de.mennomax.astikorcarts.network.packets.SPacketDrawnUpdate;
+import de.mennomax.astikorcarts.network.clientbound.UpdateDrawnMessage;
 import de.mennomax.astikorcarts.util.CartWheel;
 import de.mennomax.astikorcarts.world.AstikorWorld;
 import net.minecraft.entity.Entity;
@@ -216,7 +216,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
                     } else if (this.pulling instanceof AbstractDrawnEntity) {
                         ((AbstractDrawnEntity) this.pulling).drawn = null;
                     }
-                    AstikorCarts.CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new SPacketDrawnUpdate(-1, this.getEntityId()));
+                    AstikorCarts.CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new UpdateDrawnMessage(-1, this.getEntityId()));
                     this.pullingUUID = null;
                     if (this.ticksExisted > 20) {
                         this.playDetachSound();
@@ -225,7 +225,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
                     if (entityIn instanceof MobEntity) {
                         ((MobEntity) entityIn).getNavigator().clearPath();
                     }
-                    AstikorCarts.CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new SPacketDrawnUpdate(entityIn.getEntityId(), this.getEntityId()));
+                    AstikorCarts.CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new UpdateDrawnMessage(entityIn.getEntityId(), this.getEntityId()));
                     this.pullingUUID = entityIn.getUniqueID();
                     if (this.ticksExisted > 20) {
                         this.playAttachSound();

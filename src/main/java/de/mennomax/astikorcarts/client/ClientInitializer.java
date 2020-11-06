@@ -12,9 +12,9 @@ import de.mennomax.astikorcarts.client.renderer.texture.AssembledTexture;
 import de.mennomax.astikorcarts.client.renderer.texture.AssembledTextureFactory;
 import de.mennomax.astikorcarts.client.renderer.texture.Material;
 import de.mennomax.astikorcarts.entity.CargoCartEntity;
-import de.mennomax.astikorcarts.network.packets.CPacketActionKey;
-import de.mennomax.astikorcarts.network.packets.CPacketOpenCargoCartGui;
-import de.mennomax.astikorcarts.network.packets.CPacketToggleSlow;
+import de.mennomax.astikorcarts.network.serverbound.ActionKeyMessage;
+import de.mennomax.astikorcarts.network.serverbound.OpenCargoCartMessage;
+import de.mennomax.astikorcarts.network.serverbound.ToggleSlowMessage;
 import de.mennomax.astikorcarts.world.AstikorWorld;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
@@ -45,7 +45,7 @@ public final class ClientInitializer extends CommonInitializer {
                 final World world = mc.world;
                 if (world != null) {
                     while (this.action.isPressed()) {
-                        AstikorCarts.CHANNEL.sendToServer(new CPacketActionKey());
+                        AstikorCarts.CHANNEL.sendToServer(new ActionKeyMessage());
                     }
                     if (!mc.isGamePaused()) {
                         AstikorWorld.get(world).ifPresent(AstikorWorld::tick);
@@ -57,10 +57,10 @@ public final class ClientInitializer extends CommonInitializer {
             final Minecraft mc = Minecraft.getInstance();
             final PlayerEntity player = mc.player;
             if (player != null) {
-                if (CPacketToggleSlow.getPulling(player) != null) {
+                if (ToggleSlowMessage.getPulling(player) != null) {
                     final KeyBinding binding = mc.gameSettings.keyBindSprint;
                     while (binding.isPressed()) {
-                        AstikorCarts.CHANNEL.sendToServer(new CPacketToggleSlow());
+                        AstikorCarts.CHANNEL.sendToServer(new ToggleSlowMessage());
                         KeyBinding.setKeyBindState(binding.getKey(), false);
                     }
                 }
@@ -71,7 +71,7 @@ public final class ClientInitializer extends CommonInitializer {
                 final ClientPlayerEntity player = Minecraft.getInstance().player;
                 if (player != null && player.getRidingEntity() instanceof CargoCartEntity) {
                     e.setCanceled(true);
-                    AstikorCarts.CHANNEL.sendToServer(new CPacketOpenCargoCartGui());
+                    AstikorCarts.CHANNEL.sendToServer(new OpenCargoCartMessage());
                 }
             }
         });

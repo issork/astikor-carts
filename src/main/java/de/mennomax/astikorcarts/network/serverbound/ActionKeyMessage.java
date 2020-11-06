@@ -1,4 +1,4 @@
-package de.mennomax.astikorcarts.network.packets;
+package de.mennomax.astikorcarts.network.serverbound;
 
 import com.mojang.datafixers.util.Pair;
 import de.mennomax.astikorcarts.entity.AbstractDrawnEntity;
@@ -14,7 +14,7 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 
-public final class CPacketActionKey implements Message {
+public final class ActionKeyMessage implements Message {
     @Override
     public void encode(final PacketBuffer buf) {
     }
@@ -23,7 +23,7 @@ public final class CPacketActionKey implements Message {
     public void decode(final PacketBuffer buf) {
     }
 
-    public static void handle(final CPacketActionKey msg, final ServerMessageContext ctx) {
+    public static void handle(final ActionKeyMessage msg, final ServerMessageContext ctx) {
         final ServerPlayerEntity player = ctx.getPlayer();
         final Entity pulling = player.isPassenger() ? Objects.requireNonNull(player.getRidingEntity()) : player;
         final World world = player.world;

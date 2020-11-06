@@ -1,4 +1,4 @@
-package de.mennomax.astikorcarts.network.packets;
+package de.mennomax.astikorcarts.network.clientbound;
 
 import de.mennomax.astikorcarts.entity.AbstractDrawnEntity;
 import de.mennomax.astikorcarts.network.ClientMessageContext;
@@ -9,15 +9,15 @@ import net.minecraft.world.World;
 
 import java.util.function.BiConsumer;
 
-public final class SPacketDrawnUpdate implements Message {
+public final class UpdateDrawnMessage implements Message {
     private int pullingId;
 
     private int cartId;
 
-    public SPacketDrawnUpdate() {
+    public UpdateDrawnMessage() {
     }
 
-    public SPacketDrawnUpdate(final int pullingId, final int cartId) {
+    public UpdateDrawnMessage(final int pullingId, final int cartId) {
         this.pullingId = pullingId;
         this.cartId = cartId;
     }
@@ -34,9 +34,9 @@ public final class SPacketDrawnUpdate implements Message {
         this.cartId = buf.readVarInt();
     }
 
-    public static final class Handler implements BiConsumer<SPacketDrawnUpdate, ClientMessageContext> {
+    public static final class Handler implements BiConsumer<UpdateDrawnMessage, ClientMessageContext> {
         @Override
-        public void accept(final SPacketDrawnUpdate msg, final ClientMessageContext ctx) {
+        public void accept(final UpdateDrawnMessage msg, final ClientMessageContext ctx) {
             final World world = ctx.getWorld();
             final Entity e = world.getEntityByID(msg.cartId);
             if (e instanceof AbstractDrawnEntity) {

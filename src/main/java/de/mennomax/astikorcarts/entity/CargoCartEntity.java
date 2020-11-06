@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
 import de.mennomax.astikorcarts.inventory.container.CargoCartContainer;
-import de.mennomax.astikorcarts.network.packets.SPacketCartingJukebox;
+import de.mennomax.astikorcarts.network.clientbound.CartingJukeboxMessage;
 import de.mennomax.astikorcarts.util.CartItemStackHandler;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -130,7 +130,7 @@ public final class CargoCartEntity extends AbstractDrawnInventoryEntity {
             final ListNBT lore = display.getList("Lore", Constants.NBT.TAG_STRING);
             lore.add(StringNBT.valueOf(ITextComponent.Serializer.toJson(new TranslationTextComponent(held.getTranslationKey() + ".desc"))));
             display.put("Lore", lore);
-            AstikorCarts.CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new SPacketCartingJukebox(this, (MusicDiscItem) held.getItem()));
+            AstikorCarts.CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> this), new CartingJukeboxMessage(this, (MusicDiscItem) held.getItem()));
             if (!player.abilities.isCreativeMode) held.shrink(1);
             return true;
         }
