@@ -101,19 +101,21 @@ public final class CargoCartEntity extends AbstractDrawnInventoryEntity {
 
     @Override
     public ActionResultType processInitialInteract(final PlayerEntity player, final Hand hand) {
+        final ItemStack held = player.getHeldItem(hand);
+        if (held.getItem() instanceof MusicDiscItem) {
+            if (this.world.isRemote) return ActionResultType.SUCCESS;
+            if (this.jukebox(player, held)) return ActionResultType.CONSUME;
+            return ActionResultType.FAIL;
+        }
+        if (player.isSecondaryUseActive()) {
+            this.openContainer(player);
+            return ActionResultType.func_233537_a_(this.world.isRemote);
+        }
+        if (this.isBeingRidden()) {
+            return ActionResultType.PASS;
+        }
         if (!this.world.isRemote) {
-            final ItemStack held = player.getHeldItem(hand);
-            if (held.getItem() instanceof MusicDiscItem) {
-                if (this.jukebox(player, held)) {
-                    return ActionResultType.SUCCESS;
-                } else {
-                    return ActionResultType.FAIL;
-                }
-            } else if (player.isSneaking()) {
-                this.openContainer(player);
-            } else {
-                player.startRiding(this);
-            }
+            return player.startRiding(this) ? ActionResultType.CONSUME : ActionResultType.PASS;
         }
         return ActionResultType.SUCCESS;
     }
@@ -188,8 +190,10 @@ public final class CargoCartEntity extends AbstractDrawnInventoryEntity {
     }
 
     public void openContainer(final PlayerEntity player) {
-        player.openContainer(new SimpleNamedContainerProvider((id, inv, plyr) -> {
-            return new CargoCartContainer(id, inv, this);
-        }, this.getDisplayName()));
+        if (!this.world.isRemote) {
+            player.openContainer(new SimpleNamedContainerProvider((id, inv, plyr) -> {
+                return new CargoCartContainer(id, inv, this);
+            }, this.getDisplayName()));
+        }
     }
 }

@@ -47,18 +47,25 @@ public final class MobCartEntity extends AbstractDrawnEntity {
 
     @Override
     public ActionResultType processInitialInteract(final PlayerEntity player, final Hand hand) {
-        if (!this.world.isRemote) {
-            if (player.isSneaking()) {
+        if (player.isSecondaryUseActive()) {
+            if (!this.world.isRemote) {
                 for (final Entity entity : this.getPassengers()) {
                     if (!(entity instanceof PlayerEntity)) {
                         entity.stopRiding();
                     }
                 }
-            } else if (this.getPulling() != player) {
-                player.startRiding(this);
             }
+            return ActionResultType.func_233537_a_(this.world.isRemote);
+        } else if (this.getPulling() != player) {
+            if (!this.canFitPassenger(player)) {
+                return ActionResultType.PASS;
+            }
+            if (!this.world.isRemote) {
+                return player.startRiding(this) ? ActionResultType.CONSUME : ActionResultType.PASS;
+            }
+            return ActionResultType.SUCCESS;
         }
-        return ActionResultType.SUCCESS;
+        return ActionResultType.PASS;
     }
 
     @Override

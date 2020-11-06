@@ -108,14 +108,14 @@ public final class PlowCartEntity extends AbstractDrawnInventoryEntity {
 
     @Override
     public ActionResultType processInitialInteract(final PlayerEntity player, final Hand hand) {
-        if (!this.world.isRemote) {
-            if (player.isSneaking()) {
-                this.openContainer(player);
-            } else {
-                this.dataManager.set(PLOWING, !this.dataManager.get(PLOWING));
-            }
+        if (player.isSecondaryUseActive()) {
+            this.openContainer(player);
+            return ActionResultType.func_233537_a_(this.world.isRemote);
         }
-        return ActionResultType.SUCCESS;
+        if (!this.world.isRemote) {
+            this.dataManager.set(PLOWING, !this.dataManager.get(PLOWING));
+        }
+        return ActionResultType.func_233537_a_(this.world.isRemote);
     }
 
     public void updateSlot(final int slot) {
