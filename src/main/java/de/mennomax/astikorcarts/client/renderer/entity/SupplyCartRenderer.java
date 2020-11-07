@@ -4,18 +4,26 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.client.renderer.entity.model.SupplyCartModel;
 import de.mennomax.astikorcarts.entity.SupplyCartEntity;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BlockModelRenderer;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
+import net.minecraftforge.client.model.data.EmptyModelData;
 
 import java.util.Objects;
 
@@ -28,11 +36,60 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
     }
 
     @Override
+    public void render(final SupplyCartEntity entity, final float yaw, final float delta, final MatrixStack stack, final IRenderTypeBuffer source, final int packedLight) {
+        this.model = new SupplyCartModel();
+        super.render(entity, yaw, delta, stack, source, packedLight);
+    }
+
+    @Override
     protected void renderContents(final SupplyCartEntity entity, final float delta, final MatrixStack stack, final IRenderTypeBuffer source, final int packedLight) {
         super.renderContents(entity, delta, stack, source, packedLight);
         final NonNullList<ItemStack> cargo = entity.getCargo();
         stack.push();
         this.model.getBody().translateRotate(stack);
+        boolean flower = true;
+        for (final ItemStack itemStack : cargo) {
+            if (itemStack.isEmpty() || itemStack.getItem() instanceof BlockItem && itemStack.getItem().isIn(ItemTags.FLOWERS)) {
+                continue;
+            }
+            flower = false;
+            break;
+        }
+        if (flower) {
+            this.renderFlowers(entity, stack, source, packedLight, cargo);
+        } else {
+            this.renderSupplies(stack, source, packedLight, cargo);
+        }
+        stack.pop();
+    }
+
+    private void renderFlowers(final SupplyCartEntity entity, final MatrixStack stack, final IRenderTypeBuffer source, final int packedLight, final NonNullList<ItemStack> cargo) {
+        this.model.getFlowerBasket().render(stack, source.getBuffer(this.model.getRenderType(this.getEntityTexture(entity))), packedLight, OverlayTexture.NO_OVERLAY);
+        final BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
+        final BlockModelRenderer renderer = dispatcher.getBlockModelRenderer();
+        for (int i = 0; i < cargo.size(); i++) {
+            final ItemStack itemStack = cargo.get(i);
+            if (!(itemStack.getItem() instanceof BlockItem)) continue;
+            final int ix = i % 2, iz = i / 2;
+            final BlockState defaultState = ((BlockItem) itemStack.getItem()).getBlock().getDefaultState();
+            final BlockState state = defaultState.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF) ? defaultState.with(BlockStateProperties.DOUBLE_BLOCK_HALF, DoubleBlockHalf.UPPER) : defaultState;
+            IBakedModel model = dispatcher.getModelForState(state);
+            final int rgb = Minecraft.getInstance().getBlockColors().getColor(state, null, null, 0);
+            final float r = (float) (rgb >> 16 & 255) / 255.0F;
+            final float g = (float) (rgb >> 8 & 255) / 255.0F;
+            final float b = (float) (rgb & 255) / 255.0F;
+            stack.push();
+            stack.translate(0.0D, -0.7D, -3.0D / 16.0D);
+            stack.scale(0.65F, 0.65F, 0.65F);
+            stack.translate(ix, 0.5D, iz - 1.0D);
+            stack.rotate(Vector3f.ZP.rotationDegrees(180.0F));
+            renderer.renderModel(stack.getLast(), source.getBuffer(RenderType.getCutout()), state, model, r, g, b, packedLight, OverlayTexture.NO_OVERLAY, EmptyModelData.INSTANCE);
+            stack.pop();
+        }
+    }
+
+    private void renderSupplies(final MatrixStack stack, final IRenderTypeBuffer source, final int packedLight, final NonNullList<ItemStack> cargo) {
+        final ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
         for (int i = 0; i < cargo.size(); i++) {
             final ItemStack itemStack = cargo.get(i);
             if (itemStack.isEmpty()) continue;
@@ -41,7 +98,6 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
             if (i >= 2 && cargo.get(i - 2).getItem().isIn(ItemTags.BEDS)) continue;
             final double x = (ix - 0.5D) * 11.0D / 16.0D;
             final double z = (iz * 11.0D - 9.0D) / 16.0D;
-            final ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
             final IBakedModel model = renderer.getItemModelWithOverrides(itemStack, null, null);
             stack.push();
             if (model.isGui3d()) {
@@ -58,7 +114,6 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
             renderer.renderItem(itemStack, ItemCameraTransforms.TransformType.NONE, false, stack, source, packedLight, OverlayTexture.NO_OVERLAY, model);
             stack.pop();
         }
-        stack.pop();
     }
 
     @Override

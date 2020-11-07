@@ -20,7 +20,7 @@ public abstract class CartModel<T extends AbstractDrawnEntity> extends EntityMod
 
         this.body = new ModelRenderer(this);
         this.body.setRotationPoint(0.0F, -11.0F, 1.0F);
-        this.leftWheel =  new ModelRenderer(this, 54, 50);
+        this.leftWheel = new ModelRenderer(this, 46, 60);
         this.leftWheel.setRotationPoint(14.5F, -11.0F, 1.0F);
         this.leftWheel.addBox(-2.0F, -1.0F, -1.0F, 2, 2, 2);
         for (int i = 0; i < 8; i++) {
@@ -35,7 +35,7 @@ public abstract class CartModel<T extends AbstractDrawnEntity> extends EntityMod
             this.leftWheel.addChild(spoke);
         }
 
-        this.rightWheel = new ModelRenderer(this, 54, 50);
+        this.rightWheel = new ModelRenderer(this, 46, 60);
         this.rightWheel.setRotationPoint(-14.5F, -11.0F, 1.0F);
         this.rightWheel.addBox(0.0F, -1.0F, -1.0F, 2, 2, 2);
         for (int i = 0; i < 8; i++) {
