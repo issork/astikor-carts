@@ -41,13 +41,15 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
         final NonNullList<ItemStack> cargo = entity.getCargo();
         stack.push();
         this.model.getBody().translateRotate(stack);
-        boolean flower = true;
+        boolean flower = false;
         for (final ItemStack itemStack : cargo) {
-            if (itemStack.isEmpty() || itemStack.getItem() instanceof BlockItem && itemStack.getItem().isIn(ItemTags.FLOWERS)) {
-                continue;
+            if (itemStack.isEmpty()) continue;
+            if (itemStack.getItem() instanceof BlockItem && itemStack.getItem().isIn(ItemTags.FLOWERS)) {
+                flower = true;
+            } else {
+                flower = false;
+                break;
             }
-            flower = false;
-            break;
         }
         if (flower) {
             this.renderFlowers(entity, stack, source, packedLight, cargo);
