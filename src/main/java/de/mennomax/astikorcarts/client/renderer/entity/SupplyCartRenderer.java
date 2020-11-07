@@ -26,6 +26,7 @@ import net.minecraft.util.math.vector.Vector3f;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
 import java.util.Objects;
+import java.util.Random;
 
 public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, SupplyCartModel> {
     private static final ResourceLocation TEXTURE = new ResourceLocation(AstikorCarts.ID, "textures/entity/supply_cart.png");
@@ -86,6 +87,7 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
 
     private void renderSupplies(final MatrixStack stack, final IRenderTypeBuffer source, final int packedLight, final NonNullList<ItemStack> cargo) {
         final ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
+        final Random rng = new Random();
         for (int i = 0; i < cargo.size(); i++) {
             final ItemStack itemStack = cargo.get(i);
             if (itemStack.isEmpty()) continue;
@@ -100,14 +102,28 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
                 stack.translate(x, -0.46D, z);
                 stack.scale(0.65F, 0.65F, 0.65F);
                 stack.rotate(Vector3f.ZP.rotationDegrees(180.0F));
-                if (iz < 1 && itemStack.getItem().isIn(ItemTags.BEDS)) stack.translate(0.0D, 0.0D, 1.0D);
+                if (iz < 1 && itemStack.getItem().isIn(ItemTags.BEDS)) {
+                    stack.translate(0.0D, 0.0D, 1.0D);
+                } else if (!model.isBuiltInRenderer()) {
+                    stack.rotate(Vector3f.YP.rotationDegrees(180.0F));
+                }
+                renderer.renderItem(itemStack, ItemCameraTransforms.TransformType.NONE, false, stack, source, packedLight, OverlayTexture.NO_OVERLAY, model);
             } else {
+                rng.setSeed(32L * i + Objects.hashCode(itemStack.getItem().getRegistryName()));
                 stack.translate(x, -0.15D + ((ix + iz) % 2 == 0 ? 0.0D : 1.0e-4D), z);
                 stack.scale(0.7F, 0.7F, 0.7F);
-                stack.rotate(Vector3f.YP.rotationDegrees(Objects.hashCode(itemStack.getItem().getRegistryName()) / 65536.0F));
+                stack.rotate(Vector3f.YP.rotation(rng.nextFloat() * (float) Math.PI));
                 stack.rotate(Vector3f.XP.rotationDegrees(-90.0F));
+                final int copies = Math.min(itemStack.getCount(), (itemStack.getCount() - 1) / 16 + 2);
+                renderer.renderItem(itemStack, ItemCameraTransforms.TransformType.NONE, false, stack, source, packedLight, OverlayTexture.NO_OVERLAY, model);
+                for (int n = 1; n < copies; n++) {
+                    stack.push();
+                    stack.rotate(Vector3f.ZP.rotation(rng.nextFloat() * (float) Math.PI));
+                    stack.translate((rng.nextFloat() * 2.0F - 1.0F) * 0.05F, (rng.nextFloat() * 2.0F - 1.0F) * 0.05F, -0.1D * n);
+                    renderer.renderItem(itemStack, ItemCameraTransforms.TransformType.NONE, false, stack, source, packedLight, OverlayTexture.NO_OVERLAY, model);
+                    stack.pop();
+                }
             }
-            renderer.renderItem(itemStack, ItemCameraTransforms.TransformType.NONE, false, stack, source, packedLight, OverlayTexture.NO_OVERLAY, model);
             stack.pop();
         }
     }

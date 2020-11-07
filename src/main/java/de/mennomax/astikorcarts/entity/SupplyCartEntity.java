@@ -79,8 +79,8 @@ public final class SupplyCartEntity extends AbstractDrawnInventoryEntity {
                     }
                 }
                 final Iterator<Object2IntMap.Entry<Item>> topTotals = totals.object2IntEntrySet().stream()
-                    .sorted(Comparator.<Object2IntMap.Entry<Item>>comparingInt(e -> -e.getIntValue())
-                        .thenComparingInt(e -> e.getKey() instanceof BlockItem ? 0 : 1))
+                    .sorted(Comparator.<Object2IntMap.Entry<Item>>comparingInt(e -> e.getKey() instanceof BlockItem ? 0 : 1)
+                        .thenComparingInt(e -> -e.getIntValue()))
                     .limit(CARGO.size()).iterator();
                 final ItemStack[] items = new ItemStack[CARGO.size()];
                 Arrays.fill(items, ItemStack.EMPTY);
@@ -88,8 +88,10 @@ public final class SupplyCartEntity extends AbstractDrawnInventoryEntity {
                 for (int pos = 0; topTotals.hasNext() && pos < CARGO.size(); ) {
                     final Object2IntMap.Entry<Item> entry = topTotals.next();
                     final int count = Math.max(1, (entry.getIntValue() + forth / 2) / forth);
-                    for (int n = 0; n < count && pos < CARGO.size(); n++) {
-                        items[pos++] = stacks.getOrDefault(entry.getKey(), ItemStack.EMPTY).copy();
+                    for (int n = 1; n <= count && pos < CARGO.size(); n++) {
+                        final ItemStack stack = stacks.getOrDefault(entry.getKey(), ItemStack.EMPTY).copy();
+                        stack.setCount(Math.min(stack.getMaxStackSize(), entry.getIntValue() / n));
+                        items[pos++] = stack;
                     }
                 }
                 for (int i = 0; i < CARGO.size(); i++) {
