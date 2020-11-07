@@ -55,7 +55,7 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
         if (flower) {
             this.renderFlowers(entity, stack, source, packedLight, cargo);
         } else {
-            this.renderSupplies(stack, source, packedLight, cargo);
+            this.renderSupplies(entity, stack, source, packedLight, cargo);
         }
         stack.pop();
     }
@@ -85,7 +85,7 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
         }
     }
 
-    private void renderSupplies(final MatrixStack stack, final IRenderTypeBuffer source, final int packedLight, final NonNullList<ItemStack> cargo) {
+    private void renderSupplies(final SupplyCartEntity entity, final MatrixStack stack, final IRenderTypeBuffer source, final int packedLight, final NonNullList<ItemStack> cargo) {
         final ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
         final Random rng = new Random();
         for (int i = 0; i < cargo.size(); i++) {
@@ -96,7 +96,7 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
             if (i >= 2 && cargo.get(i - 2).getItem().isIn(ItemTags.BEDS)) continue;
             final double x = (ix - 0.5D) * 11.0D / 16.0D;
             final double z = (iz * 11.0D - 9.0D) / 16.0D;
-            final IBakedModel model = renderer.getItemModelWithOverrides(itemStack, null, null);
+            final IBakedModel model = renderer.getItemModelWithOverrides(itemStack, entity.world, null);
             stack.push();
             if (model.isGui3d()) {
                 stack.translate(x, -0.46D, z);
