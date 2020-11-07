@@ -36,12 +36,6 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
     }
 
     @Override
-    public void render(final SupplyCartEntity entity, final float yaw, final float delta, final MatrixStack stack, final IRenderTypeBuffer source, final int packedLight) {
-        this.model = new SupplyCartModel();
-        super.render(entity, yaw, delta, stack, source, packedLight);
-    }
-
-    @Override
     protected void renderContents(final SupplyCartEntity entity, final float delta, final MatrixStack stack, final IRenderTypeBuffer source, final int packedLight) {
         super.renderContents(entity, delta, stack, source, packedLight);
         final NonNullList<ItemStack> cargo = entity.getCargo();
