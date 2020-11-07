@@ -17,6 +17,7 @@ import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.tags.ItemTags;
@@ -98,11 +99,16 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
             final double z = (iz * 11.0D - 9.0D) / 16.0D;
             final IBakedModel model = renderer.getItemModelWithOverrides(itemStack, entity.world, null);
             stack.push();
-            if (model.isGui3d()) {
+            if (model.isGui3d() && itemStack.getItem() != Items.TRIDENT) {
                 stack.translate(x, -0.46D, z);
                 stack.scale(0.65F, 0.65F, 0.65F);
                 stack.rotate(Vector3f.ZP.rotationDegrees(180.0F));
-                if (iz < 1 && itemStack.getItem().isIn(ItemTags.BEDS)) {
+                if (itemStack.getItem() == Items.SHIELD) {
+                    stack.scale(1.2F, 1.2F, 1.2F);
+                    stack.rotate(Vector3f.YP.rotationDegrees(ix == 0 ? -90.0F : 90.0F));
+                    stack.translate(0.5D, 0.8D, -0.05D);
+                    stack.rotate(Vector3f.XP.rotationDegrees(-22.5F));
+                } else if (iz < 1 && itemStack.getItem().isIn(ItemTags.BEDS)) {
                     stack.translate(0.0D, 0.0D, 1.0D);
                 } else if (!model.isBuiltInRenderer()) {
                     stack.rotate(Vector3f.YP.rotationDegrees(180.0F));
@@ -115,12 +121,12 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
                 stack.rotate(Vector3f.YP.rotation(rng.nextFloat() * (float) Math.PI));
                 stack.rotate(Vector3f.XP.rotationDegrees(-90.0F));
                 final int copies = Math.min(itemStack.getCount(), (itemStack.getCount() - 1) / 16 + 2);
-                renderer.renderItem(itemStack, ItemCameraTransforms.TransformType.NONE, false, stack, source, packedLight, OverlayTexture.NO_OVERLAY, model);
+                renderer.renderItem(itemStack, ItemCameraTransforms.TransformType.FIXED, false, stack, source, packedLight, OverlayTexture.NO_OVERLAY, model);
                 for (int n = 1; n < copies; n++) {
                     stack.push();
                     stack.rotate(Vector3f.ZP.rotation(rng.nextFloat() * (float) Math.PI));
                     stack.translate((rng.nextFloat() * 2.0F - 1.0F) * 0.05F, (rng.nextFloat() * 2.0F - 1.0F) * 0.05F, -0.1D * n);
-                    renderer.renderItem(itemStack, ItemCameraTransforms.TransformType.NONE, false, stack, source, packedLight, OverlayTexture.NO_OVERLAY, model);
+                    renderer.renderItem(itemStack, ItemCameraTransforms.TransformType.FIXED, false, stack, source, packedLight, OverlayTexture.NO_OVERLAY, model);
                     stack.pop();
                 }
             }
