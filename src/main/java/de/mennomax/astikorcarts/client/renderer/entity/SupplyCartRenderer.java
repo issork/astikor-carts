@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
@@ -26,8 +27,10 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Random;
+import java.util.function.Predicate;
 
 public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, SupplyCartModel> {
     private static final ResourceLocation TEXTURE = new ResourceLocation(AstikorCarts.ID, "textures/entity/supply_cart.png");
@@ -41,23 +44,27 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
     protected void renderContents(final SupplyCartEntity entity, final float delta, final MatrixStack stack, final IRenderTypeBuffer source, final int packedLight) {
         super.renderContents(entity, delta, stack, source, packedLight);
         final NonNullList<ItemStack> cargo = entity.getCargo();
-        stack.push();
-        this.model.getBody().translateRotate(stack);
-        boolean flower = false;
-        for (final ItemStack itemStack : cargo) {
-            if (itemStack.isEmpty()) continue;
-            if (itemStack.getItem() instanceof BlockItem && itemStack.getItem().isIn(ItemTags.FLOWERS)) {
-                flower = true;
-            } else {
-                flower = false;
-                break;
+        Contents contents = Contents.SUPPLIES;
+        final Iterator<ItemStack> it = cargo.iterator();
+        outer:
+        while (it.hasNext()) {
+            final ItemStack s = it.next();
+            if (s.isEmpty()) continue;
+            for (final Contents c : Contents.values()) {
+                if (c.predicate.test(s)) {
+                    contents = c;
+                    break outer;
+                }
             }
         }
-        if (flower) {
-            this.renderFlowers(entity, stack, source, packedLight, cargo);
-        } else {
-            this.renderSupplies(entity, stack, source, packedLight, cargo);
+        while (contents != Contents.SUPPLIES && it.hasNext()) {
+            final ItemStack s = it.next();
+            if (s.isEmpty()) continue;
+            if (!contents.predicate.test(s)) contents = Contents.SUPPLIES;
         }
+        stack.push();
+        this.model.getBody().translateRotate(stack);
+        contents.renderer.render(this, entity, stack, source, packedLight, cargo);
         stack.pop();
     }
 
@@ -84,6 +91,14 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
             renderer.renderModel(stack.getLast(), source.getBuffer(RenderType.getCutout()), state, model, r, g, b, packedLight, OverlayTexture.NO_OVERLAY, EmptyModelData.INSTANCE);
             stack.pop();
         }
+    }
+
+    private void renderWheel(final SupplyCartEntity entity, final MatrixStack stack, final IRenderTypeBuffer source, final int packedLight, final NonNullList<ItemStack> cargo) {
+        stack.translate(1.18D, 0.1D, -0.15D);
+        final ModelRenderer wheel = this.model.getWheel();
+        wheel.rotateAngleX = 0.9F;
+        wheel.rotateAngleZ = (float) Math.PI * 0.3F;
+        wheel.render(stack, source.getBuffer(this.model.getRenderType(this.getEntityTexture(entity))), packedLight, OverlayTexture.NO_OVERLAY);
     }
 
     private void renderSupplies(final SupplyCartEntity entity, final MatrixStack stack, final IRenderTypeBuffer source, final int packedLight, final NonNullList<ItemStack> cargo) {
@@ -137,5 +152,24 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
     @Override
     public ResourceLocation getEntityTexture(final SupplyCartEntity entity) {
         return TEXTURE;
+    }
+
+    private enum Contents {
+        FLOWERS(s -> s.getItem() instanceof BlockItem && s.getItem().isIn(ItemTags.FLOWERS), SupplyCartRenderer::renderFlowers),
+        WHEEL(s -> AstikorCarts.Items.WHEEL.test(s.getItem()), SupplyCartRenderer::renderWheel),
+        SUPPLIES(s -> true, SupplyCartRenderer::renderSupplies);
+
+        private final Predicate<? super ItemStack> predicate;
+        private final ContentsRenderer renderer;
+
+        Contents(final Predicate<? super ItemStack> predicate, final ContentsRenderer renderer) {
+            this.predicate = predicate;
+            this.renderer = renderer;
+        }
+    }
+
+    @FunctionalInterface
+    private interface ContentsRenderer {
+        void render(final SupplyCartRenderer renderer, final SupplyCartEntity entity, final MatrixStack stack, final IRenderTypeBuffer source, final int packedLight, final NonNullList<ItemStack> cargo);
     }
 }
