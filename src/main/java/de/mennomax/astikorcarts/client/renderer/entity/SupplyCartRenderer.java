@@ -1,21 +1,24 @@
 package de.mennomax.astikorcarts.client.renderer.entity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.client.renderer.entity.model.SupplyCartModel;
 import de.mennomax.astikorcarts.entity.SupplyCartEntity;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
+import it.unimi.dsi.fastutil.objects.ObjectLists;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockModelRenderer;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.PaintingSpriteUploader;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.entity.item.PaintingType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -24,13 +27,18 @@ import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.vector.Matrix3f;
+import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Random;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, SupplyCartModel> {
     private static final ResourceLocation TEXTURE = new ResourceLocation(AstikorCarts.ID, "textures/entity/supply_cart.png");
@@ -78,7 +86,7 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
             final int ix = i % 2, iz = i / 2;
             final BlockState defaultState = ((BlockItem) itemStack.getItem()).getBlock().getDefaultState();
             final BlockState state = defaultState.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF) ? defaultState.with(BlockStateProperties.DOUBLE_BLOCK_HALF, DoubleBlockHalf.UPPER) : defaultState;
-            IBakedModel model = dispatcher.getModelForState(state);
+            final IBakedModel model = dispatcher.getModelForState(state);
             final int rgb = Minecraft.getInstance().getBlockColors().getColor(state, null, null, 0);
             final float r = (float) (rgb >> 16 & 255) / 255.0F;
             final float g = (float) (rgb >> 8 & 255) / 255.0F;
@@ -99,6 +107,32 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
         wheel.rotateAngleX = 0.9F;
         wheel.rotateAngleZ = (float) Math.PI * 0.3F;
         wheel.render(stack, source.getBuffer(this.model.getRenderType(this.getEntityTexture(entity))), packedLight, OverlayTexture.NO_OVERLAY);
+    }
+
+    private void renderPaintings(final SupplyCartEntity entity, final MatrixStack stack, final IRenderTypeBuffer source, final int packedLight, final NonNullList<ItemStack> cargo) {
+        stack.translate(0.0D, -2.5D / 16.0D, 0.0D);
+        stack.rotate(Vector3f.XP.rotationDegrees(-90.0F));
+        final IVertexBuilder buf = source.getBuffer(RenderType.getEntitySolid(Minecraft.getInstance().getPaintingSpriteUploader().getBackSprite().getAtlasTexture().getTextureLocation()));
+        final ObjectList<PaintingType> types = StreamSupport.stream(ForgeRegistries.PAINTING_TYPES.spliterator(), false)
+            .filter(t -> t.getWidth() == 16 && t.getHeight() == 16)
+            .collect(Collectors.toCollection(ObjectArrayList::new));
+        final Random rng = new Random(entity.getUniqueID().getMostSignificantBits() ^ entity.getUniqueID().getLeastSignificantBits());
+        ObjectLists.shuffle(types, rng);
+        int count = 0;
+        for (final ItemStack itemStack : cargo) {
+            if (itemStack.isEmpty()) continue;
+            count++;
+        }
+        for (int i = 0, n = 0; i < cargo.size(); i++) {
+            final ItemStack itemStack = cargo.get(i);
+            if (itemStack.isEmpty()) continue;
+            final PaintingType t = types.get(i % types.size());
+            stack.push();
+            stack.translate(0.0D, (n++ - (count - 1) * 0.5D) / count, -1.0D / 16.0D * i);
+            stack.rotate(Vector3f.ZP.rotation(rng.nextFloat() * (float) Math.PI));
+            this.renderPainting(t, stack, buf, packedLight);
+            stack.pop();
+        }
     }
 
     private void renderSupplies(final SupplyCartEntity entity, final MatrixStack stack, final IRenderTypeBuffer source, final int packedLight, final NonNullList<ItemStack> cargo) {
@@ -149,6 +183,70 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
         }
     }
 
+    private void renderPainting(final PaintingType painting, final MatrixStack stack, final IVertexBuilder buf, final int packedLight) {
+        final PaintingSpriteUploader uploader = Minecraft.getInstance().getPaintingSpriteUploader();
+        final int width = painting.getWidth();
+        final int height = painting.getHeight();
+        final TextureAtlasSprite art = uploader.getSpriteForPainting(painting);
+        final TextureAtlasSprite back = uploader.getBackSprite();
+        final Matrix4f model = stack.getLast().getMatrix();
+        final Matrix3f normal = stack.getLast().getNormal();
+        final int blockWidth = width / 16;
+        final int blockHeight = height / 16;
+        final float offsetX = -blockWidth / 2.0F;
+        final float offsetY = -blockHeight / 2.0F;
+        final float depth = 0.5F / 16.0F;
+        final float bu0 = back.getMinU();
+        final float bu1 = back.getMaxU();
+        final float bv0 = back.getMinV();
+        final float bv1 = back.getMaxV();
+        final float bup = back.getInterpolatedU(1.0D);
+        final float bvp = back.getInterpolatedV(1.0D);
+        final double uvX = 16.0D / blockWidth;
+        final double uvY = 16.0D / blockHeight;
+        for (int x = 0; x < blockWidth; ++x) {
+            for (int y = 0; y < blockHeight; ++y) {
+                final float x1 = offsetX + (x + 1);
+                final float x0 = offsetX + x;
+                final float y1 = offsetY + (y + 1);
+                final float y0 = offsetY + y;
+                final float u0 = art.getInterpolatedU(uvX * (blockWidth - x));
+                final float u1 = art.getInterpolatedU(uvX * (blockWidth - x - 1));
+                final float v0 = art.getInterpolatedV(uvY * (blockHeight - y));
+                final float v1 = art.getInterpolatedV(uvY * (blockHeight - y - 1));
+                this.vert(model, normal, buf, x1, y0, u1, v0, -depth, 0, 0, -1, packedLight);
+                this.vert(model, normal, buf, x0, y0, u0, v0, -depth, 0, 0, -1, packedLight);
+                this.vert(model, normal, buf, x0, y1, u0, v1, -depth, 0, 0, -1, packedLight);
+                this.vert(model, normal, buf, x1, y1, u1, v1, -depth, 0, 0, -1, packedLight);
+                this.vert(model, normal, buf, x1, y1, bu0, bv0, depth, 0, 0, 1, packedLight);
+                this.vert(model, normal, buf, x0, y1, bu1, bv0, depth, 0, 0, 1, packedLight);
+                this.vert(model, normal, buf, x0, y0, bu1, bv1, depth, 0, 0, 1, packedLight);
+                this.vert(model, normal, buf, x1, y0, bu0, bv1, depth, 0, 0, 1, packedLight);
+                this.vert(model, normal, buf, x1, y1, bu0, bv0, -depth, 0, 1, 0, packedLight);
+                this.vert(model, normal, buf, x0, y1, bu1, bv0, -depth, 0, 1, 0, packedLight);
+                this.vert(model, normal, buf, x0, y1, bu1, bvp, depth, 0, 1, 0, packedLight);
+                this.vert(model, normal, buf, x1, y1, bu0, bvp, depth, 0, 1, 0, packedLight);
+                this.vert(model, normal, buf, x1, y0, bu0, bv0, depth, 0, -1, 0, packedLight);
+                this.vert(model, normal, buf, x0, y0, bu1, bv0, depth, 0, -1, 0, packedLight);
+                this.vert(model, normal, buf, x0, y0, bu1, bvp, -depth, 0, -1, 0, packedLight);
+                this.vert(model, normal, buf, x1, y0, bu0, bvp, -depth, 0, -1, 0, packedLight);
+                this.vert(model, normal, buf, x1, y1, bup, bv0, depth, -1, 0, 0, packedLight);
+                this.vert(model, normal, buf, x1, y0, bup, bv1, depth, -1, 0, 0, packedLight);
+                this.vert(model, normal, buf, x1, y0, bu0, bv1, -depth, -1, 0, 0, packedLight);
+                this.vert(model, normal, buf, x1, y1, bu0, bv0, -depth, -1, 0, 0, packedLight);
+                this.vert(model, normal, buf, x0, y1, bup, bv0, -depth, 1, 0, 0, packedLight);
+                this.vert(model, normal, buf, x0, y0, bup, bv1, -depth, 1, 0, 0, packedLight);
+                this.vert(model, normal, buf, x0, y0, bu0, bv1, depth, 1, 0, 0, packedLight);
+                this.vert(model, normal, buf, x0, y1, bu0, bv0, depth, 1, 0, 0, packedLight);
+            }
+        }
+
+    }
+
+    private void vert(final Matrix4f stack, final Matrix3f normal, final IVertexBuilder buf, final float x, final float y, final float u, final float v, final float z, final int nx, final int ny, final int nz, final int packedLight) {
+        buf.pos(stack, x, y, z).color(0xFF, 0xFF, 0xFF, 0xFF).tex(u, v).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLight).normal(normal, nx, ny, nz).endVertex();
+    }
+
     @Override
     public ResourceLocation getEntityTexture(final SupplyCartEntity entity) {
         return TEXTURE;
@@ -156,6 +254,7 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
 
     private enum Contents {
         FLOWERS(s -> s.getItem() instanceof BlockItem && s.getItem().isIn(ItemTags.FLOWERS), SupplyCartRenderer::renderFlowers),
+        PAINTINGS(s -> s.getItem() == Items.PAINTING, SupplyCartRenderer::renderPaintings),
         WHEEL(s -> AstikorCarts.Items.WHEEL.test(s.getItem()), SupplyCartRenderer::renderWheel),
         SUPPLIES(s -> true, SupplyCartRenderer::renderSupplies);
 
