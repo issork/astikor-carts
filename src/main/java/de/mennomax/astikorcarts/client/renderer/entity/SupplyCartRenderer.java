@@ -12,16 +12,17 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.PaintingSpriteUploader;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.PaintingType;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.*;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.tags.ItemTags;
@@ -110,8 +111,6 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
     }
 
     private void renderPaintings(final SupplyCartEntity entity, final MatrixStack stack, final IRenderTypeBuffer source, final int packedLight, final NonNullList<ItemStack> cargo) {
-        stack.translate(0.0D, -2.5D / 16.0D, 0.0D);
-        stack.rotate(Vector3f.XP.rotationDegrees(-90.0F));
         final IVertexBuilder buf = source.getBuffer(RenderType.getEntitySolid(Minecraft.getInstance().getPaintingSpriteUploader().getBackSprite().getAtlasTexture().getTextureLocation()));
         final ObjectList<PaintingType> types = StreamSupport.stream(ForgeRegistries.PAINTING_TYPES.spliterator(), false)
             .filter(t -> t.getWidth() == 16 && t.getHeight() == 16)
@@ -123,6 +122,8 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
             if (itemStack.isEmpty()) continue;
             count++;
         }
+        stack.translate(0.0D, -2.5D / 16.0D, 0.0D);
+        stack.rotate(Vector3f.XP.rotationDegrees(-90.0F));
         for (int i = 0, n = 0; i < cargo.size(); i++) {
             final ItemStack itemStack = cargo.get(i);
             if (itemStack.isEmpty()) continue;
@@ -134,6 +135,8 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
             stack.pop();
         }
     }
+
+    private final BipedModel<LivingEntity> leggings = new BipedModel<>(0.5F), armor = new BipedModel<>(1.0F);
 
     private void renderSupplies(final SupplyCartEntity entity, final MatrixStack stack, final IRenderTypeBuffer source, final int packedLight, final NonNullList<ItemStack> cargo) {
         final ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
@@ -166,20 +169,92 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
             } else {
                 rng.setSeed(32L * i + Objects.hashCode(itemStack.getItem().getRegistryName()));
                 stack.translate(x, -0.15D + ((ix + iz) % 2 == 0 ? 0.0D : 1.0e-4D), z);
-                stack.scale(0.7F, 0.7F, 0.7F);
-                stack.rotate(Vector3f.YP.rotation(rng.nextFloat() * (float) Math.PI));
-                stack.rotate(Vector3f.XP.rotationDegrees(-90.0F));
-                final int copies = Math.min(itemStack.getCount(), (itemStack.getCount() - 1) / 16 + 2);
-                renderer.renderItem(itemStack, ItemCameraTransforms.TransformType.FIXED, false, stack, source, packedLight, OverlayTexture.NO_OVERLAY, model);
-                for (int n = 1; n < copies; n++) {
-                    stack.push();
-                    stack.rotate(Vector3f.ZP.rotation(rng.nextFloat() * (float) Math.PI));
-                    stack.translate((rng.nextFloat() * 2.0F - 1.0F) * 0.05F, (rng.nextFloat() * 2.0F - 1.0F) * 0.05F, -0.1D * n);
+                if (ArmorItem.class.equals(itemStack.getItem().getClass())) {
+                    this.renderArmor(stack, source, packedLight, itemStack, ix);
+                } else {
+                    stack.scale(0.7F, 0.7F, 0.7F);
+                    stack.rotate(Vector3f.YP.rotation(rng.nextFloat() * (float) Math.PI));
+                    stack.rotate(Vector3f.XP.rotationDegrees(-90.0F));
+                    final int copies = Math.min(itemStack.getCount(), (itemStack.getCount() - 1) / 16 + 2);
                     renderer.renderItem(itemStack, ItemCameraTransforms.TransformType.FIXED, false, stack, source, packedLight, OverlayTexture.NO_OVERLAY, model);
-                    stack.pop();
+                    for (int n = 1; n < copies; n++) {
+                        stack.push();
+                        stack.rotate(Vector3f.ZP.rotation(rng.nextFloat() * (float) Math.PI));
+                        stack.translate((rng.nextFloat() * 2.0F - 1.0F) * 0.05F, (rng.nextFloat() * 2.0F - 1.0F) * 0.05F, -0.1D * n);
+                        renderer.renderItem(itemStack, ItemCameraTransforms.TransformType.FIXED, false, stack, source, packedLight, OverlayTexture.NO_OVERLAY, model);
+                        stack.pop();
+                    }
                 }
             }
             stack.pop();
+        }
+    }
+
+    private void renderArmor(final MatrixStack stack, final IRenderTypeBuffer source, final int packedLight, final ItemStack itemStack, final int ix) {
+        final Item item = itemStack.getItem();
+        if (!(item instanceof ArmorItem)) return;
+        final ArmorItem armor = (ArmorItem) item;
+        final EquipmentSlotType slot = armor.getEquipmentSlot();
+        final BipedModel<LivingEntity> m = slot == EquipmentSlotType.LEGS ? this.leggings : this.armor;
+        stack.rotate(Vector3f.YP.rotation(ix == 0 ? (float) Math.PI * 0.5F : (float) -Math.PI * 0.5F));
+        m.setVisible(false);
+        m.isSneak = false;
+        m.isSitting = false;
+        m.isChild = false;
+        switch (slot) {
+            case HEAD:
+                stack.translate(0.0D, 0.1D, 0.0D);
+                m.bipedHead.rotateAngleX = 0.2F;
+                m.bipedHeadwear.copyModelAngles(m.bipedHead);
+                m.bipedHead.showModel = true;
+                m.bipedHeadwear.showModel = true;
+                break;
+            case CHEST:
+                stack.translate(0.0D, -0.4D, -0.15D);
+                m.bipedLeftArm.rotateAngleX = -0.15F;
+                m.bipedRightArm.rotateAngleX = -0.15F;
+                m.bipedBody.rotateAngleX = 0.9F;
+                m.bipedBody.showModel = true;
+                m.bipedRightArm.showModel = true;
+                m.bipedLeftArm.showModel = true;
+                break;
+            case LEGS:
+                stack.translate(0.0D, -0.7D, -0.15D);
+                m.bipedBody.rotateAngleX = 0.0F;
+                m.bipedRightLeg.rotateAngleX = 1.2F;
+                m.bipedLeftLeg.rotateAngleX = 1.2F;
+                m.bipedRightLeg.rotateAngleY = -0.3F;
+                m.bipedLeftLeg.rotateAngleY = 0.3F;
+                m.bipedBody.showModel = true;
+                m.bipedRightLeg.showModel = true;
+                m.bipedLeftLeg.showModel = true;
+                break;
+            case FEET:
+                stack.translate(0.0D, -1.15D, -0.1D);
+                m.bipedRightLeg.rotateAngleX = 0.0F;
+                m.bipedLeftLeg.rotateAngleX = 0.0F;
+                m.bipedRightLeg.rotateAngleY = -0.1F;
+                m.bipedLeftLeg.rotateAngleY = 0.0F;
+                m.bipedRightLeg.showModel = true;
+                m.bipedLeftLeg.showModel = true;
+                break;
+        }
+        stack.scale(0.75F, 0.75F, 0.75F);
+        final IVertexBuilder armorBuf = ItemRenderer.getArmorVertexBuilder(source, RenderType.getArmorCutoutNoCull(new ResourceLocation(
+                String.format("textures/models/armor/%s_layer_%d.png", armor.getArmorMaterial().getName(), slot == EquipmentSlotType.LEGS ? 2 : 1)
+            )), false, itemStack.hasEffect());
+        if (armor instanceof IDyeableArmorItem) {
+            final int rgb = ((IDyeableArmorItem) armor).getColor(itemStack);
+            final float r = (float) (rgb >> 16 & 255) / 255.0F;
+            final float g = (float) (rgb >> 8 & 255) / 255.0F;
+            final float b = (float) (rgb & 255) / 255.0F;
+            m.render(stack, armorBuf, packedLight, OverlayTexture.NO_OVERLAY, r, g, b, 1.0F);
+            final IVertexBuilder overlayBuf = ItemRenderer.getArmorVertexBuilder(source, RenderType.getArmorCutoutNoCull(new ResourceLocation(
+                    String.format("textures/models/armor/%s_layer_%d_overlay.png", armor.getArmorMaterial().getName(), slot == EquipmentSlotType.LEGS ? 2 : 1)
+                )), false, itemStack.hasEffect());
+            m.render(stack, overlayBuf, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+        } else {
+            m.render(stack, armorBuf, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
         }
     }
 
