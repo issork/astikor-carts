@@ -86,22 +86,26 @@ public final class PlowEntity extends AbstractDrawnInventoryEntity {
             }
             if (this.dataManager.get(PLOWING) && player != null) {
                 if (this.prevPosX != this.getPosX() || this.prevPosZ != this.getPosZ()) {
-                    for (int i = 0; i < SLOT_COUNT; i++) {
-                        final ItemStack stack = this.getStackInSlot(i);
-                        if (!stack.isEmpty()) {
-                            final float offset = 38.0F - i * 38.0F;
-                            final double blockPosX = this.getPosX() + MathHelper.sin((float) Math.toRadians(this.rotationYaw - offset)) * BLADEOFFSET;
-                            final double blockPosZ = this.getPosZ() - MathHelper.cos((float) Math.toRadians(this.rotationYaw - offset)) * BLADEOFFSET;
-                            final BlockPos blockPos = new BlockPos(blockPosX, this.getPosY() - 0.5D, blockPosZ);
-                            final boolean damageable = stack.isDamageable();
-                            final int count = stack.getCount();
-                            stack.getItem().onItemUse(new ProxyItemUseContext(player, stack, new BlockRayTraceResult(Vector3d.ZERO, Direction.UP, blockPos, false)));
-                            if (damageable && stack.getCount() < count) {
-                                this.playSound(SoundEvents.ENTITY_ITEM_BREAK, 0.8F, 0.8F + this.world.rand.nextFloat() * 0.4F);
-                                this.updateSlot(i);
-                            }
-                        }
-                    }
+                    this.plow(player);
+                }
+            }
+        }
+    }
+
+    private void plow(final PlayerEntity player) {
+        for (int i = 0; i < SLOT_COUNT; i++) {
+            final ItemStack stack = this.getStackInSlot(i);
+            if (!stack.isEmpty()) {
+                final float offset = 38.0F - i * 38.0F;
+                final double blockPosX = this.getPosX() + MathHelper.sin((float) Math.toRadians(this.rotationYaw - offset)) * BLADEOFFSET;
+                final double blockPosZ = this.getPosZ() - MathHelper.cos((float) Math.toRadians(this.rotationYaw - offset)) * BLADEOFFSET;
+                final BlockPos blockPos = new BlockPos(blockPosX, this.getPosY() - 0.5D, blockPosZ);
+                final boolean damageable = stack.isDamageable();
+                final int count = stack.getCount();
+                stack.getItem().onItemUse(new ProxyItemUseContext(player, stack, new BlockRayTraceResult(Vector3d.ZERO, Direction.UP, blockPos, false)));
+                if (damageable && stack.getCount() < count) {
+                    this.playSound(SoundEvents.ENTITY_ITEM_BREAK, 0.8F, 0.8F + this.world.rand.nextFloat() * 0.4F);
+                    this.updateSlot(i);
                 }
             }
         }
