@@ -13,6 +13,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.SimpleNamedContainerProvider;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ToolItem;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -95,7 +96,7 @@ public final class PlowEntity extends AbstractDrawnInventoryEntity {
     private void plow(final PlayerEntity player) {
         for (int i = 0; i < SLOT_COUNT; i++) {
             final ItemStack stack = this.getStackInSlot(i);
-            if (!stack.isEmpty()) {
+            if (stack.getItem() instanceof ToolItem) {
                 final float offset = 38.0F - i * 38.0F;
                 final double blockPosX = this.getPosX() + MathHelper.sin((float) Math.toRadians(this.rotationYaw - offset)) * BLADEOFFSET;
                 final double blockPosZ = this.getPosZ() - MathHelper.cos((float) Math.toRadians(this.rotationYaw - offset)) * BLADEOFFSET;
