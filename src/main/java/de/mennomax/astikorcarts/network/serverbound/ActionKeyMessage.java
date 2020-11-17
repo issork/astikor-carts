@@ -25,7 +25,8 @@ public final class ActionKeyMessage implements Message {
 
     public static void handle(final ActionKeyMessage msg, final ServerMessageContext ctx) {
         final ServerPlayerEntity player = ctx.getPlayer();
-        final Entity pulling = player.isPassenger() ? Objects.requireNonNull(player.getRidingEntity()) : player;
+        final Entity pulling = player.getRidingEntity();
+        if (pulling == null) return;
         final World world = player.world;
         AstikorWorld.get(world).map(w -> w.getDrawn(pulling)).orElse(Optional.empty())
             .map(c -> Optional.of(Pair.of(c, (Entity) null)))
