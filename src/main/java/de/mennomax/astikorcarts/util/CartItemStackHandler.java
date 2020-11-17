@@ -1,6 +1,7 @@
 package de.mennomax.astikorcarts.util;
 
 import de.mennomax.astikorcarts.entity.AbstractDrawnEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.items.ItemStackHandler;
 
 public class CartItemStackHandler<T extends AbstractDrawnEntity> extends ItemStackHandler {
@@ -9,5 +10,11 @@ public class CartItemStackHandler<T extends AbstractDrawnEntity> extends ItemSta
     public CartItemStackHandler(final int slots, final T cart) {
         super(slots);
         this.cart = cart;
+    }
+
+    @Override
+    public void deserializeNBT(final CompoundNBT nbt) {
+        nbt.remove("Size");
+        super.deserializeNBT(nbt);
     }
 }
