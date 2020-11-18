@@ -30,8 +30,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraftforge.items.ItemStackHandler;
 
-import java.util.ArrayList;
-
 public final class PlowEntity extends AbstractDrawnInventoryEntity {
     private static final int SLOT_COUNT = 3;
     private static final double BLADEOFFSET = 1.7D;
@@ -47,8 +45,8 @@ public final class PlowEntity extends AbstractDrawnInventoryEntity {
     }
 
     @Override
-    protected ArrayList<String> getAllowedEntityList() {
-        return AstikorCartsConfig.COMMON.plowPullable.get();
+    protected AstikorCartsConfig.CartConfig getConfig() {
+        return AstikorCartsConfig.COMMON.plow;
     }
 
     @Override

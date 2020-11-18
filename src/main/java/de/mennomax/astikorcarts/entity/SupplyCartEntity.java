@@ -37,7 +37,6 @@ import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.ItemStackHandler;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -54,8 +53,8 @@ public final class SupplyCartEntity extends AbstractDrawnInventoryEntity {
     }
 
     @Override
-    protected ArrayList<String> getAllowedEntityList() {
-        return AstikorCartsConfig.COMMON.cargoPullable.get();
+    protected AstikorCartsConfig.CartConfig getConfig() {
+        return AstikorCartsConfig.COMMON.supplyCart;
     }
 
     @Override

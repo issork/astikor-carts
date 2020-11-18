@@ -7,6 +7,8 @@ import de.mennomax.astikorcarts.util.CartWheel;
 import de.mennomax.astikorcarts.world.AstikorWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.IEquipable;
+import net.minecraft.entity.IRideable;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.MoverType;
@@ -58,8 +60,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     private static final DataParameter<Integer> TIME_SINCE_HIT = EntityDataManager.createKey(AbstractDrawnEntity.class, DataSerializers.VARINT);
     private static final DataParameter<Integer> FORWARD_DIRECTION = EntityDataManager.createKey(AbstractDrawnEntity.class, DataSerializers.VARINT);
     private static final DataParameter<Float> DAMAGE_TAKEN = EntityDataManager.createKey(AbstractDrawnEntity.class, DataSerializers.FLOAT);
-    public static final UUID PULL_SLOWLY_MODIFIER_UUID = UUID.fromString("49B0E52E-48F2-4D89-BED7-4F5DF26F1263");
-    public static final AttributeModifier PULL_SLOWLY_MODIFIER = (new AttributeModifier(PULL_SLOWLY_MODIFIER_UUID, "Pull slowly modifier", AstikorCartsConfig.COMMON.speedModifier.get(), AttributeModifier.Operation.MULTIPLY_TOTAL));
+    private static final UUID PULL_SLOWLY_MODIFIER_UUID = UUID.fromString("49B0E52E-48F2-4D89-BED7-4F5DF26F1263");
     private int lerpSteps;
     private double lerpX;
     private double lerpY;
@@ -217,7 +218,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
                 if (entityIn == null) {
                     if (this.pulling instanceof LivingEntity) {
                         final ModifiableAttributeInstance attr = ((LivingEntity) this.pulling).getAttribute(Attributes.MOVEMENT_SPEED);
-                        if (attr != null) attr.removeModifier(PULL_SLOWLY_MODIFIER);
+                        if (attr != null) attr.removeModifier(PULL_SLOWLY_MODIFIER_UUID);
                     } else if (this.pulling instanceof AbstractDrawnEntity) {
                         ((AbstractDrawnEntity) this.pulling).drawn = null;
                     }
@@ -372,14 +373,21 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         if (entityIn == null) {
             return true;
         }
-        return (this.pulling == null || !this.pulling.isAlive()) && !this.isPassenger(entityIn) && this.isInPullList(entityIn.getType().getRegistryName().toString());
+        return (this.pulling == null || !this.pulling.isAlive()) && !this.isPassenger(entityIn) && this.canPull(entityIn);
     }
 
-    protected boolean isInPullList(final String entityId) {
-        return this.getAllowedEntityList().contains(entityId);
+    private boolean canPull(final Entity entity) {
+        final String id = entity.getEntityString();
+        if (id == null) return false;
+        final ArrayList<String> allowed = this.getConfig().pullAnimals.get();
+        if (allowed.isEmpty()) {
+            // real semantics = can wear saddle and not steered by item
+            return entity instanceof IEquipable && ((IEquipable) entity).func_230264_L__() && !(entity instanceof IRideable);
+        }
+        return allowed.contains(id);
     }
 
-    protected abstract ArrayList<String> getAllowedEntityList();
+    protected abstract AstikorCartsConfig.CartConfig getConfig();
 
     @Override
     public boolean attackEntityFrom(final DamageSource source, final float amount) {
@@ -595,6 +603,24 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
 
     public RenderInfo getInfo(final float delta) {
         return new RenderInfo(delta);
+    }
+
+    public void toggleSlow() {
+        final Entity pulling = this.pulling;
+        if (!(pulling instanceof LivingEntity)) return;
+        final ModifiableAttributeInstance speed = ((LivingEntity) pulling).getAttribute(Attributes.MOVEMENT_SPEED);
+        if (speed == null) return;
+        final AttributeModifier modifier = speed.getModifier(PULL_SLOWLY_MODIFIER_UUID);
+        if (modifier == null) {
+            speed.applyNonPersistentModifier(new AttributeModifier(
+                PULL_SLOWLY_MODIFIER_UUID,
+                "Pull slowly modifier",
+                this.getConfig().slowSpeed.get(),
+                AttributeModifier.Operation.MULTIPLY_TOTAL
+            ));
+        } else {
+            speed.removeModifier(modifier);
+        }
     }
 
     public class RenderInfo {

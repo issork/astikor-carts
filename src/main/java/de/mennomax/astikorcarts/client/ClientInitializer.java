@@ -57,7 +57,7 @@ public final class ClientInitializer extends CommonInitializer {
             final Minecraft mc = Minecraft.getInstance();
             final PlayerEntity player = mc.player;
             if (player != null) {
-                if (ToggleSlowMessage.getPulling(player) != null) {
+                if (ToggleSlowMessage.getCart(player).isPresent()) {
                     final KeyBinding binding = mc.gameSettings.keyBindSprint;
                     while (binding.isPressed()) {
                         AstikorCarts.CHANNEL.sendToServer(new ToggleSlowMessage());

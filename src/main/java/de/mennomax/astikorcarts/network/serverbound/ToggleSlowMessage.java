@@ -5,11 +5,10 @@ import de.mennomax.astikorcarts.network.Message;
 import de.mennomax.astikorcarts.network.ServerMessageContext;
 import de.mennomax.astikorcarts.world.AstikorWorld;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
+
+import java.util.Optional;
 
 public final class ToggleSlowMessage implements Message {
     @Override
@@ -21,30 +20,13 @@ public final class ToggleSlowMessage implements Message {
     }
 
     public static void handle(final ToggleSlowMessage msg, final ServerMessageContext ctx) {
-        final Entity pulling = getPulling(ctx.getPlayer());
-        if (pulling instanceof LivingEntity) {
-            final ModifiableAttributeInstance attr = ((LivingEntity) pulling).getAttribute(Attributes.MOVEMENT_SPEED);
-            if (attr != null) {
-                if (attr.hasModifier(AbstractDrawnEntity.PULL_SLOWLY_MODIFIER)) {
-                    attr.removeModifier(AbstractDrawnEntity.PULL_SLOWLY_MODIFIER);
-                } else {
-                    attr.applyNonPersistentModifier(AbstractDrawnEntity.PULL_SLOWLY_MODIFIER);
-                }
-            }
-        }
+        getCart(ctx.getPlayer()).ifPresent(AbstractDrawnEntity::toggleSlow);
     }
 
-    public static Entity getPulling(final PlayerEntity player) {
+    public static Optional<AbstractDrawnEntity> getCart(final PlayerEntity player) {
         final Entity ridden = player.getRidingEntity();
-        if (ridden == null) {
-            return null;
-        }
-        if (ridden instanceof AbstractDrawnEntity) {
-            return ((AbstractDrawnEntity) ridden).getPulling();
-        }
-        if (AstikorWorld.stream(ridden.world).allMatch(w -> w.isPulling(ridden))) {
-            return ridden;
-        }
-        return null;
+        if (ridden == null) return Optional.empty();
+        if (ridden instanceof AbstractDrawnEntity) return Optional.of((AbstractDrawnEntity) ridden);
+        return AstikorWorld.get(ridden.world).resolve().flatMap(w -> w.getDrawn(ridden));
     }
 }

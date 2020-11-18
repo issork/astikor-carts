@@ -15,16 +15,14 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
-
 public final class AnimalCartEntity extends AbstractDrawnEntity {
     public AnimalCartEntity(final EntityType<? extends Entity> entityTypeIn, final World worldIn) {
         super(entityTypeIn, worldIn);
     }
 
     @Override
-    protected ArrayList<String> getAllowedEntityList() {
-        return AstikorCartsConfig.COMMON.mobPullable.get();
+    protected AstikorCartsConfig.CartConfig getConfig() {
+        return AstikorCartsConfig.COMMON.animalCart;
     }
 
     @Override

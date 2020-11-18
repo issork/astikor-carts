@@ -1,7 +1,6 @@
 package de.mennomax.astikorcarts.config;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -19,39 +18,33 @@ public final class AstikorCartsConfig {
     }
 
     public static class Common {
-        public final ForgeConfigSpec.DoubleValue speedModifier;
-        public final ForgeConfigSpec.ConfigValue<ArrayList<String>> cargoPullable;
-        public final ForgeConfigSpec.ConfigValue<ArrayList<String>> plowPullable;
-        public final ForgeConfigSpec.ConfigValue<ArrayList<String>> mobPullable;
+        public final CartConfig supplyCart;
+        public final CartConfig plow;
+        public final CartConfig animalCart;
 
         Common(final ForgeConfigSpec.Builder builder) {
-            builder.push("common");
+            builder.push("carts");
+            this.supplyCart = new CartConfig(builder, "supply_cart");
+            this.plow = new CartConfig(builder, "plow");
+            this.animalCart = new CartConfig(builder, "animal_cart");
+            builder.pop();
+        }
+    }
 
-            this.speedModifier = builder.comment("Speed modifier for when the sprint key is pressed while riding a living entity")
-                .worldRestart()
-                .defineInRange("speedModifier", -0.65, -1.0, 0.0);
+    public static class CartConfig {
+        public final ForgeConfigSpec.ConfigValue<ArrayList<String>> pullAnimals;
+        public final ForgeConfigSpec.DoubleValue slowSpeed;
 
-            this.cargoPullable = builder.comment("List of entities that are allowed to pull this cart.")
-                .define("cargoCart.pullEntities", new ArrayList<String>(Arrays.asList(
-                    "minecraft:horse",
-                    "minecraft:donkey",
-                    "minecraft:mule",
-                    "minecraft:pig")));
-
-            this.plowPullable = builder.comment("List of entities that are allowed to pull this cart.")
-                .define("plowCart.pullEntities", new ArrayList<String>(Arrays.asList(
-                    "minecraft:horse",
-                    "minecraft:donkey",
-                    "minecraft:mule",
-                    "minecraft:pig")));
-
-            this.mobPullable = builder.comment("List of entities that are allowed to pull this cart.")
-                .define("mobCart.pullEntities", new ArrayList<String>(Arrays.asList(
-                    "minecraft:horse",
-                    "minecraft:donkey",
-                    "minecraft:mule",
-                    "minecraft:pig")));
-
+        CartConfig(final ForgeConfigSpec.Builder builder, final String name) {
+            builder.push(name);
+            this.pullAnimals = builder
+                .comment(
+                    "Animals that are able to pull this cart, such as [\"minecraft:horse\"]\n" +
+                    "An empty list defaults to all which may wear a saddle but not steered by an item"
+                )
+                .define("pull_animals", new ArrayList<>());
+            this.slowSpeed = builder.comment("Pull speed modifier activated by sprint key while riding")
+                .defineInRange("slow_speed", -0.65D, -1.0D, 0.0D);
             builder.pop();
         }
     }
