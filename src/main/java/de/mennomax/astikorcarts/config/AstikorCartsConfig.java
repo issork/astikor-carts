@@ -19,14 +19,14 @@ public final class AstikorCartsConfig {
 
     public static class Common {
         public final CartConfig supplyCart;
-        public final CartConfig plow;
         public final CartConfig animalCart;
+        public final CartConfig plow;
 
         Common(final ForgeConfigSpec.Builder builder) {
-            builder.push("carts");
-            this.supplyCart = new CartConfig(builder, "supply_cart");
-            this.plow = new CartConfig(builder, "plow");
-            this.animalCart = new CartConfig(builder, "animal_cart");
+            builder.comment("Configuration for all carts and cart-like vehicles").push("carts");
+            this.supplyCart = new CartConfig(builder, "supply_cart", "The Supply Cart, a type of cart that stores items");
+            this.animalCart = new CartConfig(builder, "animal_cart", "The Animal Cart, a type of cart to haul other animals");
+            this.plow = new CartConfig(builder, "plow", "The Plow, an animal pulled machine for tilling soil and creating paths");
             builder.pop();
         }
     }
@@ -35,8 +35,8 @@ public final class AstikorCartsConfig {
         public final ForgeConfigSpec.ConfigValue<ArrayList<String>> pullAnimals;
         public final ForgeConfigSpec.DoubleValue slowSpeed;
 
-        CartConfig(final ForgeConfigSpec.Builder builder, final String name) {
-            builder.push(name);
+        CartConfig(final ForgeConfigSpec.Builder builder, final String name, final String description) {
+            builder.comment(description).push(name);
             this.pullAnimals = builder
                 .comment(
                     "Animals that are able to pull this cart, such as [\"minecraft:horse\"]\n" +
