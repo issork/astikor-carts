@@ -10,7 +10,11 @@ import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.ObjectLists;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.BlockModelRenderer;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.model.IBakedModel;
@@ -22,7 +26,13 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.PaintingType;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.*;
+import net.minecraft.item.ArmorItem;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.DyeableArmorItem;
+import net.minecraft.item.IDyeableArmorItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.tags.ItemTags;
@@ -169,7 +179,7 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
             } else {
                 rng.setSeed(32L * i + Objects.hashCode(itemStack.getItem().getRegistryName()));
                 stack.translate(x, -0.15D + ((ix + iz) % 2 == 0 ? 0.0D : 1.0e-4D), z);
-                if (ArmorItem.class.equals(itemStack.getItem().getClass())) {
+                if (ArmorItem.class.equals(itemStack.getItem().getClass()) || DyeableArmorItem.class.equals(itemStack.getItem().getClass())) {
                     this.renderArmor(stack, source, packedLight, itemStack, ix);
                 } else {
                     stack.scale(0.7F, 0.7F, 0.7F);
@@ -240,18 +250,29 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
                 break;
         }
         stack.scale(0.75F, 0.75F, 0.75F);
-        final IVertexBuilder armorBuf = ItemRenderer.getArmorVertexBuilder(source, RenderType.getArmorCutoutNoCull(new ResourceLocation(
-                String.format("textures/models/armor/%s_layer_%d.png", armor.getArmorMaterial().getName(), slot == EquipmentSlotType.LEGS ? 2 : 1)
-            )), false, itemStack.hasEffect());
+        final ResourceLocation tex = new ResourceLocation(armor.getArmorMaterial().getName());
+        final IVertexBuilder armorBuf = ItemRenderer.getArmorVertexBuilder(source,
+            RenderType.getArmorCutoutNoCull(new ResourceLocation(
+                tex.getNamespace(),
+                String.format("textures/models/armor/%s_layer_%d.png", tex.getPath(), slot == EquipmentSlotType.LEGS ? 2 : 1)
+            )),
+            false,
+            itemStack.hasEffect()
+        );
         if (armor instanceof IDyeableArmorItem) {
             final int rgb = ((IDyeableArmorItem) armor).getColor(itemStack);
             final float r = (float) (rgb >> 16 & 255) / 255.0F;
             final float g = (float) (rgb >> 8 & 255) / 255.0F;
             final float b = (float) (rgb & 255) / 255.0F;
             m.render(stack, armorBuf, packedLight, OverlayTexture.NO_OVERLAY, r, g, b, 1.0F);
-            final IVertexBuilder overlayBuf = ItemRenderer.getArmorVertexBuilder(source, RenderType.getArmorCutoutNoCull(new ResourceLocation(
-                    String.format("textures/models/armor/%s_layer_%d_overlay.png", armor.getArmorMaterial().getName(), slot == EquipmentSlotType.LEGS ? 2 : 1)
-                )), false, itemStack.hasEffect());
+            final IVertexBuilder overlayBuf = ItemRenderer.getArmorVertexBuilder(source,
+                RenderType.getArmorCutoutNoCull(new ResourceLocation(
+                    tex.getNamespace(),
+                    String.format("textures/models/armor/%s_layer_%d_overlay.png", tex.getPath(), slot == EquipmentSlotType.LEGS ? 2 : 1)
+                )),
+                false,
+                itemStack.hasEffect()
+            );
             m.render(stack, overlayBuf, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
         } else {
             m.render(stack, armorBuf, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
@@ -315,7 +336,6 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
                 this.vert(model, normal, buf, x0, y1, bu0, bv0, depth, 1, 0, 0, packedLight);
             }
         }
-
     }
 
     private void vert(final Matrix4f stack, final Matrix3f normal, final IVertexBuilder buf, final float x, final float y, final float u, final float v, final float z, final int nx, final int ny, final int nz, final int packedLight) {
