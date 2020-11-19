@@ -11,7 +11,6 @@ import de.mennomax.astikorcarts.network.NetBuilder;
 import de.mennomax.astikorcarts.network.serverbound.ActionKeyMessage;
 import de.mennomax.astikorcarts.network.serverbound.OpenSupplyCartMessage;
 import de.mennomax.astikorcarts.network.serverbound.ToggleSlowMessage;
-import de.mennomax.astikorcarts.network.clientbound.CartingJukeboxMessage;
 import de.mennomax.astikorcarts.network.clientbound.UpdateDrawnMessage;
 import de.mennomax.astikorcarts.server.ServerInitializer;
 import de.mennomax.astikorcarts.util.DefRegister;
@@ -46,7 +45,6 @@ public final class AstikorCarts {
         .serverbound(ActionKeyMessage::new).consumer(() -> ActionKeyMessage::handle)
         .serverbound(ToggleSlowMessage::new).consumer(() -> ToggleSlowMessage::handle)
         .clientbound(UpdateDrawnMessage::new).consumer(() -> new UpdateDrawnMessage.Handler())
-        .clientbound(CartingJukeboxMessage::new).consumer(() -> new CartingJukeboxMessage.Handler())
         .serverbound(OpenSupplyCartMessage::new).consumer(() -> OpenSupplyCartMessage::handle)
         .build();
 
