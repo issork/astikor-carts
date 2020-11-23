@@ -56,11 +56,11 @@ public class CommonInitializer implements Initializer {
         mod.bus().<AttachCapabilitiesEvent<World>, World>addGenericListener(World.class, e ->
             e.addCapability(new ResourceLocation(AstikorCarts.ID, "astikor"), AstikorWorld.createProvider(SimpleAstikorWorld::new))
         );
-        mod.bus().register(GoalAdder.mobGoal(MobEntity.class)
+        GoalAdder.mobGoal(MobEntity.class)
             .add(1, PullCartGoal::new)
             .add(1, RideCartGoal::new)
             .build()
-        );
+            .register(mod.bus());
         mod.bus().<PlayerInteractEvent.EntityInteract>addListener(e -> {
             final Entity rider = e.getTarget().getControllingPassenger();
             if (rider instanceof PostilionEntity) {

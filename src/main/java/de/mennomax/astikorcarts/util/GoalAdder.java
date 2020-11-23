@@ -9,7 +9,7 @@ import net.minecraft.entity.ai.goal.PrioritizedGoal;
 import net.minecraft.entity.ai.goal.TriggerSkeletonTrapGoal;
 import net.minecraft.entity.passive.horse.SkeletonHorseEntity;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 import java.lang.reflect.Field;
@@ -47,8 +47,11 @@ public final class GoalAdder<T extends Entity> {
         this.goals = builder.goals.build();
     }
 
-    @SubscribeEvent
-    public void onEntityJoinWorld(final EntityJoinWorldEvent event) {
+    public void register(final IEventBus bus) {
+        bus.addListener(this::onEntityJoinWorld);
+    }
+
+    private void onEntityJoinWorld(final EntityJoinWorldEvent event) {
         final Entity entity = event.getEntity();
         if (!entity.world.isRemote && this.type.isInstance(entity)) {
             final Set<PrioritizedGoal> oldGoals = this.getGoals(this.type.cast(entity));

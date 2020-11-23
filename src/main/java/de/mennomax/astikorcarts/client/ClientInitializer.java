@@ -38,7 +38,7 @@ public final class ClientInitializer extends CommonInitializer {
     @Override
     public void init(final Context mod) {
         super.init(mod);
-        mod.bus().register(new OregonSubscriber());
+        new OregonSubscriber().register(mod.bus());
         mod.bus().<TickEvent.ClientTickEvent>addListener(e -> {
             if (e.phase == TickEvent.Phase.END) {
                 final Minecraft mc = Minecraft.getInstance();

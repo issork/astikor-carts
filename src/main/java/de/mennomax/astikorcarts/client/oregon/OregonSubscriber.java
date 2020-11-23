@@ -14,10 +14,9 @@ import net.minecraft.client.gui.widget.list.AbstractList;
 import net.minecraft.stats.Stat;
 import net.minecraft.util.Util;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.GuiScreenEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,8 +34,11 @@ public final class OregonSubscriber {
 
     private State state = new IdleState();
 
-    @SubscribeEvent
-    public void onScreenKeyPressed(final GuiScreenEvent.KeyboardKeyPressedEvent.Pre event) {
+    public void register(final IEventBus bus) {
+        bus.addListener(this::onScreenKeyPressed);
+    }
+
+    private void onScreenKeyPressed(final GuiScreenEvent.KeyboardKeyPressedEvent.Pre event) {
         final Minecraft mc = Minecraft.getInstance();
         final Screen screen = event.getGui();
         if (screen instanceof StatsScreen && (event.getKeyCode() == GLFW.GLFW_KEY_ENTER || event.getKeyCode() == GLFW.GLFW_KEY_KP_ENTER) && mc.player != null) {
