@@ -1,5 +1,6 @@
 package de.mennomax.astikorcarts.network.serverbound;
 
+import com.google.common.base.MoreObjects;
 import com.mojang.datafixers.util.Pair;
 import de.mennomax.astikorcarts.entity.AbstractDrawnEntity;
 import de.mennomax.astikorcarts.network.Message;
@@ -25,8 +26,7 @@ public final class ActionKeyMessage implements Message {
 
     public static void handle(final ActionKeyMessage msg, final ServerMessageContext ctx) {
         final ServerPlayerEntity player = ctx.getPlayer();
-        final Entity pulling = player.getRidingEntity();
-        if (pulling == null) return;
+        final Entity pulling = MoreObjects.firstNonNull(player.getRidingEntity(), player);
         final World world = player.world;
         AstikorWorld.get(world).map(w -> w.getDrawn(pulling)).orElse(Optional.empty())
             .map(c -> Optional.of(Pair.of(c, (Entity) null)))

@@ -294,7 +294,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     }
 
     public boolean shouldStopPulledTick() {
-        if (!this.isAlive() || this.getPulling() == null || !this.getPulling().isAlive()) {
+        if (!this.isAlive() || this.getPulling() == null || !this.getPulling().isAlive() || this.getPulling().isPassenger()) {
             if (this.pulling != null && this.pulling instanceof PlayerEntity) {
                 this.setPulling(null);
             } else {
@@ -377,12 +377,11 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     }
 
     private boolean canPull(final Entity entity) {
-        final String id = entity.getEntityString();
-        if (id == null) return false;
+        final String id = EntityType.getKey(entity.getType()).toString();
         final ArrayList<String> allowed = this.getConfig().pullAnimals.get();
         if (allowed.isEmpty()) {
             // real semantics = can wear saddle and not steered by item
-            return entity instanceof IEquipable && ((IEquipable) entity).func_230264_L__() && !(entity instanceof IRideable);
+            return entity instanceof PlayerEntity || entity instanceof IEquipable && ((IEquipable) entity).func_230264_L__() && !(entity instanceof IRideable);
         }
         return allowed.contains(id);
     }
