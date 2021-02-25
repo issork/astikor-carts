@@ -30,7 +30,7 @@ public final class ActionKeyMessage implements Message {
         final World world = player.world;
         AstikorWorld.get(world).map(w -> w.getDrawn(pulling)).orElse(Optional.empty())
             .map(c -> Optional.of(Pair.of(c, (Entity) null)))
-            .orElseGet(() -> world.getEntitiesWithinAABB(AbstractDrawnEntity.class, player.getBoundingBox().grow(3), entity -> entity != pulling).stream()
+            .orElseGet(() -> world.getEntitiesWithinAABB(AbstractDrawnEntity.class, pulling.getBoundingBox().grow(2.0D), entity -> entity != pulling).stream()
                 .min(Comparator.comparing(pulling::getDistance))
                 .map(c -> Pair.of(c, pulling))
             ).ifPresent(p -> p.getFirst().setPulling(p.getSecond()));

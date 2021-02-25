@@ -70,7 +70,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     protected List<CartWheel> wheels;
     private int pullingId = -1;
     private UUID pullingUUID = null;
-    protected double spacing = 2.4D;
+    protected double spacing = 1.7D;
     public Entity pulling;
     protected AbstractDrawnEntity drawn;
 
@@ -133,12 +133,13 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         }
         final double targetVecLength = targetVec.length();
         final double r = 0.2D;
-        final double diff = targetVecLength - this.spacing;
+        final double relativeSpacing = Math.max(this.spacing + 0.5D * this.pulling.getWidth(), 1.0D);
+        final double diff = targetVecLength - relativeSpacing;
         final Vector3d move;
         if (Math.abs(diff) < r) {
             move = this.getMotion();
         } else {
-            move = this.getMotion().add(targetVec.subtract(targetVec.normalize().scale(this.spacing + r * Math.signum(diff))));
+            move = this.getMotion().add(targetVec.subtract(targetVec.normalize().scale(relativeSpacing + r * Math.signum(diff))));
         }
         this.onGround = true;
         final double startX = this.getPosX();
@@ -155,7 +156,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             }
         } else {
             targetVec = this.getRelativeTargetVec(1.0F);
-            if (targetVec.length() > this.spacing + 1.0D) {
+            if (targetVec.length() > relativeSpacing + 1.0D) {
                 this.setPulling(null);
             }
         }

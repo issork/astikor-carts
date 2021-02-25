@@ -41,7 +41,7 @@ public final class PlowEntity extends AbstractDrawnInventoryEntity {
 
     public PlowEntity(final EntityType<? extends Entity> entityTypeIn, final World worldIn) {
         super(entityTypeIn, worldIn);
-        this.spacing = 2.0D;
+        this.spacing = 1.3D;
     }
 
     @Override
