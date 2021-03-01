@@ -62,6 +62,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     private static final DataParameter<Integer> FORWARD_DIRECTION = EntityDataManager.createKey(AbstractDrawnEntity.class, DataSerializers.VARINT);
     private static final DataParameter<Float> DAMAGE_TAKEN = EntityDataManager.createKey(AbstractDrawnEntity.class, DataSerializers.FLOAT);
     private static final UUID PULL_SLOWLY_MODIFIER_UUID = UUID.fromString("49B0E52E-48F2-4D89-BED7-4F5DF26F1263");
+    private static final UUID PULL_MODIFIER_UUID = UUID.fromString("BA594616-5BE3-46C6-8B40-7D0230C64B77");
     private int lerpSteps;
     private double lerpX;
     private double lerpY;
@@ -220,7 +221,10 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
                 if (entityIn == null) {
                     if (this.pulling instanceof LivingEntity) {
                         final ModifiableAttributeInstance attr = ((LivingEntity) this.pulling).getAttribute(Attributes.MOVEMENT_SPEED);
-                        if (attr != null) attr.removeModifier(PULL_SLOWLY_MODIFIER_UUID);
+                        if (attr != null) {
+                            attr.removeModifier(PULL_SLOWLY_MODIFIER_UUID);
+                            attr.removeModifier(PULL_MODIFIER_UUID);
+                        }
                     } else if (this.pulling instanceof AbstractDrawnEntity) {
                         ((AbstractDrawnEntity) this.pulling).drawn = null;
                     }
@@ -230,6 +234,17 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
                         this.playDetachSound();
                     }
                 } else {
+                    if (entityIn instanceof LivingEntity && this.getConfig().pullSpeed.get() != 0.0D) {
+                        final ModifiableAttributeInstance attr = ((LivingEntity) entityIn).getAttribute(Attributes.MOVEMENT_SPEED);
+                        if (attr != null && attr.getModifier(PULL_MODIFIER_UUID) == null) {
+                            attr.applyNonPersistentModifier(new AttributeModifier(
+                                PULL_MODIFIER_UUID,
+                                "Pull modifier",
+                                this.getConfig().pullSpeed.get(),
+                                AttributeModifier.Operation.MULTIPLY_TOTAL
+                            ));
+                        }
+                    }
                     if (entityIn instanceof MobEntity) {
                         ((MobEntity) entityIn).getNavigator().clearPath();
                     }

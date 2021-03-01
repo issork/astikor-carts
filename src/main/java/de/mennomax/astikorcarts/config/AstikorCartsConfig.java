@@ -120,6 +120,7 @@ public final class AstikorCartsConfig {
     public static class CartConfig {
         public final ForgeConfigSpec.ConfigValue<ArrayList<String>> pullAnimals;
         public final ForgeConfigSpec.DoubleValue slowSpeed;
+        public final ForgeConfigSpec.DoubleValue pullSpeed;
 
         CartConfig(final ForgeConfigSpec.Builder builder, final String name, final String description) {
             builder.comment(description).push(name);
@@ -129,8 +130,10 @@ public final class AstikorCartsConfig {
                     "An empty list defaults to all which may wear a saddle but not steered by an item"
                 )
                 .define("pull_animals", new ArrayList<>());
-            this.slowSpeed = builder.comment("Pull speed modifier activated by sprint key while riding")
+            this.slowSpeed = builder.comment("Slow speed modifier toggled by the sprint key")
                 .defineInRange("slow_speed", -0.65D, -1.0D, 0.0D);
+            this.pullSpeed = builder.comment("Base speed modifier applied to animals (-0.5 = half normal speed)")
+                .defineInRange("pull_speed", 0.0D, -1.0D, 0.0D);
             builder.pop();
         }
     }
