@@ -17,6 +17,7 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -378,13 +379,16 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     }
 
     private boolean canPull(final Entity entity) {
-        final String id = EntityType.getKey(entity.getType()).toString();
+        // saddleable
+        if (entity instanceof IEquipable && !((IEquipable) entity).func_230264_L__()) return false;
+        if (entity instanceof TameableEntity && !((TameableEntity) entity).isTamed()) return false;
         final ArrayList<String> allowed = this.getConfig().pullAnimals.get();
         if (allowed.isEmpty()) {
-            // real semantics = can wear saddle and not steered by item
-            return entity instanceof PlayerEntity || entity instanceof IEquipable && ((IEquipable) entity).func_230264_L__() && !(entity instanceof IRideable);
+            return entity instanceof PlayerEntity ||
+                // real semantics = can wear saddle and not steered by item
+                entity instanceof IEquipable && !(entity instanceof IRideable);
         }
-        return allowed.contains(id);
+        return allowed.contains(EntityType.getKey(entity.getType()).toString());
     }
 
     protected abstract AstikorCartsConfig.CartConfig getConfig();

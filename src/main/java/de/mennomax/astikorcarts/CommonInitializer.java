@@ -18,25 +18,46 @@ import net.minecraft.item.Item;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.concurrent.ThreadTaskExecutor;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.fml.LogicalSidedProvider;
+import net.minecraftforge.fml.ModContainer;
+import net.minecraftforge.fml.common.thread.EffectiveSide;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistryEntry;
+import net.minecraftforge.registries.ObjectHolderRegistry;
 
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class CommonInitializer implements Initializer {
     @Override
     public void init(final Context mod) {
-        mod.context().registerConfig(ModConfig.Type.COMMON, AstikorCartsConfig.COMMON_SPEC);
+        final ModContainer container = mod.context().getActiveContainer();
+        ObjectHolderRegistry.addHandler(new Consumer<Predicate<ResourceLocation>>() {
+            boolean run = true;
+
+            @Override
+            public void accept(final Predicate<ResourceLocation> filter) {
+                if (this.run && filter.test(ForgeRegistries.ENTITIES.getRegistryName())) {
+                    container.addConfig(new ModConfig(ModConfig.Type.COMMON, AstikorCartsConfig.spec(), container));
+                    this.run = false;
+                    LogicalSidedProvider.WORKQUEUE.<ThreadTaskExecutor<Runnable>>get(EffectiveSide.get())
+                        .enqueue(() -> ObjectHolderRegistry.removeHandler(this));
+                }
+            }
+        });
         mod.modBus().<FMLCommonSetupEvent>addListener(e -> {
             CapabilityManager.INSTANCE.register(AstikorWorld.class, new Capability.IStorage<AstikorWorld>() {
                 @Nullable
@@ -50,9 +71,12 @@ public class CommonInitializer implements Initializer {
                 }
             }, SimpleAstikorWorld::new);
             e.enqueueWork(() -> {
-                GlobalEntityTypeAttributes.put(AstikorCarts.EntityTypes.POSTILION.get(), LivingEntity.registerAttributes().create());
+                GlobalEntityTypeAttributes.put(AstikorCarts.EntityTypes.POSTILION.get(), LivingEntity.registerAttributes().create()); // TODO: remove in 1.17
             });
         });
+        /*mod.modBus().<EntityAttributeCreationEvent>addListener(e -> {
+            e.put(AstikorCarts.EntityTypes.POSTILION.get(), LivingEntity.registerAttributes().create()); // TODO: add in 1.17
+        });*/
         mod.bus().<AttachCapabilitiesEvent<World>, World>addGenericListener(World.class, e ->
             e.addCapability(new ResourceLocation(AstikorCarts.ID, "astikor"), AstikorWorld.createProvider(SimpleAstikorWorld::new))
         );

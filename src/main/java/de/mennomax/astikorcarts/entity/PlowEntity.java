@@ -46,7 +46,7 @@ public final class PlowEntity extends AbstractDrawnInventoryEntity {
 
     @Override
     protected AstikorCartsConfig.CartConfig getConfig() {
-        return AstikorCartsConfig.COMMON.plow;
+        return AstikorCartsConfig.get().plow;
     }
 
     @Override

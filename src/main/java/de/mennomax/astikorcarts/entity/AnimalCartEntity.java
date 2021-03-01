@@ -22,7 +22,7 @@ public final class AnimalCartEntity extends AbstractDrawnEntity {
 
     @Override
     protected AstikorCartsConfig.CartConfig getConfig() {
-        return AstikorCartsConfig.COMMON.animalCart;
+        return AstikorCartsConfig.get().animalCart;
     }
 
     @Override
