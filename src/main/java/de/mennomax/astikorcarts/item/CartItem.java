@@ -1,22 +1,22 @@
 package de.mennomax.astikorcarts.item;
 
 import de.mennomax.astikorcarts.AstikorCarts;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EntityPredicates;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.RayTraceContext.FluidMode;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.RayTraceResult.Type;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySelector;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
@@ -27,50 +27,50 @@ public final class CartItem extends Item {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(final World world, final PlayerEntity player, final Hand hand) {
-        final ItemStack stack = player.getHeldItem(hand);
-        final RayTraceResult result = rayTrace(world, player, FluidMode.ANY);
-        if (result.getType() == Type.MISS) {
-            return ActionResult.resultPass(stack);
+    public InteractionResultHolder<ItemStack> use(final Level world, final Player player, final InteractionHand hand) {
+        final ItemStack stack = player.getItemInHand(hand);
+        final BlockHitResult result = getPlayerPOVHitResult(world, player, ClipContext.Fluid.ANY);
+        if (result.getType() == HitResult.Type.MISS) {
+            return InteractionResultHolder.pass(stack);
         } else {
-            final Vector3d lookVec = player.getLook(1.0F);
-            final List<Entity> list = world.getEntitiesInAABBexcluding(player, player.getBoundingBox().expand(lookVec.scale(5.0D)).grow(5.0D), EntityPredicates.NOT_SPECTATING.and(Entity::canBeCollidedWith));
+            final Vec3 lookVec = player.getLookAngle();
+            final List<Entity> list = world.getEntities(player, player.getBoundingBox().expandTowards(lookVec.scale(5.0D)).inflate(5.0D), EntitySelector.NO_SPECTATORS.and(Entity::canBeCollidedWith));
             if (!list.isEmpty()) {
-                final Vector3d eyePos = player.getEyePosition(1.0F);
+                final Vec3 eyePos = player.getEyePosition(1.0F);
                 for (final Entity entity : list) {
-                    final AxisAlignedBB axisalignedbb = entity.getBoundingBox().grow(entity.getCollisionBorderSize());
+                    final AABB axisalignedbb = entity.getBoundingBox().inflate(entity.getPickRadius());
                     if (axisalignedbb.contains(eyePos)) {
-                        return ActionResult.resultPass(stack);
+                        return InteractionResultHolder.pass(stack);
                     }
                 }
             }
 
-            if (result.getType() == Type.BLOCK) {
+            if (result.getType() == HitResult.Type.BLOCK) {
                 final EntityType<?> type = ForgeRegistries.ENTITIES.getValue(this.getRegistryName());
                 if (type == null) {
-                    return ActionResult.resultPass(stack);
+                    return InteractionResultHolder.pass(stack);
                 }
                 final Entity cart = type.create(world);
                 if (cart == null) {
-                    return ActionResult.resultPass(stack);
+                    return InteractionResultHolder.pass(stack);
                 }
-                cart.setPosition(result.getHitVec().x, result.getHitVec().y, result.getHitVec().z);
-                cart.rotationYaw = (player.rotationYaw + 180) % 360;
-                if (!world.hasNoCollisions(cart, cart.getBoundingBox().grow(0.1F, -0.1F, 0.1F))) {
-                    return ActionResult.resultFail(stack);
+                cart.moveTo(result.getLocation().x, result.getLocation().y, result.getLocation().z);
+                cart.setYRot((player.getYRot() + 180) % 360);
+                if (!world.noCollision(cart, cart.getBoundingBox().inflate(0.1F, -0.1F, 0.1F))) {
+                    return InteractionResultHolder.fail(stack);
                 } else {
-                    if (!world.isRemote()) {
-                        world.addEntity(cart);
-                        world.playSound(null, cart.getPosX(), cart.getPosY(), cart.getPosZ(), AstikorCarts.SoundEvents.CART_PLACED.get(), SoundCategory.BLOCKS, 0.75F, 0.8F);
+                    if (!world.isClientSide()) {
+                        world.addFreshEntity(cart);
+                        world.playSound(null, cart.getX(), cart.getY(), cart.getZ(), AstikorCarts.SoundEvents.CART_PLACED.get(), SoundSource.BLOCKS, 0.75F, 0.8F);
                     }
-                    if (!player.abilities.isCreativeMode) {
+                    if (!player.getAbilities().instabuild) {
                         stack.shrink(1);
                     }
-                    player.addStat(Stats.ITEM_USED.get(this));
-                    return ActionResult.resultSuccess(stack);
+                    player.awardStat(Stats.ITEM_USED.get(this));
+                    return InteractionResultHolder.success(stack);
                 }
             } else {
-                return ActionResult.resultPass(stack);
+                return InteractionResultHolder.pass(stack);
             }
         }
     }

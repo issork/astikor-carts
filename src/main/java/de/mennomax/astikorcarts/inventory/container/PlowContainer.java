@@ -2,19 +2,18 @@ package de.mennomax.astikorcarts.inventory.container;
 
 import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.entity.AbstractDrawnInventoryEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
 public final class PlowContainer extends CartContainer {
-    public PlowContainer(final int id, final PlayerInventory playerInv, final PacketBuffer buf) {
-        this(id, playerInv, (AbstractDrawnInventoryEntity) playerInv.player.world.getEntityByID(buf.readInt()));
+    public PlowContainer(final int id, final Inventory playerInv, final FriendlyByteBuf buf) {
+        this(id, playerInv, (AbstractDrawnInventoryEntity) playerInv.player.level.getEntity(buf.readInt()));
     }
 
-    public PlowContainer(final int id, final PlayerInventory playerInv, final AbstractDrawnInventoryEntity cart) {
+    public PlowContainer(final int id, final Inventory playerInv, final AbstractDrawnInventoryEntity cart) {
         super(AstikorCarts.ContainerTypes.PLOW_CART.get(), id, cart);
         this.addSlot(new PlowSlot(this.cartInv, 0, 57, 24));
         this.addSlot(new PlowSlot(this.cartInv, 1, 80, 17));
@@ -34,11 +33,6 @@ public final class PlowContainer extends CartContainer {
     static class PlowSlot extends SlotItemHandler {
         public PlowSlot(final IItemHandler itemHandler, final int index, final int xPosition, final int yPosition) {
             super(itemHandler, index, xPosition, yPosition);
-        }
-
-        @Override
-        public boolean isItemValid(final ItemStack stack) {
-            return true;
         }
     }
 }

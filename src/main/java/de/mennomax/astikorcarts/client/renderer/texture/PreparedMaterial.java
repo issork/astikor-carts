@@ -1,7 +1,7 @@
 package de.mennomax.astikorcarts.client.renderer.texture;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import it.unimi.dsi.fastutil.objects.ObjectList;
-import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 public class PreparedMaterial {

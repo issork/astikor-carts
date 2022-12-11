@@ -1,6 +1,6 @@
 package de.mennomax.astikorcarts.util;
 
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 
 public final class Mat4f {
 	public float m00, m01, m02, m03,
@@ -54,8 +54,8 @@ public final class Mat4f {
 
 	public Mat4f makeRotation(final float angle, final float x, final float y, final float z) {
 		this.makeIdentity();
-		final float c = MathHelper.cos(angle);
-		final float s = MathHelper.sin(angle);
+		final float c = Mth.cos(angle);
+		final float s = Mth.sin(angle);
 		final float t = 1.0F - c;
 		this.m00 = c + x * x * t;
 		this.m11 = c + y * y * t;
@@ -96,11 +96,11 @@ public final class Mat4f {
 		this.makeIdentity();
 		final float radians = (float) Math.toRadians(fovy / 2.0F);
 		final float deltaZ = zFar - zNear;
-		final float sine = MathHelper.sin(radians);
+		final float sine = Mth.sin(radians);
 		if (deltaZ == 0.0F || sine == 0.0F || aspect == 0.0F) {
 			return;
 		}
-		final float cotangent = MathHelper.cos(radians) / sine;
+		final float cotangent = Mth.cos(radians) / sine;
 		this.m00 = cotangent / aspect;
 		this.m11 = cotangent;
 		this.m22 = -(zFar + zNear) / deltaZ;

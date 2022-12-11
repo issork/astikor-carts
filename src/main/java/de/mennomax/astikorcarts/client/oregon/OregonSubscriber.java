@@ -4,20 +4,20 @@ import cpw.mods.modlauncher.api.INameMappingService;
 import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.oregon.BasicProgram;
 import de.mennomax.astikorcarts.oregon.Oregon;
+import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.StatsScreen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.gui.widget.list.AbstractList;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.achievement.StatsScreen;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.stats.Stat;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
@@ -38,28 +38,28 @@ public final class OregonSubscriber {
         bus.addListener(this::onScreenKeyPressed);
     }
 
-    private void onScreenKeyPressed(final GuiScreenEvent.KeyboardKeyPressedEvent.Pre event) {
+    private void onScreenKeyPressed(final ScreenEvent.KeyboardKeyPressedEvent.Pre event) {
         final Minecraft mc = Minecraft.getInstance();
-        final Screen screen = event.getGui();
+        final Screen screen = event.getScreen();
         if (screen instanceof StatsScreen && (event.getKeyCode() == GLFW.GLFW_KEY_ENTER || event.getKeyCode() == GLFW.GLFW_KEY_KP_ENTER) && mc.player != null) {
             this.getSelectedStat((StatsScreen) screen).ifPresent(stat -> {
-                if (AstikorCarts.Stats.CART_ONE_CM.equals(stat.getValue()) && mc.player.getStats().getValue(stat) > 2040 * 100) {
+                if (AstikorCarts.Stats.CART_ONE_CM.get().equals(stat.getValue())/* && mc.player.getStats().getValue(stat) > 2040 * 100*/) {
                     final PlayerIO io = new PlayerIO();
                     final Oregon oregon = new Oregon(io, new Random());
                     this.setState(new ActiveState(new Thread(() -> {
                         try {
                             oregon.run();
                         } finally {
-                            mc.enqueue(() -> this.setState(new IdleState()));
+                            mc.execute(() -> this.setState(new IdleState()));
                         }
                     }, "Oregon Trail 1978"), io));
                 }
             });
         }
         if (screen instanceof ChatScreen && (event.getKeyCode() == GLFW.GLFW_KEY_ENTER || event.getKeyCode() == GLFW.GLFW_KEY_KP_ENTER)) {
-            screen.getEventListeners().stream()
-                .filter(TextFieldWidget.class::isInstance)
-                .map(TextFieldWidget.class::cast)
+            screen.children().stream()
+                .filter(EditBox.class::isInstance)
+                .map(EditBox.class::cast)
                 .findFirst().ifPresent(field -> {
                     if (this.state.onChat(field)) {
                         event.setCanceled(true);
@@ -69,22 +69,22 @@ public final class OregonSubscriber {
     }
 
     private Optional<Stat<?>> getSelectedStat(final StatsScreen screen) {
-        final AbstractList<?> list = screen.func_213116_d();
+        final ObjectSelectionList<?> list = screen.getActiveList();
         if (list == null) {
             return Optional.empty();
         }
         final Class<?> classCustomStatsList$Entry;
         try {
-            classCustomStatsList$Entry = Class.forName("net.minecraft.client.gui.screen.StatsScreen$CustomStatsList$Entry");
+            classCustomStatsList$Entry = Class.forName("net.minecraft.client.gui.screens.achievement.StatsScreen$GeneralStatisticsList$Entry");
         } catch (final ClassNotFoundException e) {
             LOGGER.error("Unable to lookup custom stat entry class", e);
             return Optional.empty();
         }
-        final AbstractList.AbstractListEntry<?> entry = list.getSelected();
+        final ObjectSelectionList.Entry<?> entry = list.getSelected();
         if (!classCustomStatsList$Entry.isInstance(entry)) {
             return Optional.empty();
         }
-        final String statFieldName = ObfuscationReflectionHelper.remapName(INameMappingService.Domain.FIELD, "field_214405_b");
+        final String statFieldName = ObfuscationReflectionHelper.remapName(INameMappingService.Domain.FIELD, "f_97001_");
         final Stat<?> stat;
         try {
             final Field fieldStat = classCustomStatsList$Entry.getDeclaredField(statFieldName);
@@ -108,7 +108,7 @@ public final class OregonSubscriber {
 
         abstract void stop();
 
-        abstract boolean onChat(final TextFieldWidget field);
+        abstract boolean onChat(final EditBox field);
     }
 
     static class IdleState extends State {
@@ -121,7 +121,7 @@ public final class OregonSubscriber {
         }
 
         @Override
-        public boolean onChat(final TextFieldWidget field) {
+        public boolean onChat(final EditBox field) {
             return false;
         }
     }
@@ -139,7 +139,7 @@ public final class OregonSubscriber {
         void start() {
             this.thread.setDaemon(true);
             this.thread.start();
-            Minecraft.getInstance().displayGuiScreen(new ChatScreen("? "));
+            Minecraft.getInstance().setScreen(new ChatScreen("? "));
         }
 
         @Override
@@ -150,17 +150,17 @@ public final class OregonSubscriber {
             } catch (final InterruptedException ignored) {
             }
             final Minecraft mc = Minecraft.getInstance();
-            if (mc.currentScreen instanceof ChatScreen) {
-                mc.displayGuiScreen(null);
+            if (mc.screen instanceof ChatScreen) {
+                mc.setScreen(null);
             }
         }
 
         @Override
-        public boolean onChat(final TextFieldWidget field) {
-            final String text = field.getText();
+        public boolean onChat(final EditBox field) {
+            final String text = field.getValue();
             if (text.startsWith("?")) {
                 this.io.add(text.substring(1).trim());
-                field.setText("? ");
+                field.setValue("? ");
                 return true;
             }
             return false;
@@ -172,9 +172,9 @@ public final class OregonSubscriber {
 
         void add(final String s) {
             this.in.addLast(s);
-            final ClientPlayerEntity player = Minecraft.getInstance().player;
+            final LocalPlayer player = Minecraft.getInstance().player;
             if (player != null) {
-                player.sendMessage(new StringTextComponent(s).mergeStyle(TextFormatting.ITALIC, TextFormatting.WHITE), Util.DUMMY_UUID);
+                player.sendMessage(new TextComponent(s).withStyle(ChatFormatting.ITALIC, ChatFormatting.WHITE), Util.NIL_UUID);
             }
         }
 
@@ -195,10 +195,10 @@ public final class OregonSubscriber {
         @Override
         public void print(final String s) {
             final Minecraft mc = Minecraft.getInstance();
-            mc.runImmediately(() -> {
-                final ClientPlayerEntity player = mc.player;
+            mc.execute(() -> {
+                final LocalPlayer player = mc.player;
                 if (player != null) {
-                    player.sendMessage(new StringTextComponent(s).mergeStyle(TextFormatting.ITALIC, TextFormatting.GRAY), Util.DUMMY_UUID);
+                    player.sendMessage(new TextComponent(s).withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY), Util.NIL_UUID);
                 }
             });
         }

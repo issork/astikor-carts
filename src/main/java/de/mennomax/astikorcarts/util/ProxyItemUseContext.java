@@ -1,13 +1,13 @@
 package de.mennomax.astikorcarts.util;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.phys.BlockHitResult;
 
-public class ProxyItemUseContext extends ItemUseContext {
-    public ProxyItemUseContext(final PlayerEntity player, final ItemStack itemstack, final BlockRayTraceResult rayTraceResultIn) {
-        super(player.world, player, Hand.MAIN_HAND, itemstack, rayTraceResultIn);
+public class ProxyItemUseContext extends UseOnContext {
+    public ProxyItemUseContext(final Player player, final ItemStack itemstack, final BlockHitResult rayTraceResultIn) {
+        super(player.level, player, InteractionHand.MAIN_HAND, itemstack, rayTraceResultIn);
     }
 }

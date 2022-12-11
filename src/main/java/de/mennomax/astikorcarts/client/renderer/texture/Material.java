@@ -3,10 +3,10 @@ package de.mennomax.astikorcarts.client.renderer.texture;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
-import net.minecraft.client.renderer.model.ModelManager;
-import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.resources.ResourceLocation;
 
 public class Material {
     public static final int[][] R0 = {{1, 0}, {0, 1}};
@@ -24,7 +24,7 @@ public class Material {
     private final ObjectList<Fill> fills = new ObjectArrayList<>();
 
     public Material(ResourceLocation sprite, final int size) {
-        this(Pair.of(AtlasTexture.LOCATION_BLOCKS_TEXTURE, sprite), size);
+        this(Pair.of(TextureAtlas.LOCATION_BLOCKS, sprite), size);
     }
 
     public Material(final Pair<ResourceLocation, ResourceLocation> sprite, final int size) {
@@ -46,7 +46,7 @@ public class Material {
     }
 
     PreparedMaterial prepare(final ModelManager sprites) {
-        final TextureAtlasSprite sprite = sprites.getAtlasTexture(this.sprite.getFirst()).getSprite(this.sprite.getSecond());
+        final TextureAtlasSprite sprite = sprites.getAtlas(this.sprite.getFirst()).getSprite(this.sprite.getSecond());
         return new PreparedMaterial(this.fills, sprite, sprite.getWidth() / this.size);
     }
 }

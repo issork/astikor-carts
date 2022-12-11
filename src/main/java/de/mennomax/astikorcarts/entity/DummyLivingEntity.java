@@ -1,27 +1,26 @@
 package de.mennomax.astikorcarts.entity;
 
-import net.minecraft.block.material.PushReaction;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.LightningBoltEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.HandSide;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.PushReaction;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 
 public abstract class DummyLivingEntity extends LivingEntity {
-    protected DummyLivingEntity(final EntityType<? extends LivingEntity> type, final World world) {
+    protected DummyLivingEntity(final EntityType<? extends LivingEntity> type, final Level world) {
         super(type, world);
     }
 
     @Override
-    protected void registerData() {
-        super.registerData();
+    protected void defineSynchedData() {
+        super.defineSynchedData();
         this.setSilent(true);
         this.setNoGravity(true);
         this.setInvulnerable(true);
@@ -29,31 +28,32 @@ public abstract class DummyLivingEntity extends LivingEntity {
     }
 
     @Override
-    public Iterable<ItemStack> getArmorInventoryList() {
+    public Iterable<ItemStack> getArmorSlots() {
         return Collections.emptyList();
+
     }
 
     @Override
-    public ItemStack getItemStackFromSlot(final EquipmentSlotType slotIn) {
+    public ItemStack getItemBySlot(final EquipmentSlot slotIn) {
         return ItemStack.EMPTY;
     }
 
     @Override
-    public void setItemStackToSlot(final EquipmentSlotType slotIn, final ItemStack stack) {
+    public void setItemSlot(final EquipmentSlot slotIn, final ItemStack stack) {
     }
 
     @Override
-    public HandSide getPrimaryHand() {
-        return HandSide.RIGHT;
+    public HumanoidArm getMainArm() {
+        return HumanoidArm.RIGHT;
     }
 
     @Override
-    public boolean isImmuneToExplosions() {
+    public boolean ignoreExplosion() {
         return true;
     }
 
     @Override
-    public PushReaction getPushReaction() {
+    public PushReaction getPistonPushReaction() {
         return PushReaction.IGNORE;
     }
 
@@ -63,7 +63,7 @@ public abstract class DummyLivingEntity extends LivingEntity {
     }
 
     @Override
-    public boolean isServerWorld() {
+    public boolean isEffectiveAi() {
         return false;
     }
 
@@ -73,22 +73,22 @@ public abstract class DummyLivingEntity extends LivingEntity {
     }
 
     @Override
-    public boolean canBePushed() {
+    public boolean isPushable() {
         return false;
     }
 
     @Override
-    public boolean canBeAttackedWithItem() {
+    public boolean isAttackable() {
         return false;
     }
 
     @Override
-    protected boolean canTriggerWalking() {
-        return false;
+    public boolean isIgnoringBlockTriggers() {
+        return true;
     }
 
     @Override
-    public boolean canBeHitWithPotion() {
+    public boolean isPickable() {
         return false;
     }
 
@@ -98,12 +98,12 @@ public abstract class DummyLivingEntity extends LivingEntity {
     }
 
     @Override
-    public boolean isNonBoss() {
+    public boolean canChangeDimensions() {
         return false;
     }
 
     @Override
-    public boolean canAttack(final EntityType<?> type) {
+    public boolean canAttackType(final EntityType<?> type) {
         return false;
     }
 
@@ -113,25 +113,21 @@ public abstract class DummyLivingEntity extends LivingEntity {
     }
 
     @Override
-    public boolean isPotionApplicable(final EffectInstance effect) {
+    public boolean isAffectedByPotions() {
         return false;
     }
 
     @Override
-    public void onKillCommand() {
-        this.remove();
+    public void kill() {
+        this.discard();
     }
 
     @Override
-    public void func_241841_a(final ServerWorld world, final LightningBoltEntity bolt) {
+    public void push(Entity p_21294_) {
     }
 
     @Override
-    protected void collideWithEntity(final Entity entity) {
-    }
-
-    @Override
-    protected void collideWithNearbyEntities() {
+    protected void pushEntities() {
     }
 
     @Override
@@ -139,12 +135,17 @@ public abstract class DummyLivingEntity extends LivingEntity {
     }
 
     @Override
-    public boolean addPotionEffect(final EffectInstance effect) {
+    public boolean addEffect(final MobEffectInstance effect, @Nullable Entity entity) {
         return false;
     }
 
     @Override
-    protected void updatePotionMetadata() {
+    protected void updateEffectVisibility() {
+        super.updateEffectVisibility();
+    }
+
+    @Override
+    protected void updateInvisibilityStatus() {
         this.setInvisible(true);
     }
 }

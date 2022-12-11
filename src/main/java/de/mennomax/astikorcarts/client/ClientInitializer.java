@@ -4,10 +4,14 @@ import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.CommonInitializer;
 import de.mennomax.astikorcarts.client.gui.screen.inventory.PlowScreen;
 import de.mennomax.astikorcarts.client.oregon.OregonSubscriber;
-import de.mennomax.astikorcarts.client.renderer.entity.SupplyCartRenderer;
+import de.mennomax.astikorcarts.client.renderer.AstikorCartsModelLayers;
 import de.mennomax.astikorcarts.client.renderer.entity.AnimalCartRenderer;
 import de.mennomax.astikorcarts.client.renderer.entity.PlowRenderer;
 import de.mennomax.astikorcarts.client.renderer.entity.PostilionRenderer;
+import de.mennomax.astikorcarts.client.renderer.entity.SupplyCartRenderer;
+import de.mennomax.astikorcarts.client.renderer.entity.model.AnimalCartModel;
+import de.mennomax.astikorcarts.client.renderer.entity.model.PlowModel;
+import de.mennomax.astikorcarts.client.renderer.entity.model.SupplyCartModel;
 import de.mennomax.astikorcarts.client.renderer.texture.AssembledTexture;
 import de.mennomax.astikorcarts.client.renderer.texture.AssembledTextureFactory;
 import de.mennomax.astikorcarts.client.renderer.texture.Material;
@@ -16,24 +20,25 @@ import de.mennomax.astikorcarts.network.serverbound.ActionKeyMessage;
 import de.mennomax.astikorcarts.network.serverbound.OpenSupplyCartMessage;
 import de.mennomax.astikorcarts.network.serverbound.ToggleSlowMessage;
 import de.mennomax.astikorcarts.world.AstikorWorld;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.gui.ScreenManager;
-import net.minecraft.client.gui.screen.inventory.InventoryScreen;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
-import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.client.ClientRegistry;
+import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.client.event.ScreenOpenEvent;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.lwjgl.glfw.GLFW;
 
 public final class ClientInitializer extends CommonInitializer {
-    private final KeyBinding action = new KeyBinding("key.astikorcarts.desc", GLFW.GLFW_KEY_R, "key.categories.astikorcarts");
+    private final KeyMapping action = new KeyMapping("key.astikorcarts.desc", GLFW.GLFW_KEY_R, "key.categories.astikorcarts");
 
     @Override
     public void init(final Context mod) {
@@ -42,12 +47,12 @@ public final class ClientInitializer extends CommonInitializer {
         mod.bus().<TickEvent.ClientTickEvent>addListener(e -> {
             if (e.phase == TickEvent.Phase.END) {
                 final Minecraft mc = Minecraft.getInstance();
-                final World world = mc.world;
+                final Level world = mc.level;
                 if (world != null) {
-                    while (this.action.isPressed()) {
+                    while (this.action.consumeClick()) {
                         AstikorCarts.CHANNEL.sendToServer(new ActionKeyMessage());
                     }
-                    if (!mc.isGamePaused()) {
+                    if (!mc.isPaused()) {
                         AstikorWorld.get(world).ifPresent(AstikorWorld::tick);
                     }
                 }
@@ -55,33 +60,40 @@ public final class ClientInitializer extends CommonInitializer {
         });
         mod.bus().<InputEvent.KeyInputEvent>addListener(e -> {
             final Minecraft mc = Minecraft.getInstance();
-            final PlayerEntity player = mc.player;
+            final Player player = mc.player;
             if (player != null) {
                 if (ToggleSlowMessage.getCart(player).isPresent()) {
-                    final KeyBinding binding = mc.gameSettings.keyBindSprint;
-                    while (binding.isPressed()) {
+                    final KeyMapping binding = mc.options.keySprint;
+                    while (binding.consumeClick()) {
                         AstikorCarts.CHANNEL.sendToServer(new ToggleSlowMessage());
-                        KeyBinding.setKeyBindState(binding.getKey(), false);
+                        KeyMapping.set(binding.getKey(), false);
                     }
                 }
             }
         });
-        mod.bus().<GuiOpenEvent>addListener(e -> {
-            if (e.getGui() instanceof InventoryScreen) {
-                final ClientPlayerEntity player = Minecraft.getInstance().player;
-                if (player != null && player.getRidingEntity() instanceof SupplyCartEntity) {
+        mod.bus().<ScreenOpenEvent>addListener(e -> {
+            if (e.getScreen() instanceof InventoryScreen) {
+                final LocalPlayer player = Minecraft.getInstance().player;
+                if (player != null && player.getVehicle() instanceof SupplyCartEntity) {
                     e.setCanceled(true);
                     AstikorCarts.CHANNEL.sendToServer(new OpenSupplyCartMessage());
                 }
             }
         });
         mod.modBus().<FMLClientSetupEvent>addListener(e -> {
-            RenderingRegistry.registerEntityRenderingHandler(AstikorCarts.EntityTypes.SUPPLY_CART.get(), SupplyCartRenderer::new);
-            RenderingRegistry.registerEntityRenderingHandler(AstikorCarts.EntityTypes.PLOW.get(), PlowRenderer::new);
-            RenderingRegistry.registerEntityRenderingHandler(AstikorCarts.EntityTypes.ANIMAL_CART.get(), AnimalCartRenderer::new);
-            RenderingRegistry.registerEntityRenderingHandler(AstikorCarts.EntityTypes.POSTILION.get(), PostilionRenderer::new);
-            ScreenManager.registerFactory(AstikorCarts.ContainerTypes.PLOW_CART.get(), PlowScreen::new);
+            MenuScreens.register(AstikorCarts.ContainerTypes.PLOW_CART.get(), PlowScreen::new);
             ClientRegistry.registerKeyBinding(this.action);
+        });
+        mod.modBus().<EntityRenderersEvent.RegisterRenderers>addListener(e -> {
+            e.registerEntityRenderer(AstikorCarts.EntityTypes.SUPPLY_CART.get(), SupplyCartRenderer::new);
+            e.registerEntityRenderer(AstikorCarts.EntityTypes.PLOW.get(), PlowRenderer::new);
+            e.registerEntityRenderer(AstikorCarts.EntityTypes.ANIMAL_CART.get(), AnimalCartRenderer::new);
+            e.registerEntityRenderer(AstikorCarts.EntityTypes.POSTILION.get(), PostilionRenderer::new);
+        });
+        mod.modBus().<EntityRenderersEvent.RegisterLayerDefinitions>addListener(e -> {
+            ForgeHooksClient.registerLayerDefinition(AstikorCartsModelLayers.PLOW, PlowModel::createLayer);
+            ForgeHooksClient.registerLayerDefinition(AstikorCartsModelLayers.ANIMAL_CART, AnimalCartModel::createLayer);
+            ForgeHooksClient.registerLayerDefinition(AstikorCartsModelLayers.SUPPLY_CART, SupplyCartModel::createLayer);
         });
         new AssembledTextureFactory()
             .add(new ResourceLocation(AstikorCarts.ID, "textures/entity/animal_cart.png"), new AssembledTexture(64, 64)

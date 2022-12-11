@@ -1,13 +1,14 @@
 package de.mennomax.astikorcarts.entity;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.SlotAccess;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -19,45 +20,58 @@ public abstract class AbstractDrawnInventoryEntity extends AbstractDrawnEntity {
     public ItemStackHandler inventory = this.initInventory();
     private LazyOptional<ItemStackHandler> itemHandler = LazyOptional.of(() -> this.inventory);
 
-    public AbstractDrawnInventoryEntity(final EntityType<? extends Entity> entityTypeIn, final World worldIn) {
+    public AbstractDrawnInventoryEntity(final EntityType<? extends Entity> entityTypeIn, final Level worldIn) {
         super(entityTypeIn, worldIn);
     }
 
     protected abstract ItemStackHandler initInventory();
 
     @Override
-    public boolean replaceItemInInventory(final int inventorySlot, final ItemStack itemStackIn) {
-        if (inventorySlot >= 0 && inventorySlot < this.inventory.getSlots()) {
-            this.inventory.setStackInSlot(inventorySlot, itemStackIn);
-            return true;
-        } else {
-            return false;
+    public SlotAccess getSlot(final int slot) {
+        ItemStackHandler inventory = this.inventory;
+        if (slot >= 0 && slot < inventory.getSlots()) {
+            return new SlotAccess() {
+                @Override
+                public ItemStack get() {
+                    return inventory.getStackInSlot(slot);
+                }
+
+                @Override
+                public boolean set(final ItemStack stack) {
+                    inventory.setStackInSlot(slot, stack);
+                    return true;
+                }
+            };
         }
+        return super.getSlot(slot);
     }
 
     @Override
     public void onDestroyedAndDoDrops(final DamageSource source) {
         for (int i = 0; i < this.inventory.getSlots(); i++) {
-            InventoryHelper.spawnItemStack(this.world, this.getPosX(), this.getPosY(), this.getPosZ(), this.inventory.getStackInSlot(i));
+            ItemEntity itementity = new ItemEntity(this.level, this.getX(), this.getY(), this.getZ(), this.inventory.getStackInSlot(i));
+            itementity.setDefaultPickUpDelay();
+            this.level.addFreshEntity(itementity);
         }
     }
 
     @Override
-    protected void readAdditional(final CompoundNBT compound) {
-        super.readAdditional(compound);
+    protected void readAdditionalSaveData(final CompoundTag compound) {
+        super.readAdditionalSaveData(compound);
         this.inventory.deserializeNBT(compound.getCompound("Items"));
     }
 
     @Override
-    protected void writeAdditional(final CompoundNBT compound) {
-        super.writeAdditional(compound);
+    protected void addAdditionalSaveData(final CompoundTag compound) {
+        super.addAdditionalSaveData(compound);
         compound.put("Items", this.inventory.serializeNBT());
     }
 
+
     @Override
-    public void remove(final boolean keepData) {
-        super.remove(keepData);
-        if (!keepData && this.itemHandler != null) {
+    public void remove(final RemovalReason reason) {
+        super.remove(reason);
+        if (this.itemHandler != null) {
             this.itemHandler.invalidate();
             this.itemHandler = null;
         }

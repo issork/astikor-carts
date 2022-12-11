@@ -1,18 +1,16 @@
 package de.mennomax.astikorcarts.util;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.goal.GoalSelector;
-import net.minecraft.entity.ai.goal.PrioritizedGoal;
-import net.minecraft.entity.ai.goal.TriggerSkeletonTrapGoal;
-import net.minecraft.entity.passive.horse.SkeletonHorseEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.goal.GoalSelector;
+import net.minecraft.world.entity.ai.goal.WrappedGoal;
+import net.minecraft.world.entity.animal.horse.SkeletonHorse;
+import net.minecraft.world.entity.animal.horse.SkeletonTrapGoal;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
@@ -27,14 +25,12 @@ import java.util.function.Function;
  * } </pre>
  * <p>However, by this point an entity would have already had a chance to add toggleable goals to its
  * selectors from construction and deserialization, which may be expected to be the final goals.
- * <p>This is notably an issue with {@link SkeletonHorseEntity}, as it uses a goal
- * {@link TriggerSkeletonTrapGoal} which depends on being the last goal and when otherwise causes a
+ * <p>This is notably an issue with {@link SkeletonHorse}, as it uses a goal
+ * {@link SkeletonTrapGoal} which depends on being the last goal and when otherwise causes a
  * {@link ConcurrentModificationException} during {@link Entity#tick}.
  * <p>This class addresses the problem be adding custom goals to the beginning of the goal set.
  */
 public final class GoalAdder<T extends Entity> {
-    private static final Field GOALS = ObfuscationReflectionHelper.findField(GoalSelector.class, "field_220892_d");
-
     private final Class<T> type;
 
     private final Function<T, GoalSelector> selector;
@@ -53,11 +49,11 @@ public final class GoalAdder<T extends Entity> {
 
     private void onEntityJoinWorld(final EntityJoinWorldEvent event) {
         final Entity entity = event.getEntity();
-        if (!entity.world.isRemote && this.type.isInstance(entity)) {
-            final Set<PrioritizedGoal> oldGoals = this.getGoals(this.type.cast(entity));
-            final List<PrioritizedGoal> newGoals = new ArrayList<>(oldGoals.size() + this.goals.size());
+        if (!entity.level.isClientSide && this.type.isInstance(entity)) {
+            final Set<WrappedGoal> oldGoals = this.getGoals(this.type.cast(entity));
+            final List<WrappedGoal> newGoals = new ArrayList<>(oldGoals.size() + this.goals.size());
             for (final GoalEntry<T> goal : this.goals) {
-                newGoals.add(new PrioritizedGoal(goal.priority, goal.factory.apply(this.type.cast(entity))));
+                newGoals.add(new WrappedGoal(goal.priority, goal.factory.apply(this.type.cast(entity))));
             }
             newGoals.addAll(oldGoals);
             oldGoals.clear();
@@ -65,20 +61,15 @@ public final class GoalAdder<T extends Entity> {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private Set<PrioritizedGoal> getGoals(final T entity) {
-        try {
-            return (Set<PrioritizedGoal>) GOALS.get(this.selector.apply(entity));
-        } catch (final IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+    private Set<WrappedGoal> getGoals(final T entity) {
+        return this.selector.apply(entity).getAvailableGoals();
     }
 
-    public static <T extends MobEntity> Builder<T> mobGoal(final Class<T> type) {
+    public static <T extends Mob> Builder<T> mobGoal(final Class<T> type) {
         return GoalAdder.builder(type, m -> m.goalSelector);
     }
 
-    public static <T extends MobEntity> Builder<T> mobTarget(final Class<T> type) {
+    public static <T extends Mob> Builder<T> mobTarget(final Class<T> type) {
         return GoalAdder.builder(type, m -> m.targetSelector);
     }
 

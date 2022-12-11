@@ -3,7 +3,7 @@ package de.mennomax.astikorcarts.world;
 import de.mennomax.astikorcarts.entity.AbstractDrawnEntity;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 
 import javax.annotation.Nullable;
 import java.util.Iterator;
@@ -16,18 +16,18 @@ public final class SimpleAstikorWorld implements AstikorWorld {
     public void addPulling(final AbstractDrawnEntity drawn) {
         @Nullable final Entity pulling = drawn.getPulling();
         if (pulling != null) {
-            this.pulling.put(pulling.getEntityId(), drawn);
+            this.pulling.put(pulling.getId(), drawn);
         }
     }
 
     @Override
     public Optional<AbstractDrawnEntity> getDrawn(final Entity e) {
-        return Optional.ofNullable(this.pulling.get(e.getEntityId()));
+        return Optional.ofNullable(this.pulling.get(e.getId()));
     }
 
     @Override
     public boolean isPulling(final Entity e) {
-        return this.pulling.containsKey(e.getEntityId());
+        return this.pulling.containsKey(e.getId());
     }
 
     @Override

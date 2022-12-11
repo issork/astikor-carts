@@ -2,21 +2,21 @@ package de.mennomax.astikorcarts.entity;
 
 import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.WaterMobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.WaterAnimal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 public final class AnimalCartEntity extends AbstractDrawnEntity {
-    public AnimalCartEntity(final EntityType<? extends Entity> entityTypeIn, final World worldIn) {
+    public AnimalCartEntity(final EntityType<? extends Entity> entityTypeIn, final Level worldIn) {
         super(entityTypeIn, worldIn);
     }
 
@@ -31,90 +31,90 @@ public final class AnimalCartEntity extends AbstractDrawnEntity {
         final Entity coachman = this.getControllingPassenger();
         final Entity pulling = this.getPulling();
         if (pulling != null && coachman != null && pulling.getControllingPassenger() == null) {
-            final PostilionEntity postilion = AstikorCarts.EntityTypes.POSTILION.get().create(this.world);
+            final PostilionEntity postilion = AstikorCarts.EntityTypes.POSTILION.get().create(this.level);
             if (postilion != null) {
-                postilion.setPositionAndRotation(pulling.getPosX(), pulling.getPosY(), pulling.getPosZ(), coachman.rotationYaw, coachman.rotationPitch);
+                postilion.moveTo(pulling.getX(), pulling.getY(), pulling.getZ(), coachman.getYRot(), coachman.getXRot());
                 if (postilion.startRiding(pulling)) {
-                    this.world.addEntity(postilion);
+                    this.level.addFreshEntity(postilion);
                 } else {
-                    postilion.remove();
+                    postilion.discard();
                 }
             }
         }
     }
 
     @Override
-    public ActionResultType processInitialInteract(final PlayerEntity player, final Hand hand) {
+    public InteractionResult interact(final Player player, final InteractionHand hand) {
         if (player.isSecondaryUseActive()) {
-            if (!this.world.isRemote) {
+            if (!this.level.isClientSide) {
                 for (final Entity entity : this.getPassengers()) {
-                    if (!(entity instanceof PlayerEntity)) {
+                    if (!(entity instanceof Player)) {
                         entity.stopRiding();
                     }
                 }
             }
-            return ActionResultType.func_233537_a_(this.world.isRemote);
+            return InteractionResult.sidedSuccess(this.level.isClientSide);
         } else if (this.getPulling() != player) {
-            if (!this.canFitPassenger(player)) {
-                return ActionResultType.PASS;
+            if (!this.canAddPassenger(player)) {
+                return InteractionResult.PASS;
             }
-            if (!this.world.isRemote) {
-                return player.startRiding(this) ? ActionResultType.CONSUME : ActionResultType.PASS;
+            if (!this.level.isClientSide) {
+                return player.startRiding(this) ? InteractionResult.CONSUME : InteractionResult.PASS;
             }
-            return ActionResultType.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
-        return ActionResultType.PASS;
+        return InteractionResult.PASS;
     }
 
     @Override
-    public void applyEntityCollision(final Entity entityIn) {
-        if (!entityIn.isPassenger(this)) {
-            if (!this.world.isRemote && this.getPulling() != entityIn && this.getControllingPassenger() == null && this.getPassengers().size() < 2 && !entityIn.isPassenger() && entityIn.getWidth() < this.getWidth() && entityIn instanceof LivingEntity
-                && !(entityIn instanceof WaterMobEntity) && !(entityIn instanceof PlayerEntity)) {
+    public void push(final Entity entityIn) {
+        if (!entityIn.hasPassenger(this)) {
+            if (!this.level.isClientSide && this.getPulling() != entityIn && this.getControllingPassenger() == null && this.getPassengers().size() < 2 && !entityIn.isPassenger() && entityIn.getBbWidth() < this.getBbWidth() && entityIn instanceof LivingEntity
+                && !(entityIn instanceof WaterAnimal) && !(entityIn instanceof Player)) {
                 entityIn.startRiding(this);
             } else {
-                super.applyEntityCollision(entityIn);
+                super.push(entityIn);
             }
         }
     }
 
     @Override
-    protected boolean canFitPassenger(final Entity passenger) {
+    protected boolean canAddPassenger(final Entity passenger) {
         return this.getPassengers().size() < 2;
     }
 
     @Override
-    public double getMountedYOffset() {
+    public double getPassengersRidingOffset() {
         return 11.0D / 16.0D;
     }
 
     @Override
-    public void updatePassenger(final Entity passenger) {
-        if (this.isPassenger(passenger)) {
+    public void positionRider(final Entity passenger) {
+        if (this.hasPassenger(passenger)) {
             double f = -0.1D;
 
             if (this.getPassengers().size() > 1) {
                 f = this.getPassengers().indexOf(passenger) == 0 ? 0.2D : -0.6D;
 
-                if (passenger instanceof AnimalEntity) {
+                if (passenger instanceof Animal) {
                     f += 0.2D;
                 }
             }
 
-            final Vector3d forward = this.getLookVec();
-            final Vector3d origin = new Vector3d(0.0D, this.getMountedYOffset(), 1.0D / 16.0D);
-            final Vector3d pos = origin.add(forward.scale(f + MathHelper.sin((float) Math.toRadians(this.rotationPitch)) * 0.7D));
-            passenger.setPosition(this.getPosX() + pos.x, this.getPosY() + pos.y + passenger.getYOffset(), this.getPosZ() + pos.z);
-            passenger.setRenderYawOffset(this.rotationYaw);
-            final float f2 = MathHelper.wrapDegrees(passenger.rotationYaw - this.rotationYaw);
-            final float f1 = MathHelper.clamp(f2, -105.0F, 105.0F);
-            passenger.prevRotationYaw += f1 - f2;
-            passenger.rotationYaw += f1 - f2;
-            passenger.setRotationYawHead(passenger.rotationYaw);
-            if (passenger instanceof AnimalEntity && this.getPassengers().size() > 1) {
-                final int j = passenger.getEntityId() % 2 == 0 ? 90 : 270;
-                passenger.setRenderYawOffset(((AnimalEntity) passenger).renderYawOffset + j);
-                passenger.setRotationYawHead(passenger.getRotationYawHead() + j);
+            final Vec3 forward = this.getLookAngle();
+            final Vec3 origin = new Vec3(0.0D, this.getPassengersRidingOffset(), 1.0D / 16.0D);
+            final Vec3 pos = origin.add(forward.scale(f + Mth.sin((float) Math.toRadians(this.getXRot())) * 0.7D));
+            passenger.setPos(this.getX() + pos.x, this.getY() + pos.y + passenger.getMyRidingOffset(), this.getZ() + pos.z);
+            passenger.setYBodyRot(this.getYRot());
+            final float f2 = Mth.wrapDegrees(passenger.getYRot() - this.getYRot());
+            final float f1 = Mth.clamp(f2, -105.0F, 105.0F);
+            passenger.yRotO += f1 - f2;
+            passenger.setYRot(passenger.getYRot() + (f1 - f2));
+            passenger.setYHeadRot(passenger.getYRot());
+            if (passenger instanceof Animal && this.getPassengers().size() > 1) {
+                final int j = passenger.getId() % 2 == 0 ? 90 : 270;
+                passenger.setYBodyRot(((Animal) passenger).yBodyRot + j);
+                passenger.setYHeadRot(passenger.getYHeadRot() + j);
             }
         }
     }

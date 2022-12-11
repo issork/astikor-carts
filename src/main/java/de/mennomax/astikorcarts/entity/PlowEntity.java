@@ -6,40 +6,40 @@ import de.mennomax.astikorcarts.config.AstikorCartsConfig;
 import de.mennomax.astikorcarts.inventory.container.PlowContainer;
 import de.mennomax.astikorcarts.util.CartItemStackHandler;
 import de.mennomax.astikorcarts.util.ProxyItemUseContext;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.SimpleNamedContainerProvider;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ToolItem;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TieredItem;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.network.NetworkHooks;
 
 public final class PlowEntity extends AbstractDrawnInventoryEntity {
     private static final int SLOT_COUNT = 3;
     private static final double BLADEOFFSET = 1.7D;
-    private static final DataParameter<Boolean> PLOWING = EntityDataManager.createKey(PlowEntity.class, DataSerializers.BOOLEAN);
-    private static final ImmutableList<DataParameter<ItemStack>> TOOLS = ImmutableList.of(
-        EntityDataManager.createKey(PlowEntity.class, DataSerializers.ITEMSTACK),
-        EntityDataManager.createKey(PlowEntity.class, DataSerializers.ITEMSTACK),
-        EntityDataManager.createKey(PlowEntity.class, DataSerializers.ITEMSTACK));
+    private static final EntityDataAccessor<Boolean> PLOWING = SynchedEntityData.defineId(PlowEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final ImmutableList<EntityDataAccessor<ItemStack>> TOOLS = ImmutableList.of(
+        SynchedEntityData.defineId(PlowEntity.class, EntityDataSerializers.ITEM_STACK),
+        SynchedEntityData.defineId(PlowEntity.class, EntityDataSerializers.ITEM_STACK),
+        SynchedEntityData.defineId(PlowEntity.class, EntityDataSerializers.ITEM_STACK));
 
-    public PlowEntity(final EntityType<? extends Entity> entityTypeIn, final World worldIn) {
+    public PlowEntity(final EntityType<? extends Entity> entityTypeIn, final Level worldIn) {
         super(entityTypeIn, worldIn);
         this.spacing = 1.3D;
     }
@@ -55,7 +55,7 @@ public final class PlowEntity extends AbstractDrawnInventoryEntity {
             @Override
             protected void onLoad() {
                 for (int i = 0; i < TOOLS.size(); i++) {
-                    this.cart.getDataManager().set(TOOLS.get(i), this.getStackInSlot(i));
+                    this.cart.getEntityData().set(TOOLS.get(i), this.getStackInSlot(i));
                 }
             }
 
@@ -67,7 +67,7 @@ public final class PlowEntity extends AbstractDrawnInventoryEntity {
     }
 
     public boolean getPlowing() {
-        return this.dataManager.get(PLOWING);
+        return this.entityData.get(PLOWING);
     }
 
     @Override
@@ -76,34 +76,34 @@ public final class PlowEntity extends AbstractDrawnInventoryEntity {
         if (this.getPulling() == null) {
             return;
         }
-        if (!this.world.isRemote) {
-            PlayerEntity player = null;
-            if (this.getPulling() instanceof PlayerEntity) {
-                player = (PlayerEntity) this.getPulling();
-            } else if (this.getPulling().getControllingPassenger() instanceof PlayerEntity) {
-                player = (PlayerEntity) this.getPulling().getControllingPassenger();
+        if (!this.level.isClientSide) {
+            Player player = null;
+            if (this.getPulling() instanceof Player pl) {
+                player = pl;
+            } else if (this.getPulling().getControllingPassenger() instanceof Player pl) {
+                player = pl;
             }
-            if (this.dataManager.get(PLOWING) && player != null) {
-                if (this.prevPosX != this.getPosX() || this.prevPosZ != this.getPosZ()) {
+            if (this.entityData.get(PLOWING) && player != null) {
+                if (this.xo != this.getX() || this.zo != this.getZ()) {
                     this.plow(player);
                 }
             }
         }
     }
 
-    private void plow(final PlayerEntity player) {
+    private void plow(final Player player) {
         for (int i = 0; i < SLOT_COUNT; i++) {
             final ItemStack stack = this.getStackInSlot(i);
-            if (stack.getItem() instanceof ToolItem) {
+            if (stack.getItem() instanceof TieredItem) {
                 final float offset = 38.0F - i * 38.0F;
-                final double blockPosX = this.getPosX() + MathHelper.sin((float) Math.toRadians(this.rotationYaw - offset)) * BLADEOFFSET;
-                final double blockPosZ = this.getPosZ() - MathHelper.cos((float) Math.toRadians(this.rotationYaw - offset)) * BLADEOFFSET;
-                final BlockPos blockPos = new BlockPos(blockPosX, this.getPosY() - 0.5D, blockPosZ);
-                final boolean damageable = stack.isDamageable();
+                final double blockPosX = this.getX() + Mth.sin((float) Math.toRadians(this.getYRot() - offset)) * BLADEOFFSET;
+                final double blockPosZ = this.getZ() - Mth.cos((float) Math.toRadians(this.getYRot() - offset)) * BLADEOFFSET;
+                final BlockPos blockPos = new BlockPos(blockPosX, this.getY() - 0.5D, blockPosZ);
+                final boolean damageable = stack.isDamageableItem();
                 final int count = stack.getCount();
-                stack.getItem().onItemUse(new ProxyItemUseContext(player, stack, new BlockRayTraceResult(Vector3d.ZERO, Direction.UP, blockPos, false)));
+                stack.getItem().useOn(new ProxyItemUseContext(player, stack, new BlockHitResult(Vec3.ZERO, Direction.UP, blockPos, false)));
                 if (damageable && stack.getCount() < count) {
-                    this.playSound(SoundEvents.ENTITY_ITEM_BREAK, 0.8F, 0.8F + this.world.rand.nextFloat() * 0.4F);
+                    this.playSound(SoundEvents.ITEM_BREAK, 0.8F, 0.8F + this.level.random.nextFloat() * 0.4F);
                     this.updateSlot(i);
                 }
             }
@@ -111,30 +111,30 @@ public final class PlowEntity extends AbstractDrawnInventoryEntity {
     }
 
     @Override
-    public ActionResultType processInitialInteract(final PlayerEntity player, final Hand hand) {
+    public InteractionResult interact(final Player player, final InteractionHand hand) {
         if (player.isSecondaryUseActive()) {
             this.openContainer(player);
-            return ActionResultType.func_233537_a_(this.world.isRemote);
+            return InteractionResult.sidedSuccess(this.level.isClientSide);
         }
-        if (!this.world.isRemote) {
-            this.dataManager.set(PLOWING, !this.dataManager.get(PLOWING));
+        if (!this.level.isClientSide) {
+            this.entityData.set(PLOWING, !this.entityData.get(PLOWING));
         }
-        return ActionResultType.func_233537_a_(this.world.isRemote);
+        return InteractionResult.sidedSuccess(this.level.isClientSide);
     }
 
     public void updateSlot(final int slot) {
-        if (!this.world.isRemote) {
+        if (!this.level.isClientSide) {
             if (this.inventory.getStackInSlot(slot).isEmpty()) {
-                this.dataManager.set(TOOLS.get(slot), ItemStack.EMPTY);
+                this.entityData.set(TOOLS.get(slot), ItemStack.EMPTY);
             } else {
-                this.dataManager.set(TOOLS.get(slot), this.inventory.getStackInSlot(slot));
+                this.entityData.set(TOOLS.get(slot), this.inventory.getStackInSlot(slot));
             }
 
         }
     }
 
     public ItemStack getStackInSlot(final int i) {
-        return this.dataManager.get(TOOLS.get(i));
+        return this.entityData.get(TOOLS.get(i));
     }
 
     @Override
@@ -143,32 +143,31 @@ public final class PlowEntity extends AbstractDrawnInventoryEntity {
     }
 
     @Override
-    protected void registerData() {
-        super.registerData();
-        this.dataManager.register(PLOWING, false);
-        for (final DataParameter<ItemStack> param : TOOLS) {
-            this.dataManager.register(param, ItemStack.EMPTY);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(PLOWING, false);
+        for (final EntityDataAccessor<ItemStack> param : TOOLS) {
+            this.entityData.define(param, ItemStack.EMPTY);
         }
     }
 
     @Override
-    protected void readAdditional(final CompoundNBT compound) {
-        super.readAdditional(compound);
-        this.dataManager.set(PLOWING, compound.getBoolean("Plowing"));
+    protected void readAdditionalSaveData(final CompoundTag compound) {
+        super.readAdditionalSaveData(compound);
+        this.entityData.set(PLOWING, compound.getBoolean("Plowing"));
     }
 
     @Override
-    protected void writeAdditional(final CompoundNBT compound) {
-        super.writeAdditional(compound);
-        compound.putBoolean("Plowing", this.dataManager.get(PLOWING));
-
+    protected void addAdditionalSaveData(final CompoundTag compound) {
+        super.addAdditionalSaveData(compound);
+        compound.putBoolean("Plowing", this.entityData.get(PLOWING));
     }
 
-    private void openContainer(final PlayerEntity player) {
-        if (player instanceof ServerPlayerEntity) {
-            NetworkHooks.openGui((ServerPlayerEntity) player,
-                new SimpleNamedContainerProvider((windowId, playerInventory, p) -> new PlowContainer(windowId, playerInventory, this), this.getDisplayName()),
-                buf -> buf.writeInt(this.getEntityId())
+    private void openContainer(final Player player) {
+        if (player instanceof ServerPlayer serverPlayer) {
+            NetworkHooks.openGui(serverPlayer,
+                new SimpleMenuProvider((windowId, playerInventory, p) -> new PlowContainer(windowId, playerInventory, this), this.getDisplayName()),
+                buf -> buf.writeInt(this.getId())
             );
         }
     }

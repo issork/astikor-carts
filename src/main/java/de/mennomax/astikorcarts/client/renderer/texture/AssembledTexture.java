@@ -1,12 +1,12 @@
 package de.mennomax.astikorcarts.client.renderer.texture;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import it.unimi.dsi.fastutil.objects.ObjectListIterator;
-import net.minecraft.client.renderer.model.ModelManager;
+import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.client.renderer.texture.NativeImage;
-import net.minecraft.client.renderer.texture.Texture;
+import net.minecraft.client.resources.model.ModelManager;
 
 public class AssembledTexture {
     private final int width, height;
@@ -23,7 +23,7 @@ public class AssembledTexture {
         return this;
     }
 
-    Texture assemble(final ModelManager sprites) {
+    AbstractTexture assemble(final ModelManager sprites) {
         final PreparedMaterial[] prepared = new PreparedMaterial[this.materials.size()];
         int resolution = 1;
         for (final ObjectListIterator<Material> it = this.materials.iterator(); it.hasNext(); ) {

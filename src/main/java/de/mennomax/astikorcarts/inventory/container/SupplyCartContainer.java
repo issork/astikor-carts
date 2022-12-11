@@ -1,14 +1,14 @@
 package de.mennomax.astikorcarts.inventory.container;
 
 import de.mennomax.astikorcarts.entity.AbstractDrawnInventoryEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.Slot;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
 import net.minecraftforge.items.SlotItemHandler;
 
 public final class SupplyCartContainer extends CartContainer {
-    public SupplyCartContainer(final int id, final PlayerInventory playerInv, final AbstractDrawnInventoryEntity cart) {
-        super(ContainerType.GENERIC_9X6, id, cart);
+    public SupplyCartContainer(final int id, final Inventory playerInv, final AbstractDrawnInventoryEntity cart) {
+        super(MenuType.GENERIC_9x6, id, cart);
         final int upperInvHeight = 36;
 
         for (int i = 0; i < 6; ++i) {

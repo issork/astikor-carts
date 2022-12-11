@@ -1,7 +1,7 @@
 package de.mennomax.astikorcarts.util;
 
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -24,12 +24,12 @@ public final class DefRegister {
         return new Forge<>(this.namespace, registry);
     }
 
-    public <T> Vanilla<T, Void> of(final Registry<T> registry) {
-        return new Vanilla<>(this.namespace, registry, (t, v) -> {}, rl -> null);
+    public <T, X extends IForgeRegistryEntry<X>> Vanilla<T, Void> of(final Class<X> type, final Registry<T> registry) {
+        return new Vanilla<>(this.namespace, type, registry, (t, v) -> {}, rl -> null);
     }
 
-    public <T, N> Vanilla<T, N> of(final Registry<T> registry, final BiConsumer<T, N> callback, final Function<ResourceLocation, N> defaultData) {
-        return new Vanilla<>(this.namespace, registry, callback, defaultData);
+    public <T, N, X extends IForgeRegistryEntry<X>> Vanilla<T, N> of(final Class<X> type, final Registry<T> registry, final BiConsumer<T, N> callback, final Function<ResourceLocation, N> defaultData) {
+        return new Vanilla<>(this.namespace, type, registry, callback, defaultData);
     }
 
     public void registerAll(final IEventBus bus, final Register... registers) {
@@ -44,30 +44,41 @@ public final class DefRegister {
 
     public static final class Vanilla<T, N> implements Register {
         final String namespace;
+        final Class<? extends IForgeRegistryEntry<?>> type;
         final Registry<T> registry;
         final BiConsumer<T, N> callback;
         final Function<ResourceLocation, N> defaultData;
+        final List<Runnable> entries = new ArrayList<>();
 
-        private Vanilla(final String namespace, final Registry<T> registry, final BiConsumer<T, N> callback, final Function<ResourceLocation, N> defaultData) {
+        private Vanilla(final String namespace, final Class<? extends IForgeRegistryEntry<?>> type, final Registry<T> registry, final BiConsumer<T, N> callback, final Function<ResourceLocation, N> defaultData) {
             this.namespace = namespace;
+            this.type = type;
             this.registry = registry;
             this.callback = callback;
             this.defaultData = defaultData;
         }
 
-        public <U extends T> U make(final String name, final Function<ResourceLocation, U> object) {
+        public <U extends T> Supplier<U> make(final String name, final Function<ResourceLocation, U> object) {
             return this.make(name, object, this.defaultData);
         }
 
-        public <U extends T> U make(final String name, final Function<ResourceLocation, U> object, final Function<ResourceLocation, N> data) {
+        @SuppressWarnings("unchecked")
+        public <U extends T> Supplier<U> make(final String name, final Function<ResourceLocation, U> object, final Function<ResourceLocation, N> data) {
             final ResourceLocation key = new ResourceLocation(this.namespace, name);
-            final U u = Registry.register(this.registry, key, object.apply(key));
-            this.callback.accept(u, data.apply(key));
-            return u;
+            this.entries.add(() -> {
+                final U u = Registry.register(this.registry, key, object.apply(key));
+                this.callback.accept(u, data.apply(key));
+            });
+            return () -> {
+                T t = this.registry.get(key);
+                if (t == null) throw new IllegalStateException();
+                return (U) t;
+            };
         }
 
         @Override
         public void register(final IEventBus bus) {
+            bus.addGenericListener(this.type, (RegistryEvent.Register e) -> this.entries.forEach(Runnable::run));
         }
     }
 

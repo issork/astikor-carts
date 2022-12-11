@@ -1,6 +1,6 @@
 package de.mennomax.astikorcarts.client.renderer.texture;
 
-import net.minecraft.client.renderer.texture.NativeImage;
+import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 public class Fill {

@@ -1,10 +1,11 @@
 package de.mennomax.astikorcarts.world;
 
 import de.mennomax.astikorcarts.entity.AbstractDrawnEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.Direction;
-import net.minecraft.world.World;
-import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullSupplier;
@@ -17,8 +18,7 @@ public interface AstikorWorld {
     final class Capability {
         private Capability() {}
 
-        @CapabilityInject(AstikorWorld.class)
-        private static net.minecraftforge.common.capabilities.Capability<AstikorWorld> INSTANCE;
+        private static net.minecraftforge.common.capabilities.Capability<AstikorWorld> INSTANCE = CapabilityManager.get(new CapabilityToken<>() {});;
     }
 
     void addPulling(final AbstractDrawnEntity drawn);
@@ -29,11 +29,11 @@ public interface AstikorWorld {
 
     void tick();
 
-    static LazyOptional<AstikorWorld> get(final World world) {
+    static LazyOptional<AstikorWorld> get(final Level world) {
         return world.getCapability(Capability.INSTANCE);
     }
 
-    static Stream<AstikorWorld> stream(final World world) {
+    static Stream<AstikorWorld> stream(final Level world) {
         return world.getCapability(Capability.INSTANCE).map(Stream::of).orElse(Stream.empty());
     }
 

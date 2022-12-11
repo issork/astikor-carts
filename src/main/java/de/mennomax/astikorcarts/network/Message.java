@@ -1,9 +1,9 @@
 package de.mennomax.astikorcarts.network;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 public interface Message {
-    void encode(final PacketBuffer buf);
+    void encode(final FriendlyByteBuf buf);
 
-    void decode(final PacketBuffer buf);
+    void decode(final FriendlyByteBuf buf);
 }

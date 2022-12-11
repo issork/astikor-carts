@@ -1,66 +1,21 @@
 package de.mennomax.astikorcarts.config;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
-import com.google.common.reflect.ClassPath;
-import com.google.gson.internal.UnsafeAllocator;
-import com.mojang.serialization.Lifecycle;
 import net.jodah.typetools.TypeResolver;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.IEquipable;
-import net.minecraft.entity.IRideable;
-import net.minecraft.entity.passive.horse.LlamaEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.item.crafting.RecipeManager;
-import net.minecraft.profiler.EmptyProfiler;
-import net.minecraft.profiler.IProfiler;
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.tags.ITagCollectionSupplier;
-import net.minecraft.util.Direction;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.DynamicRegistries;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.SimpleRegistry;
-import net.minecraft.world.Difficulty;
-import net.minecraft.world.Dimension;
-import net.minecraft.world.DimensionType;
-import net.minecraft.world.ITickList;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.chunk.AbstractChunkProvider;
-import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
-import net.minecraft.world.storage.ISpawnWorldInfo;
-import net.minecraft.world.storage.MapData;
-import net.minecraft.world.storage.ServerWorldInfo;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import net.minecraftforge.fml.config.ModConfig;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ItemSteerable;
+import net.minecraft.world.entity.Saddleable;
+import net.minecraft.world.entity.animal.horse.Llama;
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.apache.commons.lang3.tuple.Pair;
 
-import net.minecraftforge.common.ForgeConfigSpec;
-import org.apache.logging.log4j.LogManager;
-
-import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public final class AstikorCartsConfig {
     public static Common get() {
@@ -89,7 +44,7 @@ public final class AstikorCartsConfig {
         public final CartConfig plow;
 
         Common(final ForgeConfigSpec.Builder builder) {
-            builder.comment("Configuration for all carts and cart-like vehicles\n\nDefault pull_entities = " + referencePullAnimals()).push("carts");
+            builder.comment("Configuration for all carts and cart-like vehicles\n\nDefault pull_animals = " + referencePullAnimals()).push("carts");
             this.supplyCart = new CartConfig(builder, "supply_cart", "The Supply Cart, a type of cart that stores items");
             this.animalCart = new CartConfig(builder, "animal_cart", "The Animal Cart, a type of cart to haul other animals");
             this.plow = new CartConfig(builder, "plow", "The Plow, an animal pulled machine for tilling soil and creating paths");
@@ -100,14 +55,14 @@ public final class AstikorCartsConfig {
             return "[\n" +
                 StreamSupport.stream(ForgeRegistries.ENTITIES.spliterator(), false)
                     .filter(type -> {
-                        final Class<?> entityClass = TypeResolver.resolveRawArgument(Supplier.class, Objects.requireNonNull(
-                            ObfuscationReflectionHelper.getPrivateValue(EntityType.class, type, "field_200732_aK"),
+                        final Class<?> entityClass = TypeResolver.resolveRawArgument(EntityType.EntityFactory.class, Objects.requireNonNull(
+                            ObfuscationReflectionHelper.getPrivateValue(EntityType.class, type, "f_20535_"),
                             "factory"
                         ).getClass());
                         if (Entity.class.equals(entityClass)) return type == EntityType.PLAYER;
-                        return IEquipable.class.isAssignableFrom(entityClass) &&
-                            !IRideable.class.isAssignableFrom(entityClass) &&
-                            !LlamaEntity.class.isAssignableFrom(entityClass); // no horse-llamas
+                        return Saddleable.class.isAssignableFrom(entityClass) &&
+                            !ItemSteerable.class.isAssignableFrom(entityClass) &&
+                            !Llama.class.isAssignableFrom(entityClass); // no horse-llamas
                     })
                     .map(ForgeRegistryEntry::getRegistryName)
                     .filter(Objects::nonNull)
