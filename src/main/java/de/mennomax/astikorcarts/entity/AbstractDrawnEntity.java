@@ -172,7 +172,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
             if (cm > 0) {
                 for (final Entity passenger : this.getPassengers()) {
                     if (passenger instanceof Player player) {
-                        player.awardStat(AstikorCarts.Stats.CART_ONE_CM.get(), cm);
+                        player.awardStat(AstikorCarts.Stats.CART_ONE_CM, cm);
                     }
                 }
             }

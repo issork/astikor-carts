@@ -8,7 +8,7 @@ import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.animal.horse.SkeletonHorse;
 import net.minecraft.world.entity.animal.horse.SkeletonTrapGoal;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 /**
- * <p>The traditional usage of {@link EntityJoinWorldEvent} to add custom AI appends goals to the end of
+ * <p>The traditional usage of {@link EntityJoinLevelEvent} to add custom AI appends goals to the end of
  * the {@link GoalSelector}'s goal set, for example:
  * <pre> {@code
  *    mob.goalSelector.addGoal(1, new CustomGoal(mob))
@@ -47,7 +47,7 @@ public final class GoalAdder<T extends Entity> {
         bus.addListener(this::onEntityJoinWorld);
     }
 
-    private void onEntityJoinWorld(final EntityJoinWorldEvent event) {
+    private void onEntityJoinWorld(final EntityJoinLevelEvent event) {
         final Entity entity = event.getEntity();
         if (!entity.level.isClientSide && this.type.isInstance(entity)) {
             final Set<WrappedGoal> oldGoals = this.getGoals(this.type.cast(entity));

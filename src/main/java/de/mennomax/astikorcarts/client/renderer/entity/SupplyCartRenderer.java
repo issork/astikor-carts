@@ -33,7 +33,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.decoration.Motive;
+import net.minecraft.world.entity.decoration.PaintingVariant;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeableArmorItem;
@@ -43,7 +43,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
-import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Iterator;
@@ -116,7 +116,7 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
             stack.scale(0.65F, 0.65F, 0.65F);
             stack.translate(ix, 0.5D, iz - 1.0D);
             stack.mulPose(Vector3f.ZP.rotationDegrees(180.0F));
-            renderer.renderModel(stack.last(), source.getBuffer(RenderType.cutout()), state, model, r, g, b, packedLight, OverlayTexture.NO_OVERLAY, EmptyModelData.INSTANCE);
+            renderer.renderModel(stack.last(), source.getBuffer(RenderType.cutout()), state, model, r, g, b, packedLight, OverlayTexture.NO_OVERLAY, ModelData.EMPTY, null);
             stack.popPose();
         }
     }
@@ -131,7 +131,7 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
 
     private void renderPaintings(final SupplyCartEntity entity, final PoseStack stack, final MultiBufferSource source, final int packedLight, final NonNullList<ItemStack> cargo) {
         final VertexConsumer buf = source.getBuffer(RenderType.entitySolid(Minecraft.getInstance().getPaintingTextures().getBackSprite().atlas().location()));
-        final ObjectList<Motive> types = StreamSupport.stream(ForgeRegistries.PAINTING_TYPES.spliterator(), false)
+        final ObjectList<PaintingVariant> types = StreamSupport.stream(ForgeRegistries.PAINTING_VARIANTS.spliterator(), false)
             .filter(t -> t.getWidth() == 16 && t.getHeight() == 16)
             .collect(Collectors.toCollection(ObjectArrayList::new));
         final Random rng = new Random(entity.getUUID().getMostSignificantBits() ^ entity.getUUID().getLeastSignificantBits());
@@ -146,7 +146,7 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
         for (int i = 0, n = 0; i < cargo.size(); i++) {
             final ItemStack itemStack = cargo.get(i);
             if (itemStack.isEmpty()) continue;
-            final Motive t = types.get(i % types.size());
+            final PaintingVariant t = types.get(i % types.size());
             stack.pushPose();
             stack.translate(0.0D, (n++ - (count - 1) * 0.5D) / count, -1.0D / 16.0D * i);
             stack.mulPose(Vector3f.ZP.rotation(rng.nextFloat() * (float) Math.PI));
@@ -184,7 +184,7 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
                 }
                 renderer.render(itemStack, ItemTransforms.TransformType.NONE, false, stack, source, packedLight, OverlayTexture.NO_OVERLAY, model);
             } else {
-                rng.setSeed(32L * i + Objects.hashCode(itemStack.getItem().getRegistryName()));
+                rng.setSeed(32L * i + Objects.hashCode(ForgeRegistries.ITEMS.getKey(itemStack.getItem())));
                 stack.translate(x, -0.15D + ((ix + iz) % 2 == 0 ? 0.0D : 1.0e-4D), z);
                 if (ArmorItem.class.equals(itemStack.getItem().getClass()) || DyeableArmorItem.class.equals(itemStack.getItem().getClass())) {
                     this.renderArmor(entity, stack, source, packedLight, itemStack, ix);
@@ -280,7 +280,7 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
         }
     }
 
-    private void renderPainting(final Motive painting, final PoseStack stack, final VertexConsumer buf, final int packedLight) {
+    private void renderPainting(final PaintingVariant painting, final PoseStack stack, final VertexConsumer buf, final int packedLight) {
         final PaintingTextureManager uploader = Minecraft.getInstance().getPaintingTextures();
         final int width = painting.getWidth();
         final int height = painting.getHeight();

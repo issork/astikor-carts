@@ -46,7 +46,7 @@ public final class CartItem extends Item {
             }
 
             if (result.getType() == HitResult.Type.BLOCK) {
-                final EntityType<?> type = ForgeRegistries.ENTITIES.getValue(this.getRegistryName());
+                final EntityType<?> type = ForgeRegistries.ENTITY_TYPES.getValue(ForgeRegistries.ITEMS.getKey(this));
                 if (type == null) {
                     return InteractionResultHolder.pass(stack);
                 }

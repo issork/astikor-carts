@@ -165,7 +165,7 @@ public final class PlowEntity extends AbstractDrawnInventoryEntity {
 
     private void openContainer(final Player player) {
         if (player instanceof ServerPlayer serverPlayer) {
-            NetworkHooks.openGui(serverPlayer,
+            NetworkHooks.openScreen(serverPlayer,
                 new SimpleMenuProvider((windowId, playerInventory, p) -> new PlowContainer(windowId, playerInventory, this), this.getDisplayName()),
                 buf -> buf.writeInt(this.getId())
             );

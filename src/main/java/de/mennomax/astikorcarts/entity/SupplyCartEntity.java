@@ -18,7 +18,7 @@ import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -273,7 +273,7 @@ public final class SupplyCartEntity extends AbstractDrawnInventoryEntity {
                         } catch (final JsonParseException ignored) {
                             continue;
                         }
-                        if (component instanceof TranslatableComponent && descKey.equals(((TranslatableComponent) component).getKey())) {
+                        if (component.getContents() instanceof TranslatableContents translatable && descKey.equals(translatable.getKey())) {
                             lore.remove(i);
                         }
                     }
@@ -300,7 +300,7 @@ public final class SupplyCartEntity extends AbstractDrawnInventoryEntity {
             tag.put("RecordItem", disc.save(new CompoundTag()));
             final CompoundTag display = stack.getOrCreateTagElement("display");
             final ListTag lore = display.getList("Lore", Tag.TAG_STRING);
-            lore.add(StringTag.valueOf(Component.Serializer.toJson(new TranslatableComponent(disc.getDescriptionId() + ".desc"))));
+            lore.add(StringTag.valueOf(Component.Serializer.toJson(Component.translatable(disc.getDescriptionId() + ".desc"))));
             display.put("Lore", lore);
             return true;
         }

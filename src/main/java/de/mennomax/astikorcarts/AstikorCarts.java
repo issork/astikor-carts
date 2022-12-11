@@ -13,13 +13,12 @@ import de.mennomax.astikorcarts.network.serverbound.ActionKeyMessage;
 import de.mennomax.astikorcarts.network.serverbound.OpenSupplyCartMessage;
 import de.mennomax.astikorcarts.network.serverbound.ToggleSlowMessage;
 import de.mennomax.astikorcarts.server.ServerInitializer;
-import de.mennomax.astikorcarts.util.DefRegister;
-import de.mennomax.astikorcarts.util.RegObject;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.stats.Stat;
 import net.minecraft.stats.StatFormatter;
-import net.minecraft.stats.StatType;
+import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.inventory.MenuType;
@@ -35,13 +34,18 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegisterEvent;
 import net.minecraftforge.registries.RegistryObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.function.Supplier;
 
 @Mod(AstikorCarts.ID)
 public final class AstikorCarts {
     public static final String ID = "astikorcarts";
+
+    public static final Logger LOGGER = LoggerFactory.getLogger(AstikorCarts.class);
 
     public static final SimpleChannel CHANNEL = new NetBuilder(new ResourceLocation(ID, "main"))
         .version(1).optionalServer().requiredClient()
@@ -50,8 +54,6 @@ public final class AstikorCarts {
         .clientbound(UpdateDrawnMessage::new).consumer(() -> new UpdateDrawnMessage.Handler())
         .serverbound(OpenSupplyCartMessage::new).consumer(() -> OpenSupplyCartMessage::handle)
         .build();
-
-    private static final DefRegister REG = new DefRegister(ID);
 
     public static final class Items {
         private Items() {
@@ -74,7 +76,7 @@ public final class AstikorCarts {
         private EntityTypes() {
         }
 
-        private static final DeferredRegister<EntityType<?>> R = DeferredRegister.create(ForgeRegistries.ENTITIES, ID);
+        private static final DeferredRegister<EntityType<?>> R = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, ID);
 
         public static final RegistryObject<EntityType<SupplyCartEntity>> SUPPLY_CART;
         public static final RegistryObject<EntityType<PlowEntity>> PLOW;
@@ -114,16 +116,25 @@ public final class AstikorCarts {
         private Stats() {
         }
 
-        private static final DefRegister.Vanilla<ResourceLocation, StatFormatter> R = REG.of(StatType.class, Registry.CUSTOM_STAT, net.minecraft.stats.Stats.CUSTOM::get, rl -> StatFormatter.DEFAULT);
+        public static final ResourceLocation CART_ONE_CM = new ResourceLocation(ID, "cart_one_cm");
 
-        public static final Supplier<ResourceLocation> CART_ONE_CM = R.make("cart_one_cm", rl -> rl, rl -> StatFormatter.DISTANCE);
+        private static void register(final IEventBus bus) {
+            bus.addListener(Stats::registerEntries);
+        }
+
+        private static void registerEntries(RegisterEvent e) {
+            if (Registry.STAT_TYPE_REGISTRY.equals(e.getRegistryKey())) {
+                Registry.register(Registry.CUSTOM_STAT, Stats.CART_ONE_CM, Stats.CART_ONE_CM);
+                net.minecraft.stats.Stats.CUSTOM.get(Stats.CART_ONE_CM, StatFormatter.DISTANCE);
+            }
+        }
     }
 
     public static final class ContainerTypes {
         private ContainerTypes() {
         }
 
-        private static final DeferredRegister<MenuType<?>> R = DeferredRegister.create(ForgeRegistries.CONTAINERS, ID);
+        private static final DeferredRegister<MenuType<?>> R = DeferredRegister.create(ForgeRegistries.MENU_TYPES, ID);
 
         public static final RegistryObject<MenuType<PlowContainer>> PLOW_CART = R.register("plow", () -> IForgeMenuType.create(PlowContainer::new));
     }
@@ -131,7 +142,7 @@ public final class AstikorCarts {
     public AstikorCarts() {
         final Initializer.Context ctx = new InitContext();
         DistExecutor.runForDist(() -> ClientInitializer::new, () -> ServerInitializer::new).init(ctx);
-        REG.registerAll(ctx.modBus(), Stats.R);
+        Stats.register(ctx.modBus());
         Items.R.register(ctx.modBus());
         EntityTypes.R.register(ctx.modBus());
         SoundEvents.R.register(ctx.modBus());

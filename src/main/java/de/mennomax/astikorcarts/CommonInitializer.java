@@ -12,36 +12,20 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.fml.ModContainer;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.util.thread.EffectiveSide;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.ObjectHolderRegistry;
-
-import java.util.function.Consumer;
-import java.util.function.Predicate;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 
 public class CommonInitializer implements Initializer {
     @Override
     public void init(final Context mod) {
-        final ModContainer container = mod.context().getActiveContainer();
-        ObjectHolderRegistry.addHandler(new Consumer<>() {
-            boolean run = true;
-
-            @Override
-            public void accept(final Predicate<ResourceLocation> filter) {
-                if (this.run && filter.test(ForgeRegistries.ENTITIES.getRegistryName())) {
-                    container.addConfig(new ModConfig(ModConfig.Type.COMMON, AstikorCartsConfig.spec(), container));
-                    this.run = false;
-                    LogicalSidedProvider.WORKQUEUE.get(EffectiveSide.get())
-                        .execute(() -> ObjectHolderRegistry.removeHandler(this));
-                }
-            }
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, AstikorCartsConfig.spec());
+        mod.modBus().<FMLLoadCompleteEvent>addListener(e -> {
+            AstikorCarts.LOGGER.info("Automatic pull animal configuration:\n{}", AstikorCartsConfig.Common.getComment());
         });
         mod.modBus().<EntityAttributeCreationEvent>addListener(e -> {
             e.put(AstikorCarts.EntityTypes.POSTILION.get(), LivingEntity.createLivingAttributes().build());
@@ -60,9 +44,9 @@ public class CommonInitializer implements Initializer {
                 rider.stopRiding();
             }
         });
-        mod.bus().<TickEvent.WorldTickEvent>addListener(e -> {
+        mod.bus().<TickEvent.LevelTickEvent>addListener(e -> {
             if (e.phase == TickEvent.Phase.END) {
-                AstikorWorld.get(e.world).ifPresent(AstikorWorld::tick);
+                AstikorWorld.get(e.level).ifPresent(AstikorWorld::tick);
             }
         });
     }

@@ -9,8 +9,8 @@ import net.minecraft.world.entity.animal.horse.Llama;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -44,16 +44,20 @@ public final class AstikorCartsConfig {
         public final CartConfig plow;
 
         Common(final ForgeConfigSpec.Builder builder) {
-            builder.comment("Configuration for all carts and cart-like vehicles\n\nDefault pull_animals = " + referencePullAnimals()).push("carts");
+            builder.comment("Configuration for all carts and cart-like vehicles, check log for automatic \"pull_animals\" list.").push("carts");
             this.supplyCart = new CartConfig(builder, "supply_cart", "The Supply Cart, a type of cart that stores items");
             this.animalCart = new CartConfig(builder, "animal_cart", "The Animal Cart, a type of cart to haul other animals");
             this.plow = new CartConfig(builder, "plow", "The Plow, an animal pulled machine for tilling soil and creating paths");
             builder.pop();
         }
 
+        public static String getComment() {
+            return "pull_animals = " + referencePullAnimals();
+        }
+
         static String referencePullAnimals() {
             return "[\n" +
-                StreamSupport.stream(ForgeRegistries.ENTITIES.spliterator(), false)
+                StreamSupport.stream(ForgeRegistries.ENTITY_TYPES.spliterator(), false)
                     .filter(type -> {
                         final Class<?> entityClass = TypeResolver.resolveRawArgument(EntityType.EntityFactory.class, Objects.requireNonNull(
                             ObfuscationReflectionHelper.getPrivateValue(EntityType.class, type, "f_20535_"),
@@ -64,9 +68,9 @@ public final class AstikorCartsConfig {
                             !ItemSteerable.class.isAssignableFrom(entityClass) &&
                             !Llama.class.isAssignableFrom(entityClass); // no horse-llamas
                     })
-                    .map(ForgeRegistryEntry::getRegistryName)
+                    .map(ForgeRegistries.ENTITY_TYPES::getKey)
                     .filter(Objects::nonNull)
-                    .map(type -> "    \"" + type.toString() + "\"")
+                    .map(type -> "    \"" + type + "\"")
                     .collect(Collectors.joining(",\n")) +
                 "\n  ]";
         }

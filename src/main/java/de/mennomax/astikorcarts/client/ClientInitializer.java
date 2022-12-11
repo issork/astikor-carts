@@ -28,11 +28,10 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.client.ClientRegistry;
-import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.client.event.ScreenOpenEvent;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.lwjgl.glfw.GLFW;
@@ -58,7 +57,7 @@ public final class ClientInitializer extends CommonInitializer {
                 }
             }
         });
-        mod.bus().<InputEvent.KeyInputEvent>addListener(e -> {
+        mod.bus().<InputEvent.Key>addListener(e -> {
             final Minecraft mc = Minecraft.getInstance();
             final Player player = mc.player;
             if (player != null) {
@@ -71,7 +70,7 @@ public final class ClientInitializer extends CommonInitializer {
                 }
             }
         });
-        mod.bus().<ScreenOpenEvent>addListener(e -> {
+        mod.bus().<ScreenEvent.Opening>addListener(e -> {
             if (e.getScreen() instanceof InventoryScreen) {
                 final LocalPlayer player = Minecraft.getInstance().player;
                 if (player != null && player.getVehicle() instanceof SupplyCartEntity) {
@@ -82,7 +81,9 @@ public final class ClientInitializer extends CommonInitializer {
         });
         mod.modBus().<FMLClientSetupEvent>addListener(e -> {
             MenuScreens.register(AstikorCarts.ContainerTypes.PLOW_CART.get(), PlowScreen::new);
-            ClientRegistry.registerKeyBinding(this.action);
+        });
+        mod.modBus().<RegisterKeyMappingsEvent>addListener(e -> {
+            e.register(this.action);
         });
         mod.modBus().<EntityRenderersEvent.RegisterRenderers>addListener(e -> {
             e.registerEntityRenderer(AstikorCarts.EntityTypes.SUPPLY_CART.get(), SupplyCartRenderer::new);
@@ -91,9 +92,9 @@ public final class ClientInitializer extends CommonInitializer {
             e.registerEntityRenderer(AstikorCarts.EntityTypes.POSTILION.get(), PostilionRenderer::new);
         });
         mod.modBus().<EntityRenderersEvent.RegisterLayerDefinitions>addListener(e -> {
-            ForgeHooksClient.registerLayerDefinition(AstikorCartsModelLayers.PLOW, PlowModel::createLayer);
-            ForgeHooksClient.registerLayerDefinition(AstikorCartsModelLayers.ANIMAL_CART, AnimalCartModel::createLayer);
-            ForgeHooksClient.registerLayerDefinition(AstikorCartsModelLayers.SUPPLY_CART, SupplyCartModel::createLayer);
+            e.registerLayerDefinition(AstikorCartsModelLayers.PLOW, PlowModel::createLayer);
+            e.registerLayerDefinition(AstikorCartsModelLayers.ANIMAL_CART, AnimalCartModel::createLayer);
+            e.registerLayerDefinition(AstikorCartsModelLayers.SUPPLY_CART, SupplyCartModel::createLayer);
         });
         new AssembledTextureFactory()
             .add(new ResourceLocation(AstikorCarts.ID, "textures/entity/animal_cart.png"), new AssembledTexture(64, 64)

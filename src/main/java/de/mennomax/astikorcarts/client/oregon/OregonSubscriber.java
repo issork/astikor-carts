@@ -5,7 +5,6 @@ import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.oregon.BasicProgram;
 import de.mennomax.astikorcarts.oregon.Oregon;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.ObjectSelectionList;
@@ -13,7 +12,7 @@ import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.achievement.StatsScreen;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.stats.Stat;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -38,12 +37,12 @@ public final class OregonSubscriber {
         bus.addListener(this::onScreenKeyPressed);
     }
 
-    private void onScreenKeyPressed(final ScreenEvent.KeyboardKeyPressedEvent.Pre event) {
+    private void onScreenKeyPressed(final ScreenEvent.KeyPressed.Pre event) {
         final Minecraft mc = Minecraft.getInstance();
         final Screen screen = event.getScreen();
         if (screen instanceof StatsScreen && (event.getKeyCode() == GLFW.GLFW_KEY_ENTER || event.getKeyCode() == GLFW.GLFW_KEY_KP_ENTER) && mc.player != null) {
             this.getSelectedStat((StatsScreen) screen).ifPresent(stat -> {
-                if (AstikorCarts.Stats.CART_ONE_CM.get().equals(stat.getValue())/* && mc.player.getStats().getValue(stat) > 2040 * 100*/) {
+                if (AstikorCarts.Stats.CART_ONE_CM.equals(stat.getValue()) && mc.player.getStats().getValue(stat) > 2040 * 100) {
                     final PlayerIO io = new PlayerIO();
                     final Oregon oregon = new Oregon(io, new Random());
                     this.setState(new ActiveState(new Thread(() -> {
@@ -174,7 +173,7 @@ public final class OregonSubscriber {
             this.in.addLast(s);
             final LocalPlayer player = Minecraft.getInstance().player;
             if (player != null) {
-                player.sendMessage(new TextComponent(s).withStyle(ChatFormatting.ITALIC, ChatFormatting.WHITE), Util.NIL_UUID);
+                player.sendSystemMessage(Component.literal(s).withStyle(ChatFormatting.ITALIC, ChatFormatting.WHITE));
             }
         }
 
@@ -198,7 +197,7 @@ public final class OregonSubscriber {
             mc.execute(() -> {
                 final LocalPlayer player = mc.player;
                 if (player != null) {
-                    player.sendMessage(new TextComponent(s).withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY), Util.NIL_UUID);
+                    player.sendSystemMessage(Component.literal(s).withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
                 }
             });
         }
