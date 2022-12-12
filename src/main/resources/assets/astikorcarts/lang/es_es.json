@@ -1,16 +1,17 @@
 {
   "item.astikorcarts.supply_cart": "Carreta",
   "item.astikorcarts.plow": "Arado",
-  "item.astikorcarts.animal_cart": "Carreta de Transporte",
+  "item.astikorcarts.animal_cart": "Carreta de transporte",
   "item.astikorcarts.wheel": "Rueda",
   "itemGroup.astikorcarts": "AstikorCarts",
   "entity.astikorcarts.supply_cart": "Carreta",
   "entity.astikorcarts.plow": "Arado",
-  "entity.astikorcarts.animal_cart": "Carreta de Transporte",
+  "entity.astikorcarts.animal_cart": "Carreta de transporte",
+  "entity.astikorcarts.postilion": "Postillón",
   "key.categories.astikorcarts": "AstikorCarts",
-  "key.astikorcarts.desc": "Botón de Acción",
+  "key.astikorcarts.desc": "Botón de acción",
   "subtitles.astikorcarts.cart.attached": "Carreta unida",
   "subtitles.astikorcarts.cart.detached": "Carreta separada",
   "subtitles.astikorcarts.cart.placed": "Carreta colocada",
-  "stat.astikorcarts.cart_one_cm": "Distancia de la Carreta"
+  "stat.astikorcarts.cart_one_cm": "Distancia de la carreta"
 }
