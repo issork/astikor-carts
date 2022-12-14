@@ -2,6 +2,7 @@ package de.mennomax.astikorcarts.client.renderer.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
@@ -28,6 +29,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.PaintingTextureManager;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
@@ -36,10 +38,12 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.PaintingVariant;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.DyeableArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.entity.BannerPattern;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
@@ -47,6 +51,7 @@ import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 import java.util.function.Predicate;
@@ -93,6 +98,11 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
         stack.pushPose();
         this.model.getBody().translateAndRotate(stack);
         contents.renderer.render(this, entity, stack, source, packedLight, cargo);
+        final List<Pair<Holder<BannerPattern>, DyeColor>> list = entity.getBannerPattern();
+        if (!list.isEmpty()) {
+            stack.translate(0.0D, -0.6D, 1.5D);
+            this.renderBanner(stack, source, packedLight, list);
+        }
         stack.popPose();
     }
 
