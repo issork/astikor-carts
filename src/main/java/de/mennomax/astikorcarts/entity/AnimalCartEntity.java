@@ -54,7 +54,12 @@ public final class AnimalCartEntity extends AbstractDrawnEntity {
                 }
             }
             return InteractionResult.sidedSuccess(this.level.isClientSide);
-        } else if (this.getPulling() != player) {
+        }
+        final InteractionResult bannerResult = this.useBanner(player, hand);
+        if (bannerResult.consumesAction()) {
+            return bannerResult;
+        }
+        if (this.getPulling() != player) {
             if (!this.canAddPassenger(player)) {
                 return InteractionResult.PASS;
             }

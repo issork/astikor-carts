@@ -1,5 +1,6 @@
 package de.mennomax.astikorcarts.entity;
 
+import com.mojang.datafixers.util.Pair;
 import de.mennomax.astikorcarts.AstikorCarts;
 import de.mennomax.astikorcarts.config.AstikorCartsConfig;
 import de.mennomax.astikorcarts.network.clientbound.UpdateDrawnMessage;
@@ -7,6 +8,7 @@ import de.mennomax.astikorcarts.util.CartWheel;
 import de.mennomax.astikorcarts.world.AstikorWorld;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
@@ -14,7 +16,11 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.IndirectEntityDamageSource;
 import net.minecraft.world.entity.Entity;
@@ -34,11 +40,15 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.DismountHelper;
+import net.minecraft.world.item.BannerItem;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BannerBlockEntity;
+import net.minecraft.world.level.block.entity.BannerPattern;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -59,6 +69,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
     private static final EntityDataAccessor<Integer> TIME_SINCE_HIT = SynchedEntityData.defineId(AbstractDrawnEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> FORWARD_DIRECTION = SynchedEntityData.defineId(AbstractDrawnEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DAMAGE_TAKEN = SynchedEntityData.defineId(AbstractDrawnEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<ItemStack> BANNER = SynchedEntityData.defineId(AbstractDrawnEntity.class, EntityDataSerializers.ITEM_STACK);
     private static final UUID PULL_SLOWLY_MODIFIER_UUID = UUID.fromString("49B0E52E-48F2-4D89-BED7-4F5DF26F1263");
     private static final UUID PULL_MODIFIER_UUID = UUID.fromString("BA594616-5BE3-46C6-8B40-7D0230C64B77");
     private int lerpSteps;
@@ -428,6 +439,27 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         return false;
     }
 
+    protected InteractionResult useBanner(final Player player, final InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (stack.is(ItemTags.BANNERS)) {
+            ItemStack oldBanner = this.getBanner();
+            if (!this.level.isClientSide) {
+                ItemStack banner = stack.split(1);
+                if (!oldBanner.isEmpty()) {
+                    if (stack.isEmpty()) {
+                        player.setItemInHand(hand, oldBanner);
+                    } else if (!player.getInventory().add(oldBanner)) {
+                        player.drop(oldBanner, false);
+                    }
+                }
+                this.playSound(SoundEvents.WOOD_PLACE, 1.0F, 0.8F);
+                this.setBanner(banner);
+            }
+            return InteractionResult.sidedSuccess(this.level.isClientSide);
+        }
+        return InteractionResult.PASS;
+    }
+
     /**
      * Called when the cart has been destroyed by a creative player or the carts
      * health hit 0.
@@ -439,6 +471,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         if (this.level.getGameRules().getBoolean(GameRules.RULE_DOENTITYDROPS)) {
             if (!byCreativePlayer) {
                 this.spawnAtLocation(this.getCartItem());
+                this.spawnAtLocation(this.getBanner());
             }
             this.onDestroyedAndDoDrops(source);
         }
@@ -451,7 +484,6 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
      * @param source
      */
     public void onDestroyedAndDoDrops(final DamageSource source) {
-
     }
 
     private void tickLerp() {
@@ -574,6 +606,22 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         return this.entityData.get(FORWARD_DIRECTION);
     }
 
+    public void setBanner(final ItemStack banner) {
+        this.entityData.set(BANNER, banner);
+    }
+
+    public ItemStack getBanner() {
+        return this.entityData.get(BANNER);
+    }
+
+    public List<Pair<Holder<BannerPattern>, DyeColor>> getBannerPattern() {
+        final ItemStack banner = this.getBanner();
+        if (banner.getItem() instanceof BannerItem item) {
+            return BannerBlockEntity.createPatterns(item.getColor(), BannerBlockEntity.getItemPatterns(banner));
+        }
+        return List.of();
+    }
+
     @Override
     public ItemStack getPickedResult(final HitResult target) {
         return new ItemStack(this.getCartItem());
@@ -599,6 +647,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         this.entityData.define(TIME_SINCE_HIT, 0);
         this.entityData.define(FORWARD_DIRECTION, 1);
         this.entityData.define(DAMAGE_TAKEN, 0.0F);
+        this.entityData.define(BANNER, ItemStack.EMPTY);
     }
 
     @Override
@@ -606,12 +655,19 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         if (compound.hasUUID("PullingUUID")) {
             this.pullingUUID = compound.getUUID("PullingUUID");
         }
+        if (compound.contains("BannerItem")) {
+            this.setBanner(ItemStack.of(compound.getCompound("BannerItem")));
+        }
     }
 
     @Override
     protected void addAdditionalSaveData(final CompoundTag compound) {
         if (this.pulling != null) {
             compound.putUUID("PullingUUID", this.pullingUUID);
+        }
+        final ItemStack banner = this.getBanner();
+        if (!banner.isEmpty()) {
+            compound.put("BannerItem", banner.save(new CompoundTag()));
         }
     }
 

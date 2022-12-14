@@ -112,6 +112,10 @@ public final class SupplyCartEntity extends AbstractDrawnInventoryEntity {
             this.openContainer(player);
             return InteractionResult.sidedSuccess(this.level.isClientSide);
         }
+        final InteractionResult bannerResult = this.useBanner(player, hand);
+        if (bannerResult.consumesAction()) {
+            return bannerResult;
+        }
         final ItemStack held = player.getItemInHand(hand);
         if (this.hasJukebox()) {
             if (this.level.isClientSide) return InteractionResult.SUCCESS;
