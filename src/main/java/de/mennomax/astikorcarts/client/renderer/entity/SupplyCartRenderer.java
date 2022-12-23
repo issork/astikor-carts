@@ -132,11 +132,13 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
     }
 
     private void renderWheel(final SupplyCartEntity entity, final PoseStack stack, final MultiBufferSource source, final int packedLight, final NonNullList<ItemStack> cargo) {
+        stack.pushPose();
         stack.translate(1.18D, 0.1D, -0.15D);
         final ModelPart wheel = this.model.getWheel();
         wheel.xRot = 0.9F;
         wheel.zRot = (float) Math.PI * 0.3F;
         wheel.render(stack, source.getBuffer(this.model.renderType(this.getTextureLocation(entity))), packedLight, OverlayTexture.NO_OVERLAY);
+        stack.popPose();
     }
 
     private void renderPaintings(final SupplyCartEntity entity, final PoseStack stack, final MultiBufferSource source, final int packedLight, final NonNullList<ItemStack> cargo) {
@@ -151,6 +153,7 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
             if (itemStack.isEmpty()) continue;
             count++;
         }
+        stack.pushPose();
         stack.translate(0.0D, -2.5D / 16.0D, 0.0D);
         stack.mulPose(Vector3f.XP.rotationDegrees(-90.0F));
         for (int i = 0, n = 0; i < cargo.size(); i++) {
@@ -163,6 +166,7 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
             this.renderPainting(t, stack, buf, packedLight);
             stack.popPose();
         }
+        stack.popPose();
     }
 
     private void renderSupplies(final SupplyCartEntity entity, final PoseStack stack, final MultiBufferSource source, final int packedLight, final NonNullList<ItemStack> cargo) {
