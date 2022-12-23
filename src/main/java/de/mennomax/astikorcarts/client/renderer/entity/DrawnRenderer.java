@@ -75,7 +75,7 @@ public abstract class DrawnRenderer<T extends AbstractDrawnEntity, M extends Ent
         stack.scale(-1.0F, -1.0F, 1.0F);
     }
 
-    protected void renderBanner(final PoseStack stack, final MultiBufferSource source, final int packedLight, final List<Pair<Holder<BannerPattern>, DyeColor>> banner) {
+    protected void renderBanner(final PoseStack stack, final MultiBufferSource source, final int packedLight, final List<Pair<BannerPattern, DyeColor>> banner) {
         stack.pushPose();
         stack.mulPose(Vector3f.YP.rotationDegrees(90.0F));
         final float scale = 2.0F / 3.0F;

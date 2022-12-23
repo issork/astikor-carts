@@ -26,7 +26,7 @@ public final class AnimalCartRenderer extends DrawnRenderer<AnimalCartEntity, An
     @Override
     protected void renderContents(final AnimalCartEntity entity, final float delta, final PoseStack stack, final MultiBufferSource source, final int packedLight) {
         super.renderContents(entity, delta, stack, source, packedLight);
-        final List<Pair<Holder<BannerPattern>, DyeColor>> list = entity.getBannerPattern();
+        final List<Pair<BannerPattern, DyeColor>> list = entity.getBannerPattern();
         if (!list.isEmpty()) {
             stack.pushPose();
             this.model.getBody().translateAndRotate(stack);

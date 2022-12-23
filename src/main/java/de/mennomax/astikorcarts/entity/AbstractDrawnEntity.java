@@ -614,7 +614,7 @@ public abstract class AbstractDrawnEntity extends Entity implements IEntityAddit
         return this.entityData.get(BANNER);
     }
 
-    public List<Pair<Holder<BannerPattern>, DyeColor>> getBannerPattern() {
+    public List<Pair<BannerPattern, DyeColor>> getBannerPattern() {
         final ItemStack banner = this.getBanner();
         if (banner.getItem() instanceof BannerItem item) {
             return BannerBlockEntity.createPatterns(item.getColor(), BannerBlockEntity.getItemPatterns(banner));

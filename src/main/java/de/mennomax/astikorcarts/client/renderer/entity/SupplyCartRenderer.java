@@ -98,7 +98,7 @@ public final class SupplyCartRenderer extends DrawnRenderer<SupplyCartEntity, Su
         stack.pushPose();
         this.model.getBody().translateAndRotate(stack);
         contents.renderer.render(this, entity, stack, source, packedLight, cargo);
-        final List<Pair<Holder<BannerPattern>, DyeColor>> list = entity.getBannerPattern();
+        final List<Pair<BannerPattern, DyeColor>> list = entity.getBannerPattern();
         if (!list.isEmpty()) {
             stack.translate(0.0D, -0.6D, 1.5D);
             this.renderBanner(stack, source, packedLight, list);
