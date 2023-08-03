@@ -25,12 +25,14 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.ContainerEntity;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -42,12 +44,13 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 
-public final class SupplyCartEntity extends AbstractDrawnInventoryEntity {
+public final class SupplyCartEntity extends AbstractDrawnInventoryEntity implements Container {
     private static final ImmutableList<EntityDataAccessor<ItemStack>> CARGO = ImmutableList.of(
         SynchedEntityData.defineId(SupplyCartEntity.class, EntityDataSerializers.ITEM_STACK),
         SynchedEntityData.defineId(SupplyCartEntity.class, EntityDataSerializers.ITEM_STACK),
@@ -239,6 +242,58 @@ public final class SupplyCartEntity extends AbstractDrawnInventoryEntity {
             player.openMenu(new SimpleMenuProvider((id, inv, plyr) -> {
                 return new SupplyCartContainer(id, inv, this);
             }, this.getDisplayName()));
+        }
+    }
+
+    @Override
+    public int getContainerSize() {
+        return this.inventory.getSlots();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        for(int i =0; i < this.inventory.getSlots(); i++){
+            ItemStack itemstack = this.inventory.getStackInSlot(i);
+            if (!itemstack.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public @NotNull ItemStack getItem(int slot) {
+        return inventory.getStackInSlot(slot);
+    }
+
+    @Override
+    public @NotNull ItemStack removeItem(int slot, int amount) {
+        return inventory.extractItem(slot, amount, false);
+    }
+
+    @Override
+    public @NotNull ItemStack removeItemNoUpdate(int slot) {
+        return inventory.extractItem(slot, 64, true);
+    }
+
+    @Override
+    public void setItem(int slot, @NotNull ItemStack stack) {
+        inventory.setStackInSlot(slot, stack);
+    }
+
+    @Override
+    public void setChanged() {
+    }
+
+    @Override
+    public boolean stillValid(@NotNull Player player) {
+        return true;
+    }
+
+    @Override
+    public void clearContent() {
+        for(int i =0; i < this.inventory.getSlots(); i++){
+            removeItemNoUpdate(i);
         }
     }
 
