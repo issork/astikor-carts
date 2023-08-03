@@ -9,7 +9,7 @@ displayName="AstikorCarts"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/astikorcarts"
 # A file name (in the root of the mod JAR) containing a logo for display
 #logoFile="examplemod.png"
-authors="MennoMax, pau101"
+authors="MennoMax, pau101, talhanation"
 description="This mod adds carts that can be pulled by other entities to the game.\nTo attach an entity, press the \"Action Key\" specified in the controls.\n\nYou might have to add the entity in the config file first."
 
 [[dependencies.astikorcarts]]
