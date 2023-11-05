@@ -1,0 +1,17 @@
+{
+  "item.astikorcarts.supply_cart": "Zasobovaci vozik",
+  "item.astikorcarts.plow": "Pluh",
+  "item.astikorcarts.animal_cart": "Zvi?eci vozik",
+  "item.astikorcarts.wheel": "Kolo",
+  "itemGroup.astikorcarts": "AstikorCarts",
+  "entity.astikorcarts.supply_cart": "Zasobovaci vozik",
+  "entity.astikorcarts.plow": "Pluh",
+  "entity.astikorcarts.animal_cart": "Zvi?eci vozik",
+  "entity.astikorcarts.postilion": "P?eprav?ik",
+  "key.categories.astikorcarts": "AstikorCarts",
+  "key.astikorcarts.desc": "Pou?it vozik",
+  "subtitles.astikorcarts.cart.attached": "Vozik p?ipojen",
+  "subtitles.astikorcarts.cart.detached": "Vozik odpojen",
+  "subtitles.astikorcarts.cart.placed": "Vozik umist?n",
+  "stat.astikorcarts.cart_one_cm": "Jizdni vzdalenost vozikem"
+}
