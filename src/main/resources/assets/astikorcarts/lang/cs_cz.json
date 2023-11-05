@@ -1,0 +1,17 @@
+{
+  "item.astikorcarts.supply_cart": "Zásobovací vozík",
+  "item.astikorcarts.plow": "Pluh",
+  "item.astikorcarts.animal_cart": "Zvířecí vozík",
+  "item.astikorcarts.wheel": "Kolo",
+  "itemGroup.astikorcarts": "AstikorCarts",
+  "entity.astikorcarts.supply_cart": "Zasobovací vozík",
+  "entity.astikorcarts.plow": "Pluh",
+  "entity.astikorcarts.animal_cart": "Zvířecí vozík",
+  "entity.astikorcarts.postilion": "Přepravčík",
+  "key.categories.astikorcarts": "AstikorCarts",
+  "key.astikorcarts.desc": "Použít vozík",
+  "subtitles.astikorcarts.cart.attached": "Vozík připojen",
+  "subtitles.astikorcarts.cart.detached": "Vozik odpojen",
+  "subtitles.astikorcarts.cart.placed": "Vozík umístěn",
+  "stat.astikorcarts.cart_one_cm": "Jízdní vzdálenost vozíkem"
+}
